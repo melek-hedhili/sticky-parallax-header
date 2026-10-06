@@ -70,7 +70,7 @@ const AppNavigator: React.FC = () => (
       <Stack.Screen
         name={ROUTES.TABBED_HEADER_WITH_SECTION_LISTS}
         component={TabbedHeaderWithSectionListsExample}
-        options={{ headerShown: true }}
+        options={{ headerShown: true, title: 'SectionList Tabs' }}
       />
       <Stack.Screen
         name={ROUTES.TABBED_HEADER_FLASHLIST}

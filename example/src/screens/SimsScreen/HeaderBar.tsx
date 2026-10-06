@@ -2,7 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
 import * as React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '../../constants';
@@ -10,10 +11,11 @@ import { colors } from '../../constants';
 import { simsScreenTestIDs } from './testIDs';
 
 interface HeaderBarProps {
-  scrollValue: Animated.SharedValue<number>;
+  scrollValue: SharedValue<number>;
 }
 
 const DEFAULT_TOP_INSET = 30;
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({ scrollValue }) => {
   const navigation = useNavigation();
@@ -32,25 +34,31 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ scrollValue }) => {
             scrollValue.value,
             [0, 110, 160],
             [24, 24, -40],
-            Extrapolate.CLAMP
+            Extrapolation.CLAMP
           ),
         },
       ],
     };
   }, [scrollValue]);
   const headerContainerAnimatedStyle = useAnimatedStyle(() => {
-    return { opacity: interpolate(scrollValue.value, [0, 110, 150], [0, 0, 1], Extrapolate.CLAMP) };
+    return {
+      opacity: interpolate(scrollValue.value, [0, 110, 150], [0, 0, 1], Extrapolation.CLAMP),
+    };
   }, [scrollValue]);
   const headerButtonAnimatedStyle = useAnimatedStyle(() => {
-    return { opacity: interpolate(scrollValue.value, [0, 110, 140], [1, 1, 0], Extrapolate.CLAMP) };
+    return {
+      opacity: interpolate(scrollValue.value, [0, 110, 140], [1, 1, 0], Extrapolation.CLAMP),
+    };
   }, [scrollValue]);
   const headerDetailsContainerAnimatedStyle = useAnimatedStyle(() => {
-    return { opacity: interpolate(scrollValue.value, [0, 250, 330], [0, 0, 1], Extrapolate.CLAMP) };
+    return {
+      opacity: interpolate(scrollValue.value, [0, 250, 330], [0, 0, 1], Extrapolation.CLAMP),
+    };
   }, [scrollValue]);
 
   return (
     <>
-      <TouchableOpacity
+      <AnimatedTouchableOpacity
         onPress={goBack}
         style={[
           styles.headerButtonContainer,
@@ -67,7 +75,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ scrollValue }) => {
             }}
           />
         </Animated.View>
-      </TouchableOpacity>
+      </AnimatedTouchableOpacity>
       <Animated.View style={[styles.headerContainer, headerContainerAnimatedStyle]}>
         <BlurView style={styles.headerBlurView} tint="dark" intensity={90} />
       </Animated.View>

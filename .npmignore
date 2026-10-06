@@ -1,9 +1,11 @@
-readme_*
-examples
-docs
-node_modules
-yarn-error.log
-.history
-.DS_Store
-/assets
-!src/assets
+# Yarn Classic's files whitelist takes precedence; keep production paths explicit.
+**/__tests__/**
+**/__fixtures__/**
+**/__mocks__/**
+**/*.test.*
+**/*.spec.*
+example/**
+test-app/**
+docs/**
+node_modules/**
+package-lock.json

@@ -43,7 +43,7 @@ android.iml
 
 # Cocoapods
 #
-../sticky-parallax-header/example/example/ios/Pods
+**/ios/Pods/
 
 # node.js
 #
@@ -67,3 +67,9 @@ lib/
 /example/vendor/bundle
 
 .npmrc
+
+# Modern docs and native caches
+**/.docusaurus/
+**/.cxx/
+**/dist/
+/test-app/vendor/bundle

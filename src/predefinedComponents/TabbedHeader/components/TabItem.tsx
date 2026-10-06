@@ -6,15 +6,14 @@ import Animated from 'react-native-reanimated';
 import { colors } from '../../../constants';
 import type { Tab, TabsConfig } from '../../common/SharedProps';
 
-interface TabItemProps
-  extends Pick<
-    TabsConfig,
-    | 'tabTextActiveStyle'
-    | 'tabTextContainerActiveStyle'
-    | 'tabTextContainerStyle'
-    | 'tabTextStyle'
-    | 'tabWrapperStyle'
-  > {
+interface TabItemProps extends Pick<
+  TabsConfig,
+  | 'tabTextActiveStyle'
+  | 'tabTextContainerActiveStyle'
+  | 'tabTextContainerStyle'
+  | 'tabTextStyle'
+  | 'tabWrapperStyle'
+> {
   tab: Tab;
   page: number;
   activeTab: number;

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import type { FlatList } from 'react-native';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { commonStyles } from '../../constants';
+import type { FlatListRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderFlatList } from '../../primitiveComponents/StickyHeaderFlatList';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
@@ -13,7 +13,7 @@ import { useAvatarHeader } from './hooks/useAvatarHeader';
 
 function AvatarHeaderFlatListInner<ItemT>(
   props: AvatarHeaderFlatListProps<ItemT>,
-  ref: React.ForwardedRef<FlatList<ItemT>>
+  ref: React.ForwardedRef<FlatListRef<ItemT>>
 ) {
   const {
     backgroundColor,
@@ -49,9 +49,9 @@ function AvatarHeaderFlatListInner<ItemT>(
     renderHeader: defaultRenderHeader,
     scrollValue,
     scrollViewRef,
-  } = useAvatarHeader<FlatList<ItemT>>(props);
+  } = useAvatarHeader<FlatListRef<ItemT>>(props);
 
-  React.useImperativeHandle(ref, () => scrollViewRef.current as FlatList<ItemT>);
+  React.useImperativeHandle(ref, () => scrollViewRef.current as FlatListRef<ItemT>);
 
   const wrapperAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -105,7 +105,7 @@ function AvatarHeaderFlatListInner<ItemT>(
 }
 
 type AvatarHeaderFlatListType = <ItemT>(
-  props: AvatarHeaderFlatListProps<ItemT> & React.RefAttributes<FlatList<ItemT>>
+  props: AvatarHeaderFlatListProps<ItemT> & React.RefAttributes<FlatListRef<ItemT>>
 ) => React.ReactElement;
 
 export const AvatarHeaderFlatList = React.forwardRef(

@@ -1,17 +1,23 @@
-import type { FlashList } from '@shopify/flash-list';
+import type { FlashListRef } from '@shopify/flash-list';
 import { useMemo } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import type { ColorValue } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import { useResponsiveSize } from '../../../hooks/useResponsiveSize';
 import { useStickyHeaderFlashListScrollProps } from '../../../primitiveComponents/useStickyHeaderFlashListScrollProps';
 import type { SharedPredefinedProps } from '../SharedProps';
 
+import { usePredefinedHeaderHeight } from './usePredefinedHeaderHeight';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function usePredefinedFlashListHeader<T extends FlashList<any>>(
+export function usePredefinedFlashListHeader<T extends FlashListRef<any>>(
   props: SharedPredefinedProps
-) {
-  const { height } = useWindowDimensions();
-  const { responsiveHeight } = useResponsiveSize();
+): ReturnType<typeof useStickyHeaderFlashListScrollProps<T>> & {
+  contentBackgroundColor: ColorValue | undefined;
+  innerScrollHeight: number;
+  parallaxHeight: number;
+} {
+  const { contentContainerStyle, headerHeight = 100 } = props;
+  const { height, parallaxHeight } = usePredefinedHeaderHeight(props.parallaxHeight);
 
   const {
     onMomentumScrollEnd,
@@ -20,15 +26,9 @@ export function usePredefinedFlashListHeader<T extends FlashList<any>>(
     scrollHeight,
     scrollValue,
     scrollViewRef,
-  } = useStickyHeaderFlashListScrollProps<T>(props);
+  } = useStickyHeaderFlashListScrollProps<T>({ ...props, parallaxHeight });
 
-  const {
-    contentContainerStyle,
-    headerHeight = 100,
-    parallaxHeight = responsiveHeight(53),
-  } = props;
-
-  const innerScrollHeight = height - headerHeight - parallaxHeight;
+  const innerScrollHeight = Math.max(0, height - headerHeight - scrollHeight);
 
   const { contentBackgroundColor } = useMemo(() => {
     const contentContainerFlattenedStyle = StyleSheet.flatten(contentContainerStyle);

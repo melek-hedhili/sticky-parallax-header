@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { PixelRatio, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, screenStyles } from '../../constants';
+import { colors } from '../../constants';
 
 export const Tabs: React.FC = () => {
   return (
@@ -23,7 +23,7 @@ const Tab: React.FC<{ title: string }> = ({ title }) => {
         color: colors.paleGrey,
       }}
       style={({ pressed }) => [styles.tab, pressed && styles.pressedTab]}>
-      <Text style={[screenStyles.text, styles.tabTitle]}>{title}</Text>
+      <Text style={styles.tabTitle}>{title}</Text>
     </Pressable>
   );
 };
@@ -36,29 +36,25 @@ const styles = StyleSheet.create({
     }),
   },
   tab: {
-    alignItems: 'flex-start',
-    margin: 10 / PixelRatio.get(),
-    padding: 10 / PixelRatio.get(),
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: 48,
+    paddingHorizontal: 4,
+    paddingVertical: 12,
   },
   tabTitle: {
-    fontSize: 16 / PixelRatio.getFontScale(),
-    fontWeight: 'bold',
-    padding: 10 / PixelRatio.get(),
-    textAlign: 'left',
+    color: colors.white,
+    fontFamily: 'AvertaStd-Semibold',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
   },
   tabsContainer: {
     alignItems: 'center',
-    backgroundColor: colors.purpleishBlue,
-    elevation: 2,
+    backgroundColor: colors.secondaryGreen,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    padding: 10,
-    shadowColor: Platform.select({
-      ios: 'gray',
-      default: undefined,
-    }),
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.7,
-    shadowRadius: 0.8,
+    paddingHorizontal: 12,
   },
 });

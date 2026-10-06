@@ -1,0 +1,12 @@
+**/node_modules/
+lib/
+**/build/
+**/dist/
+docs/.docusaurus/
+**/.expo/
+**/ios/Pods/
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+package-lock.json
+**/yarn.lock

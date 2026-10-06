@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { share } from '../../assets/icons';
 import { colors } from '../../constants';
@@ -8,12 +9,14 @@ import { colors } from '../../constants';
 import { simsScreenTestIDs } from './testIDs';
 
 interface ForegroundProps {
-  scrollValue: Animated.SharedValue<number>;
+  scrollValue: SharedValue<number>;
 }
 
 export const Foreground: React.FC<ForegroundProps> = ({ scrollValue }) => {
   const foregroundWrapperAnimatedStyle = useAnimatedStyle(() => {
-    return { opacity: interpolate(scrollValue.value, [0, 250, 330], [1, 1, 0], Extrapolate.CLAMP) };
+    return {
+      opacity: interpolate(scrollValue.value, [0, 250, 330], [1, 1, 0], Extrapolation.CLAMP),
+    };
   }, [scrollValue]);
 
   return (

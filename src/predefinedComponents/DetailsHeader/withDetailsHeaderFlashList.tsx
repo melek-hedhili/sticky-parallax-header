@@ -1,27 +1,34 @@
-import type { FlashList, FlashListProps } from '@shopify/flash-list';
+import type { FlashList, FlashListRef } from '@shopify/flash-list';
 import * as React from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { commonStyles } from '../../constants';
-import type { StickyHeaderFlashListProps } from '../../primitiveComponents/StickyHeaderProps';
+import type { FlashListComponent } from '../../primitiveComponents/withStickyHeaderFlashList';
 import { withStickyHeaderFlashList } from '../../primitiveComponents/withStickyHeaderFlashList';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
-import type { DetailsHeaderFlashListProps } from './DetailsHeaderProps';
+import type { DetailsHeaderFlashListProps } from './DetailsHeaderFlashListProps';
 import { HeaderBar } from './components/HeaderBar';
 import { useDetailsFlashListHeader } from './hooks/useDetailsFlashListHeader';
 
+export function withDetailsHeaderFlashList(
+  flashListComponent: typeof FlashList
+): <ItemT>(
+  props: DetailsHeaderFlashListProps<ItemT> & React.RefAttributes<FlashListRef<ItemT>>
+) => React.ReactElement | null;
 export function withDetailsHeaderFlashList<ItemT>(
-  flashListComponent: React.ComponentClass<FlashListProps<ItemT>>
-) {
-  const StickyHeaderFlashList = withStickyHeaderFlashList(
-    flashListComponent as React.ComponentClass<FlashListProps<ItemT>>
-  ) as (
-    props: StickyHeaderFlashListProps<ItemT> & React.RefAttributes<FlashList<ItemT>>
-  ) => React.ReactElement;
+  flashListComponent: FlashListComponent<ItemT>
+): React.ForwardRefExoticComponent<
+  React.PropsWithoutRef<DetailsHeaderFlashListProps<ItemT>> &
+    React.RefAttributes<FlashListRef<ItemT>>
+>;
+export function withDetailsHeaderFlashList<ItemT>(
+  flashListComponent: FlashListComponent<ItemT>
+): unknown {
+  const StickyHeaderFlashList = withStickyHeaderFlashList<ItemT>(flashListComponent);
 
-  return React.forwardRef<FlashList<ItemT>, DetailsHeaderFlashListProps<ItemT>>((props, ref) => {
+  return React.forwardRef<FlashListRef<ItemT>, DetailsHeaderFlashListProps<ItemT>>((props, ref) => {
     const {
       backgroundColor,
       decelerationRate = 'fast',
@@ -52,7 +59,7 @@ export function withDetailsHeaderFlashList<ItemT>(
       onMomentumScrollEnd,
     } = useDetailsFlashListHeader<ItemT>(props);
 
-    React.useImperativeHandle(ref, () => scrollViewRef.current as FlashList<ItemT>);
+    React.useImperativeHandle(ref, () => scrollViewRef.current as FlashListRef<ItemT>);
 
     const wrapperAnimatedStyle = useAnimatedStyle(() => {
       return {

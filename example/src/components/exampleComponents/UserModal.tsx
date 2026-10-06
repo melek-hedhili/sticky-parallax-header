@@ -20,7 +20,7 @@ interface Props {
 const UserModal: React.FC<Props> = ({ setModalVisible, user, onPressCloseModal }) => {
   const navigation = useNavigation<RootStackNavigationProp>();
   const insets = useSafeAreaInsets();
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const title = "Author's Quizes";
   const cards = React.useMemo(

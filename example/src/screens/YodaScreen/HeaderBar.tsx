@@ -1,7 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors } from '../../constants';
@@ -9,7 +10,7 @@ import { colors } from '../../constants';
 import { yodaScreenTestIDs } from './testIDs';
 
 interface HeaderBarProps {
-  scrollValue: Animated.SharedValue<number>;
+  scrollValue: SharedValue<number>;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({ scrollValue }) => {
@@ -19,7 +20,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ scrollValue }) => {
   }, [navigation]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    return { opacity: interpolate(scrollValue.value, [0, 60, 90], [0, 0, 1], Extrapolate.CLAMP) };
+    return { opacity: interpolate(scrollValue.value, [0, 60, 90], [0, 0, 1], Extrapolation.CLAMP) };
   }, [scrollValue]);
 
   return (

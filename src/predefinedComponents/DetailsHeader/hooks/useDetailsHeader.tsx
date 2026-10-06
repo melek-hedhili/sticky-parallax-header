@@ -1,14 +1,16 @@
 import * as React from 'react';
-import { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { ViewStyle } from 'react-native';
+import type { AnimatedStyle } from 'react-native-reanimated';
+import { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import type { ScrollComponent } from '../../common/SharedProps';
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedHeader } from '../../common/hooks/usePredefinedHeader';
 import { scrollPosition } from '../../common/utils/scrollPosition';
-import type { DetailsHeaderScrollViewProps } from '../DetailsHeaderProps';
+import type { DetailsHeaderSharedProps } from '../DetailsHeaderProps';
 import { Foreground } from '../components/HeaderForeground';
 
-export function useDetailsHeader<T extends ScrollComponent>(props: DetailsHeaderScrollViewProps) {
+export function useDetailsHeader<T extends ScrollComponent>(props: DetailsHeaderSharedProps) {
   const {
     contentBackgroundColor,
     onMomentumScrollEnd,
@@ -47,7 +49,12 @@ export function useDetailsHeader<T extends ScrollComponent>(props: DetailsHeader
   ];
   const headerTitleContainerAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(scrollValue.value, headerTitleInputRange, [0, 0, 1], Extrapolate.CLAMP),
+      opacity: interpolate(
+        scrollValue.value,
+        headerTitleInputRange,
+        [0, 0, 1],
+        Extrapolation.CLAMP
+      ),
     };
   });
 
@@ -108,7 +115,8 @@ export function useDetailsHeader<T extends ScrollComponent>(props: DetailsHeader
   ]);
 
   return {
-    headerTitleContainerAnimatedStyle,
+    headerTitleContainerAnimatedStyle:
+      headerTitleContainerAnimatedStyle as AnimatedStyle<ViewStyle>,
     onMomentumScrollEnd,
     onScroll,
     onScrollEndDrag,

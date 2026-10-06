@@ -1,8 +1,7 @@
 import type { ImageSourcePropType, StyleProp, TextStyle } from 'react-native';
-import type Animated from 'react-native-reanimated';
+import type { AnimatedStyle } from 'react-native-reanimated';
 
 import type {
-  StickyHeaderFlashListProps,
   StickyHeaderFlatListProps,
   StickyHeaderScrollViewProps,
   StickyHeaderSectionListProps,
@@ -14,26 +13,19 @@ export interface AvatarHeaderSharedProps extends IconProps, SharedPredefinedProp
   hasBorderRadius?: boolean;
   image?: ImageSourcePropType;
   subtitle?: string;
-  subtitleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  subtitleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   subtitleTestID?: string;
   tabsContainerBackgroundColor?: AnimatedColorProp;
   title?: string;
-  titleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  titleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   titleTestID?: string;
 }
 
 export interface AvatarHeaderScrollViewProps
-  extends AvatarHeaderSharedProps,
-    StickyHeaderScrollViewProps {}
+  extends AvatarHeaderSharedProps, StickyHeaderScrollViewProps {}
 
 export interface AvatarHeaderFlatListProps<ItemT>
-  extends AvatarHeaderSharedProps,
-    StickyHeaderFlatListProps<ItemT> {}
+  extends AvatarHeaderSharedProps, StickyHeaderFlatListProps<ItemT> {}
 
 export interface AvatarHeaderSectionListProps<ItemT, SectionT>
-  extends AvatarHeaderSharedProps,
-    StickyHeaderSectionListProps<ItemT, SectionT> {}
-
-export interface AvatarHeaderFlashListProps<ItemT>
-  extends Omit<AvatarHeaderSharedProps, 'contentContainerStyle'>,
-    StickyHeaderFlashListProps<ItemT> {}
+  extends AvatarHeaderSharedProps, StickyHeaderSectionListProps<ItemT, SectionT> {}

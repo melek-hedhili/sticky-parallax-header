@@ -1,9 +1,9 @@
 import * as React from 'react';
-import type { SectionList } from 'react-native';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { commonStyles } from '../../constants';
+import type { SectionListRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderSectionList } from '../../primitiveComponents/StickyHeaderSectionList';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
@@ -13,7 +13,7 @@ import { useDetailsHeader } from './hooks/useDetailsHeader';
 
 function DetailsHeaderSectionListInner<ItemT, SectionT>(
   props: DetailsHeaderSectionListProps<ItemT, SectionT>,
-  ref: React.ForwardedRef<SectionList<ItemT, SectionT>>
+  ref: React.ForwardedRef<SectionListRef<ItemT, SectionT>>
 ) {
   const {
     backgroundColor,
@@ -48,9 +48,9 @@ function DetailsHeaderSectionListInner<ItemT, SectionT>(
     onMomentumScrollEnd,
     renderHeader: defaultRenderHeader,
     scrollViewRef,
-  } = useDetailsHeader<SectionList<ItemT, SectionT>>(props);
+  } = useDetailsHeader<SectionListRef<ItemT, SectionT>>(props);
 
-  React.useImperativeHandle(ref, () => scrollViewRef.current as SectionList<ItemT, SectionT>);
+  React.useImperativeHandle(ref, () => scrollViewRef.current as SectionListRef<ItemT, SectionT>);
 
   const wrapperAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -104,7 +104,7 @@ function DetailsHeaderSectionListInner<ItemT, SectionT>(
 
 type DetailsHeaderSectionListType = <ItemT, SectionT>(
   props: DetailsHeaderSectionListProps<ItemT, SectionT> &
-    React.RefAttributes<SectionList<ItemT, SectionT>>
+    React.RefAttributes<SectionListRef<ItemT, SectionT>>
 ) => React.ReactElement;
 
 export const DetailsHeaderSectionList = React.forwardRef(

@@ -1,14 +1,9 @@
-import type { FlashList } from '@shopify/flash-list';
+import type { FlashListRef } from '@shopify/flash-list';
 import { useCallback, useEffect, useRef } from 'react';
 import type { NativeScrollEvent } from 'react-native';
 import { Platform } from 'react-native';
-import {
-  runOnJS,
-  useAnimatedReaction,
-  useAnimatedRef,
-  useSharedValue,
-  useWorkletCallback,
-} from 'react-native-reanimated';
+import { useAnimatedReaction, useAnimatedRef, useSharedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { useResponsiveSize } from '../hooks/useResponsiveSize';
 
@@ -17,10 +12,11 @@ import type { StickyHeaderSharedProps, StickyHeaderSnapProps } from './StickyHea
 const VELOCITY_THRESHOLD = 7;
 
 // FIXME: unknown does not work here :/
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useStickyHeaderFlashListScrollProps<T extends FlashList<any> = FlashList<any>>(
-  props: StickyHeaderSharedProps & StickyHeaderSnapProps
-) {
+
+export function useStickyHeaderFlashListScrollProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends FlashListRef<any> = FlashListRef<any>,
+>(props: StickyHeaderSharedProps & StickyHeaderSnapProps) {
   const { responsiveHeight } = useResponsiveSize();
 
   const {
@@ -46,7 +42,7 @@ export function useStickyHeaderFlashListScrollProps<T extends FlashList<any> = F
     onTopReachedRef.current = onTopReached;
   }, [onTopReached]);
 
-  function maybeTopReached(value: number) {
+  const maybeTopReached = useCallback((value: number) => {
     if (value <= 0) {
       if (!onTopReachedWasCalled.current && onTopReachedRef.current) {
         onTopReachedRef.current();
@@ -55,14 +51,14 @@ export function useStickyHeaderFlashListScrollProps<T extends FlashList<any> = F
     } else {
       onTopReachedWasCalled.current = false;
     }
-  }
+  }, []);
 
   useAnimatedReaction(
     () => scrollValue.value,
     (value) => {
-      runOnJS(maybeTopReached)(value);
+      scheduleOnRN(maybeTopReached, value);
     },
-    [scrollValue]
+    [maybeTopReached, scrollValue]
   );
 
   const scrollHeight = Math.max(parallaxHeight, headerHeight * 2);
@@ -75,8 +71,9 @@ export function useStickyHeaderFlashListScrollProps<T extends FlashList<any> = F
     scrollViewRef.current?.scrollToOffset({ animated: true, offset: scrollHeight });
   }, [scrollHeight, scrollViewRef]);
 
-  const onSnapToEdge = useWorkletCallback(
+  const onSnapToEdge = useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       const scrollToHeight = snapStopThreshold ?? scrollHeight;
       const snapToEdgeThreshold = snapStartThreshold ?? scrollHeight / 2;
 
@@ -103,12 +100,12 @@ export function useStickyHeaderFlashListScrollProps<T extends FlashList<any> = F
         // TODO: when react-native-web will support onMomentumScrollEnd & onScrollEndDrag events
         // handle web snap scroll
         if (isUnderSnapToEdgeThresholdAndDragIsSlow || isOverSnapToEdgeThresholdAndDragIsQuick) {
-          runOnJS(snapToTop)();
+          scheduleOnRN(snapToTop);
         } else if (
           isOverSnapToEdgeThresholdAndDragIsSlow ||
           isUnderSnapToEdgeThresholdAndDragIsQuick
         ) {
-          runOnJS(snapToBottom)();
+          scheduleOnRN(snapToBottom);
         }
       }
     },
@@ -123,16 +120,18 @@ export function useStickyHeaderFlashListScrollProps<T extends FlashList<any> = F
     ]
   );
 
-  const onMomentumScrollEndInternal = useWorkletCallback(
+  const onMomentumScrollEndInternal = useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       onMomentumScrollEnd?.(e);
       onSnapToEdge(e);
     },
     [onMomentumScrollEnd, onSnapToEdge]
   );
 
-  const onScrollEndDragInternal = useWorkletCallback(
+  const onScrollEndDragInternal = useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       onScrollEndDrag?.(e);
       if (Platform.OS === 'android' || Math.abs(e.velocity?.y ?? 0) > 0) {
         return;
@@ -143,12 +142,13 @@ export function useStickyHeaderFlashListScrollProps<T extends FlashList<any> = F
     [onScrollEndDrag, onSnapToEdge]
   );
 
-  const onScrollInternal = useWorkletCallback(
+  const onScrollInternal = useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       scrollValue.value = e.contentOffset.y;
       onScroll?.(e);
     },
-    [onScroll]
+    [onScroll, scrollValue]
   );
 
   return {

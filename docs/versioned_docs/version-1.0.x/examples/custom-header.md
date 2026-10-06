@@ -6,6 +6,8 @@ sidebar_position: 2
 
 To create custom header layout, you'll have to use `StickyHeader(ScrollView|FlatList|SectionList)` & `useStickyHeaderScrollProps`. If you want to use custom scroll component, instead of `StickyHeader(ScrollView|FlatList|SectionList)`, you can wrap your custom scroll component in `withStickyHeader` HOC.
 
+## Scroll props
+
 For scroll props use `useStickyHeaderScrollProps` hook, which is responsible for creating "snap effect" behavior.
 
 Props returned from `useStickyHeaderScrollProps` should be passed to sticky header component (`StickyHeader(ScrollView|FlatList|SectionList)` or `withStickyHeader` decorated scroll component).

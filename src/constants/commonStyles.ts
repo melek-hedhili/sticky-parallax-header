@@ -23,6 +23,11 @@ const commonStyles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-around',
   },
+  headerBarContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+  },
   headerWrapper: {
     alignItems: 'center',
     alignSelf: 'stretch',

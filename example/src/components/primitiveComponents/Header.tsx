@@ -1,13 +1,20 @@
 import * as React from 'react';
-import { Image, PixelRatio, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
+
+import { logo } from '../../assets/images';
+import { colors, screenStyles } from '../../constants';
 
 export const Header: React.FC = () => {
   return (
     <View style={styles.headerContainer}>
       <Image
-        source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
+        accessibilityLabel="Netguru"
+        resizeMode="contain"
+        source={logo}
         style={styles.headerImage}
       />
+      <Text style={styles.title}>Explore sticky headers</Text>
+      <Text style={[screenStyles.text, styles.description]}>Scroll to collapse the header.</Text>
     </View>
   );
 };
@@ -16,11 +23,29 @@ const styles = StyleSheet.create({
   headerContainer: {
     alignItems: 'center',
     alignSelf: 'stretch',
+    backgroundColor: colors.primaryGreen,
     justifyContent: 'center',
-    padding: 50 / PixelRatio.get(),
+    minHeight: 200,
+    paddingHorizontal: 24,
+    paddingVertical: 24,
   },
   headerImage: {
-    height: 200 / PixelRatio.get(),
-    width: 200 / PixelRatio.get(),
+    height: 24,
+    width: 142,
+  },
+  title: {
+    color: colors.white,
+    fontFamily: 'AvertaStd-Semibold',
+    fontSize: 24,
+    lineHeight: 28,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  description: {
+    color: colors.white,
+    fontSize: 16,
+    lineHeight: 24,
+    marginTop: 8,
+    textAlign: 'center',
   },
 });

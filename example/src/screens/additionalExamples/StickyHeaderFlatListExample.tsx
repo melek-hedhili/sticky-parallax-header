@@ -19,7 +19,7 @@ export const StickyHeaderFlatListExample: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={screenStyles.screenContainer}>
+    <SafeAreaView style={[screenStyles.screenContainer, screenStyles.lightBackground]}>
       <StickyHeaderFlatList
         containerStyle={screenStyles.stretchContainer}
         data={DATA}

@@ -9,7 +9,7 @@ import type { RootStackNavigationProp } from '../../navigation/types';
 import { homeScreenTestIDs } from './testIDs';
 
 interface ExampleLinkProps {
-  routeName: typeof ROUTES[keyof typeof ROUTES];
+  routeName: (typeof ROUTES)[keyof typeof ROUTES];
   label: string;
   testID: string;
 }
@@ -116,9 +116,13 @@ export const ExampleLink: React.FC<ExampleLinkProps> = ({ routeName, label, test
   const navigation = useNavigation<RootStackNavigationProp>();
 
   const navigateTo = React.useCallback(
-    (route: typeof ROUTES[keyof typeof ROUTES]) => {
+    (route: (typeof ROUTES)[keyof typeof ROUTES]) => {
       return () => {
-        navigation.navigate(route);
+        if (route === ROUTES.CARD) {
+          navigation.navigate(route, {});
+        } else {
+          navigation.navigate(route);
+        }
       };
     },
     [navigation]

@@ -1,7 +1,6 @@
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
-const lightCodeTheme = require('prism-react-renderer/themes/github');
+const { themes } = require('prism-react-renderer');
 
-/** @type {import('@docusaurus/types').DocusaurusConfig} */
+/** @type {import('@docusaurus/types').Config} */
 module.exports = {
   title: 'React Native Sticky Parallax Header',
   tagline:
@@ -9,7 +8,12 @@ module.exports = {
   url: 'https://netguru.github.io',
   baseUrl: '/sticky-parallax-header/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenAnchors: 'throw',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+    },
+  },
   favicon: 'img/netguru_logo.png',
   organizationName: 'netguru', // Usually your GitHub org/user name.
   projectName: 'sticky-parallax-header', // Usually your repo name.
@@ -79,8 +83,9 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Netguru, Inc. Built with Docusaurus.`,
     },
     prism: {
-      theme: lightCodeTheme,
-      darkTheme: darkCodeTheme,
+      theme: themes.github,
+      darkTheme: themes.dracula,
+      additionalLanguages: ['bash', 'diff', 'json'],
     },
   },
   presets: [

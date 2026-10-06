@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
-import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import type { AnimatedColorProp } from '../SharedProps';
 import { parseAnimatedColorProp } from '../utils/parseAnimatedColorProp';
@@ -9,7 +10,7 @@ interface HeaderBackgroundProps {
   backgroundColor?: AnimatedColorProp;
   hasBorderRadius?: boolean;
   height: number;
-  scrollValue: Animated.SharedValue<number>;
+  scrollValue: SharedValue<number>;
 }
 
 export const HeaderBackground: React.FC<HeaderBackgroundProps> = ({
@@ -31,7 +32,7 @@ export const HeaderBackground: React.FC<HeaderBackgroundProps> = ({
         scrollValue.value,
         [0, height],
         [80, 0],
-        Extrapolate.EXTEND
+        Extrapolation.EXTEND
       ),
     };
   }, [backgroundColor, hasBorderRadius, scrollValue, height]);

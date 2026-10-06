@@ -1,14 +1,31 @@
-This pull request resolves ???
+## Change
 
-**Description**
+<!-- Describe the problem, its trigger, and the resulting behavior. Link an issue if available. -->
 
-<!-- Describe, what this pull request is solving. -->
+## Compatibility and affected areas
 
-**Affected platforms**
+<!-- State any impact on public exports, props, refs, worklets, or dependency requirements. -->
 
+- [ ] Library
+- [ ] Example app
+- [ ] Documentation or tooling
 - [ ] Android
 - [ ] iOS
+- [ ] Web
 
-**Test plan/screenshots/videos**
+## Validation
 
-<!-- Demonstrate steps to check proposed changes. Add screenshots and/or videos if there are UI changes. -->
+<!-- Follow CONTRIBUTING.md. Record exact commands and outcomes;
+     distinguish new failures from existing limitations.
+     Report JS regressions, strict packed-consumer results, and actual native/browser interactions separately. -->
+
+| Command or scenario | Result | Existing failure or new issue |
+| ------------------- | ------ | ----------------------------- |
+|                     |        |                               |
+
+<!-- List checks/platforms not run and why. For UI changes, describe exercised
+     interactions and attach screenshots or video when useful. -->
+
+## Remaining work
+
+<!-- Record unresolved questions, follow-up work, and any documentation/baseline updates. -->

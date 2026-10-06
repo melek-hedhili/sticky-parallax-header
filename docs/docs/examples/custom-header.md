@@ -4,24 +4,22 @@ sidebar_position: 2
 
 # Custom Header
 
-To create custom header layout, you'll have to use `StickyHeader(ScrollView|FlatList|SectionList)` & `useStickyHeaderScrollProps`. If you want to use custom scroll component, instead of `StickyHeader(ScrollView|FlatList|SectionList)`, you can wrap your custom scroll component in `withStickyHeader` HOC.
+Use `StickyHeaderScrollView`, `StickyHeaderFlatList`, or `StickyHeaderSectionList` to supply your own `renderHeader` and `renderTabs`. Wrap another compatible scroll component with `withStickyHeader` when needed. FlashList has a [separate adapter](custom-flashlist-header.md).
 
-For scroll props use `useStickyHeaderScrollProps` hook, which is responsible for creating "snap effect" behavior.
+## Scroll props
 
-Props returned from `useStickyHeaderScrollProps` should be passed to sticky header component (`StickyHeader(ScrollView|FlatList|SectionList)` or `withStickyHeader` decorated scroll component).
-
-To display custom header or tabs layout, use `renderHeader` & `renderTabs` props.
-
-Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/SimsScreen/index.tsx)
+`useStickyHeaderScrollProps` supplies the ref, measured scroll area and handlers for snapping. Forward all three handlers and use `scrollHeight` for the header container. Here the title fades as the header collapses; the tab bar remains sticky.
 
 ```tsx
-const PARALLAX_HEIGHT = 330;
-const HEADER_BAR_HEIGHT = 92;
-const SNAP_START_THRESHOLD = 50;
-const SNAP_STOP_THRESHOLD = 330;
+import type { ComponentRef } from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import {
+  StickyHeaderScrollView,
+  useStickyHeaderScrollProps,
+} from 'react-native-sticky-parallax-header';
 
-const SimsScreen: React.FC = () => {
-  const { width: windowWidth } = useWindowDimensions();
+export default function CustomHeaderScreen() {
   const {
     onMomentumScrollEnd,
     onScroll,
@@ -29,51 +27,43 @@ const SimsScreen: React.FC = () => {
     scrollHeight,
     scrollValue,
     scrollViewRef,
-    // useStickyHeaderScrollProps is generic and need to know
-    // which component (ScrollView, FlatList<ItemT> or SectionList<ItemT, SectionT>)
-    // will be enhanced with sticky scroll props
-  } = useStickyHeaderScrollProps<ScrollView>({
-    parallaxHeight: PARALLAX_HEIGHT,
-    snapStartThreshold: SNAP_START_THRESHOLD,
-    snapStopThreshold: SNAP_STOP_THRESHOLD,
+  } = useStickyHeaderScrollProps<ComponentRef<typeof ScrollView>>({
+    parallaxHeight: 280,
+    snapStartThreshold: 50,
+    snapStopThreshold: 280,
     snapToEdge: true,
   });
+  const titleStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollValue.value, [0, 200], [1, 0], Extrapolation.CLAMP),
+  }));
 
   return (
-    <View style={screenStyles.screenContainer}>
-      <View style={[styles.headerBarContainer, { width: windowWidth }]}>
-        <HeaderBar scrollValue={scrollValue} />
-      </View>
-      <View style={screenStyles.stretchContainer}>
-        <StickyHeaderScrollView
-          ref={scrollViewRef}
-          containerStyle={screenStyles.stretchContainer}
-          onScroll={onScroll}
-          onMomentumScrollEnd={onMomentumScrollEnd}
-          onScrollEndDrag={onScrollEndDrag}
-          renderHeader={() => {
-            return (
-              <View pointerEvents="box-none" style={{ height: scrollHeight }}>
-                <Foreground scrollValue={scrollValue} />
-              </View>
-            );
-          }}
-          renderTabs={() => (
-            <View style={styles.tabContainer}>
-              <Tabs />
-            </View>
-          )}
-          showsVerticalScrollIndicator={false}
-          style={screenStyles.stretch}>
-          <SafeAreaView edges={['left', 'right', 'bottom']} style={styles.content}>
-            <Text style={screenStyles.text}>
-              {text}
-            </Text>
-          </SafeAreaView>
-        </StickyHeaderScrollView>
-      </View>
-      <StatusBar barStyle="light-content" backgroundColor={colors.black} translucent />
-    </View>
+    <StickyHeaderScrollView
+      ref={scrollViewRef}
+      containerStyle={{ flex: 1 }}
+      onScroll={onScroll}
+      onMomentumScrollEnd={onMomentumScrollEnd}
+      onScrollEndDrag={onScrollEndDrag}
+      renderHeader={() => (
+        <View style={{ height: scrollHeight, padding: 24, backgroundColor: '#22577a' }}>
+          <Animated.Text style={[{ color: 'white', fontSize: 32 }, titleStyle]}>
+            Explore nearby
+          </Animated.Text>
+        </View>
+      )}
+      renderTabs={() => (
+        <View style={{ padding: 16, backgroundColor: '#d8f3dc' }}>
+          <Text>Field notes</Text>
+        </View>
+      )}>
+      {Array.from({ length: 30 }, (_, index) => (
+        <Text key={index} style={{ padding: 24 }}>
+          Trail {index + 1}
+        </Text>
+      ))}
+    </StickyHeaderScrollView>
   );
-};
+}
 ```
+
+The primitives leave safe-area layout to you; use `SafeAreaView` from `react-native-safe-area-context` around this screen when it does not sit below a navigation header. See [scroll references](../guides/scrollview-reference.md) for imperative scrolling.

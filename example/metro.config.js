@@ -1,40 +1,45 @@
 const path = require('path');
-const exclusionList = require('metro-config/src/defaults/exclusionList');
-const escape = require('escape-string-regexp');
-const pak = require('../package.json');
 
-const root = path.resolve(__dirname, '..');
+const { getDefaultConfig } = require('expo/metro-config');
 
-const modules = Object.keys({
-  ...pak.peerDependencies,
-});
+const config = getDefaultConfig(__dirname);
 
-module.exports = {
-  projectRoot: __dirname,
-  watchFolders: [root],
-
-  // We need to make sure that only one version is loaded for peerDependencies
-  // So we block them at the root, and alias them to the versions in example's node_modules
-  resolver: {
-    blockList: exclusionList(
-      modules.map(
-        (m) =>
-          new RegExp(`^${escape(path.join(root, 'node_modules', m))}\\/.*$`)
-      )
-    ),
-
-    extraNodeModules: modules.reduce((acc, name) => {
-      acc[name] = path.join(__dirname, 'node_modules', name);
-      return acc;
-    }, {}),
-  },
-
-  transformer: {
-    getTransformOptions: async () => ({
-      transform: {
-        experimentalImportSupport: false,
-        inlineRequires: true,
-      },
-    }),
-  },
+config.watchFolders = [path.resolve(__dirname, '../src')];
+const runtimePackages = [
+  '@babel/runtime',
+  'react',
+  'react-dom',
+  'react-native',
+  'react-native-web',
+  'react-native-reanimated',
+  'react-native-worklets',
+  'react-native-safe-area-context',
+  '@shopify/flash-list',
+];
+const libraryEntries = {
+  'react-native-sticky-parallax-header': '../src/index.tsx',
+  'react-native-sticky-parallax-header/flash-list': '../src/flash-list.ts',
 };
+
+// Source imports use this app's native runtime, including imports from ../src.
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (libraryEntries[moduleName]) {
+    return { type: 'sourceFile', filePath: path.resolve(__dirname, libraryEntries[moduleName]) };
+  }
+
+  const peer = runtimePackages.find(
+    (name) => moduleName === name || moduleName.startsWith(`${name}/`)
+  );
+
+  if (peer) {
+    return context.resolveRequest(
+      { ...context, originModulePath: path.join(__dirname, 'index.js') },
+      moduleName,
+      platform
+    );
+  }
+
+  return context.resolveRequest(context, moduleName, platform);
+};
+
+module.exports = config;

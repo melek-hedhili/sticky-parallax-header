@@ -23,7 +23,7 @@ export const AvatarHeaderSectionListExample: React.FC = () => {
   const isDarkTheme = useColorScheme() === 'dark';
 
   const sections = React.useMemo(() => {
-    const section: SectionListData<typeof Brandon.cards[0]> = {
+    const section: SectionListData<(typeof Brandon.cards)[0]> = {
       data: Brandon.cards,
       keyExtractor: (item) => item.question,
       renderItem: ({ item, index }) => (

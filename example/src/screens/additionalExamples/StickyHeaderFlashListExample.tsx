@@ -1,12 +1,13 @@
+import type { FlashListRef } from '@shopify/flash-list';
 import { FlashList } from '@shopify/flash-list';
 import * as React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { StickyHeaderFlashListProps } from 'react-native-sticky-parallax-header';
+import type { StickyHeaderFlashListProps } from 'react-native-sticky-parallax-header/flash-list';
 import {
   useStickyHeaderFlashListScrollProps,
   withStickyHeaderFlashList,
-} from 'react-native-sticky-parallax-header';
+} from 'react-native-sticky-parallax-header/flash-list';
 
 import { DATA } from '../../assets/data/paragraphs';
 import { Header } from '../../components/primitiveComponents/Header';
@@ -24,12 +25,12 @@ const data = DATA.concat(DATA)
   .concat(DATA)
   .concat(DATA);
 
-const PARALLAX_HEIGHT = 330;
+const PARALLAX_HEIGHT = 200;
 const SNAP_START_THRESHOLD = 50;
-const SNAP_STOP_THRESHOLD = 330;
+const SNAP_STOP_THRESHOLD = PARALLAX_HEIGHT;
 
 const StickyHeaderFlashList = withStickyHeaderFlashList(FlashList) as (
-  props: StickyHeaderFlashListProps<string> & React.RefAttributes<FlashList<string>>
+  props: StickyHeaderFlashListProps<string> & React.RefAttributes<FlashListRef<string>>
 ) => React.ReactElement;
 
 export const StickyHeaderFlashListExample: React.FC = () => {
@@ -50,7 +51,7 @@ export const StickyHeaderFlashListExample: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={screenStyles.screenContainer}>
+    <SafeAreaView style={[screenStyles.screenContainer, screenStyles.lightBackground]}>
       <StickyHeaderFlashList
         ref={scrollViewRef}
         containerStyle={screenStyles.stretchContainer}
@@ -80,7 +81,6 @@ export const StickyHeaderFlashListExample: React.FC = () => {
         }}
         renderTabs={() => <Tabs />}
         scrollEventThrottle={16}
-        estimatedItemSize={400}
         showsVerticalScrollIndicator={false}
       />
       <StatusBar backgroundColor="transparent" barStyle="dark-content" />

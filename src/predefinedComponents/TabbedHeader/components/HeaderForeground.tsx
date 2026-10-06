@@ -1,19 +1,20 @@
 import * as React from 'react';
 import type { ImageSourcePropType, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { colors, commonStyles, constants } from '../../../constants';
-import { useResponsiveSize } from '../../../hooks/useResponsiveSize';
 import { useRTLStyles } from '../../common/hooks/useRTLStyles';
+import { getForegroundImageSizes } from '../../common/utils/getForegroundImageSizes';
 import { scrollPosition } from '../../common/utils/scrollPosition';
 
 interface ForegroundProps {
   foregroundImage?: ImageSourcePropType;
   height: number;
-  scrollValue: Animated.SharedValue<number>;
+  scrollValue: SharedValue<number>;
   title?: string;
-  titleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  titleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   titleTestID?: string;
 }
 
@@ -25,16 +26,14 @@ export const Foreground: React.FC<ForegroundProps> = ({
   titleStyle,
   titleTestID = 'TabbedHeaderForegroundTitleTestID',
 }) => {
-  const { responsiveWidth } = useResponsiveSize();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const isLandscape =
     windowWidth > windowHeight && windowHeight <= constants.breakpoints.mediumPhoneShorterEdge;
 
-  const profilePicBorderRadius = responsiveWidth(4.5);
   const messageStyle = [styles.message, titleStyle];
-  const startSize = responsiveWidth(18);
-  const endSize = responsiveWidth(10);
+  const { startSize, endSize } = getForegroundImageSizes(windowWidth, height, 10);
+  const profilePicBorderRadius = startSize / 4;
   const [startImgFade, finishImgFade] = [scrollPosition(height, 22), scrollPosition(height, 27)];
   const [startImgSize, finishImgSize] = [scrollPosition(height, 20), scrollPosition(height, 30)];
   const [startTitleFade, finishTitleFade] = [
@@ -48,7 +47,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
         scrollValue.value,
         [0, startImgFade, finishImgFade],
         [1, 1, 0],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
     };
   }, [scrollValue, startImgFade, finishImgFade]);
@@ -57,7 +56,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
       scrollValue.value,
       [0, startImgSize, finishImgSize],
       [startSize, startSize, endSize],
-      Extrapolate.CLAMP
+      Extrapolation.CLAMP
     );
 
     return {
@@ -72,7 +71,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
         scrollValue.value,
         [0, startTitleFade, finishTitleFade],
         [1, 1, 0],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
     };
   }, [scrollValue, startTitleFade, finishTitleFade]);

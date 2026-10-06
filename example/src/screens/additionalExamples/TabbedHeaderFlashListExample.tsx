@@ -1,7 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import * as React from 'react';
 import { Platform, RefreshControl, StatusBar, StyleSheet } from 'react-native';
-import { withTabbedHeaderFlashList } from 'react-native-sticky-parallax-header';
+import { withTabbedHeaderFlashList } from 'react-native-sticky-parallax-header/flash-list';
 
 import type { ItemType, SectionType } from '../../assets/data/tabbedSections';
 import { FLASHLIST_TABBED_SECTIONS } from '../../assets/data/tabbedSections';
@@ -67,7 +67,7 @@ export const TabbedHeaderFlashListExample: React.FC = () => {
         getItemType={(item) => {
           return isSection(item) ? 'sectionHeader' : 'row';
         }}
-        estimatedItemSize={200}
+
         stickyHeaderIndices={stickyHeaderIndices}
         decelerationRate="normal"
         {...(Platform.OS !== 'web' && {

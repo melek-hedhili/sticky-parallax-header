@@ -1,6 +1,8 @@
-import type { RefObject } from 'react';
-import type { ScrollView, StyleProp, ViewStyle } from 'react-native';
-import type Animated from 'react-native-reanimated';
+import type { StyleProp, ViewStyle } from 'react-native';
+import type { AnimatedRef } from 'react-native-reanimated';
+import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+
+import type { ScrollViewRef } from '../../primitiveComponents/ScrollComponent';
 
 export interface InternalPagerProps {
   disableScrollToPosition?: boolean;
@@ -8,10 +10,10 @@ export interface InternalPagerProps {
   minScrollHeight: number;
   onChangeTab?: (previousPage: number, newPage: number) => void;
   page: number;
-  pageContainerStyle?: StyleProp<Animated.AnimateStyle<ViewStyle>>;
+  pageContainerStyle?: StyleProp<AnimatedStyle<ViewStyle>>;
   rememberTabScrollPosition?: boolean;
   scrollHeight: number;
-  scrollRef: RefObject<ScrollView>;
-  scrollValue: Animated.SharedValue<number>;
+  scrollRef: AnimatedRef<ScrollViewRef>;
+  scrollValue: SharedValue<number>;
   swipedPage?: (index: number) => void;
 }

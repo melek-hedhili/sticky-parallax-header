@@ -1,18 +1,25 @@
 import * as React from 'react';
-import type { NativeScrollEvent, ScrollView, SectionList, ViewToken } from 'react-native';
+import type { NativeScrollEvent, SectionListProps } from 'react-native';
 import { Platform } from 'react-native';
-import { runOnJS, useSharedValue, useWorkletCallback } from 'react-native-reanimated';
+import type { AnimatedRef } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
+import type { ScrollViewRef, SectionListRef } from '../../../primitiveComponents/ScrollComponent';
 import type { ScrollComponent } from '../../common/SharedProps';
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedHeader } from '../../common/hooks/usePredefinedHeader';
 import { debounce } from '../../common/utils/debounce';
-import type { TabbedHeaderListProps, TabbedHeaderPagerProps } from '../TabbedHeaderProps';
+import type {
+  TabbedHeaderListProps,
+  TabbedHeaderPagerProps,
+  TabbedHeaderSharedProps,
+} from '../TabbedHeaderProps';
 import { Foreground } from '../components/HeaderForeground';
 
 import { useRenderTabs } from './useRenderTabs';
 
-function useRenderHeader<T extends ScrollComponent>(props: TabbedHeaderPagerProps) {
+function useRenderHeader<T extends ScrollComponent>(props: TabbedHeaderSharedProps) {
   const {
     contentBackgroundColor,
     innerScrollHeight,
@@ -35,9 +42,13 @@ function useRenderHeader<T extends ScrollComponent>(props: TabbedHeaderPagerProp
     titleTestID,
   } = props;
   const horizontalScrollValue = useSharedValue(0);
-  const onHorizontalPagerScroll = useWorkletCallback((e: NativeScrollEvent) => {
-    horizontalScrollValue.value = e.contentOffset.x;
-  }, []);
+  const onHorizontalPagerScroll = React.useCallback(
+    (e: NativeScrollEvent) => {
+      'worklet';
+      horizontalScrollValue.value = e.contentOffset.x;
+    },
+    [horizontalScrollValue]
+  );
 
   const renderHeader = React.useCallback(() => {
     return (
@@ -101,7 +112,7 @@ export function useTabbedHeaderPager(props: TabbedHeaderPagerProps) {
     scrollHeight,
     scrollValue,
     scrollViewRef,
-  } = useRenderHeader<ScrollView>(props);
+  } = useRenderHeader<ScrollViewRef>(props);
   const { backgroundColor, initialPage, tabsContainerBackgroundColor } = props;
   const [currentPage, setCurrentPage] = React.useState(initialPage ?? 0);
 
@@ -135,7 +146,7 @@ export function useTabbedHeaderPager(props: TabbedHeaderPagerProps) {
     renderTabs,
     scrollHeight,
     scrollValue,
-    scrollViewRef,
+    scrollViewRef: scrollViewRef as AnimatedRef<ScrollViewRef>,
     setCurrentPage,
   };
 }
@@ -143,7 +154,7 @@ export function useTabbedHeaderPager(props: TabbedHeaderPagerProps) {
 export function useTabbedHeaderList<
   ItemT,
   SectionT,
-  T extends SectionList<ItemT, SectionT> = SectionList<ItemT, SectionT>
+  T extends SectionListRef<ItemT, SectionT> = SectionListRef<ItemT, SectionT>,
 >(props: TabbedHeaderListProps<ItemT, SectionT>) {
   const ignoreViewabilityItemsChangedEvent = useSharedValue(false);
   const {
@@ -156,60 +167,76 @@ export function useTabbedHeaderList<
     scrollValue,
     scrollViewRef,
   } = useRenderHeader<T>(props);
-  const onMomentumScrollEndInternal = useWorkletCallback(
+  const onMomentumScrollEndInternal = React.useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       ignoreViewabilityItemsChangedEvent.value = false;
       onMomentumScrollEnd?.(e);
     },
-    [onMomentumScrollEnd]
+    [ignoreViewabilityItemsChangedEvent, onMomentumScrollEnd]
   );
-  const debouncedIgnoreViewabilityItemsChangedCallback = debounce(() => {
-    ignoreViewabilityItemsChangedEvent.value = false;
-  }, 100);
-  const onScrollInternal = useWorkletCallback(
+  const debouncedIgnoreViewabilityItemsChangedCallback = React.useMemo(
+    () =>
+      debounce(() => {
+        ignoreViewabilityItemsChangedEvent.value = false;
+      }, 100),
+    [ignoreViewabilityItemsChangedEvent]
+  );
+
+  React.useEffect(
+    () => () => debouncedIgnoreViewabilityItemsChangedCallback.cancel(),
+    [debouncedIgnoreViewabilityItemsChangedCallback]
+  );
+  const onScrollInternal = React.useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       if (Platform.OS === 'web') {
         // On web there is no onMomentumScrollEnd
-        runOnJS(debouncedIgnoreViewabilityItemsChangedCallback)();
+        scheduleOnRN(debouncedIgnoreViewabilityItemsChangedCallback);
       }
 
       onScroll?.(e);
     },
-    [onScroll]
+    [debouncedIgnoreViewabilityItemsChangedCallback, onScroll]
   );
 
   const { backgroundColor, sections, tabsContainerBackgroundColor } = props;
 
   const [activeSection, setActiveSection] = React.useState(0);
 
-  const goToSection = React.useCallback((sectionIndex: number) => {
-    ignoreViewabilityItemsChangedEvent.value = true;
-    scrollViewRef.current?.scrollToLocation({
-      animated: true,
-      itemIndex: 0,
-      sectionIndex,
-      viewPosition: 0,
-    });
-    setActiveSection(sectionIndex);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const goToSection = React.useCallback(
+    (sectionIndex: number) => {
+      ignoreViewabilityItemsChangedEvent.value = true;
+      scrollViewRef.current?.scrollToLocation({
+        animated: true,
+        itemIndex: 0,
+        sectionIndex,
+        viewPosition: 0,
+      });
+      setActiveSection(sectionIndex);
+    },
+    [ignoreViewabilityItemsChangedEvent, scrollViewRef]
+  );
 
-  const onViewableItemsChanged = React.useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+  const onViewableItemsChanged = React.useCallback<
+    NonNullable<SectionListProps<ItemT, SectionT>['onViewableItemsChanged']>
+  >(
+    ({ viewableItems }) => {
       if (!viewableItems.length || ignoreViewabilityItemsChangedEvent.value) {
         return;
       }
 
-      const newActiveSection = sections.findIndex(
-        (section) => section.key === viewableItems[0].section?.key
-      );
+      const newActiveSection = sections.findIndex((section) => {
+        const key = (section as { key?: string }).key;
+
+        return key !== undefined && key === viewableItems[0].section?.key;
+      });
 
       if (newActiveSection !== -1) {
         setActiveSection(newActiveSection);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sections]
+    [ignoreViewabilityItemsChangedEvent, sections]
   );
 
   const renderTabs = useRenderTabs({

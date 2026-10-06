@@ -1,14 +1,7 @@
 import * as React from 'react';
 import type { NativeScrollEvent } from 'react-native';
 import { StatusBar, StyleSheet, View, useColorScheme } from 'react-native';
-import {
-  ColorSpace,
-  interpolateSharableColor,
-  useDerivedValue,
-  useInterpolateConfig,
-  useSharedValue,
-  useWorkletCallback,
-} from 'react-native-reanimated';
+import { interpolateColor, useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
 
 import { Brandon, Ewa, Jennifer } from '../../assets/data/cards';
@@ -23,31 +16,36 @@ export const TabbedHeaderWithAnimatedColorsExample: React.FC = () => {
   const isDarkTheme = useColorScheme() === 'dark';
   const horizontalScrollValue = useSharedValue(0);
   const scrollValue = useSharedValue(0);
-  const onHorizontalScroll = useWorkletCallback((e: NativeScrollEvent) => {
-    horizontalScrollValue.value = e.contentOffset.x;
-  });
-  const onScroll = useWorkletCallback((e: NativeScrollEvent) => {
-    scrollValue.value = e.contentOffset.y;
-  });
+  const onHorizontalScroll = React.useCallback(
+    (e: NativeScrollEvent) => {
+      'worklet';
+      horizontalScrollValue.value = e.contentOffset.x;
+    },
+    [horizontalScrollValue]
+  );
+  const onScroll = React.useCallback(
+    (e: NativeScrollEvent) => {
+      'worklet';
+      scrollValue.value = e.contentOffset.y;
+    },
+    [scrollValue]
+  );
 
-  const tabUnderlineColorInterpolateConfig = useInterpolateConfig(
-    [0, 1242, 2484],
-    [colors.activeOrange, colors.coralPink, colors.detailsBlue],
-    ColorSpace.RGB
+  const tabUnderlineColor = useDerivedValue(() =>
+    interpolateColor(
+      horizontalScrollValue.value,
+      [0, 1242, 2484],
+      [colors.activeOrange, colors.coralPink, colors.detailsBlue],
+      'RGB'
+    )
   );
-  const tabsContainerBackgroundColorInterpolateConfig = useInterpolateConfig(
-    [0, 800, 1600],
-    [colors.primaryGreen, colors.activeOrange, colors.coralPink],
-    ColorSpace.RGB
-  );
-  const tabUnderlineColor = useDerivedValue(
-    () => interpolateSharableColor(horizontalScrollValue.value, tabUnderlineColorInterpolateConfig),
-    [horizontalScrollValue, tabUnderlineColorInterpolateConfig]
-  );
-  const tabsContainerBackgroundColor = useDerivedValue(
-    () =>
-      interpolateSharableColor(scrollValue.value, tabsContainerBackgroundColorInterpolateConfig),
-    [scrollValue, tabsContainerBackgroundColorInterpolateConfig]
+  const tabsContainerBackgroundColor = useDerivedValue(() =>
+    interpolateColor(
+      scrollValue.value,
+      [0, 800, 1600],
+      [colors.primaryGreen, colors.activeOrange, colors.coralPink],
+      'RGB'
+    )
   );
 
   return (

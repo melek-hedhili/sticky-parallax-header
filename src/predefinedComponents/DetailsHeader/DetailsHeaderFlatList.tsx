@@ -1,9 +1,9 @@
 import * as React from 'react';
-import type { FlatList } from 'react-native';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { commonStyles } from '../../constants';
+import type { FlatListRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderFlatList } from '../../primitiveComponents/StickyHeaderFlatList';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
@@ -13,7 +13,7 @@ import { useDetailsHeader } from './hooks/useDetailsHeader';
 
 function DetailsHeaderFlatListInner<ItemT>(
   props: DetailsHeaderFlatListProps<ItemT>,
-  ref: React.ForwardedRef<FlatList<ItemT>>
+  ref: React.ForwardedRef<FlatListRef<ItemT>>
 ) {
   const {
     backgroundColor,
@@ -47,9 +47,9 @@ function DetailsHeaderFlatListInner<ItemT>(
     onScroll,
     onScrollEndDrag,
     onMomentumScrollEnd,
-  } = useDetailsHeader<FlatList<ItemT>>(props);
+  } = useDetailsHeader<FlatListRef<ItemT>>(props);
 
-  React.useImperativeHandle(ref, () => scrollViewRef.current as FlatList<ItemT>);
+  React.useImperativeHandle(ref, () => scrollViewRef.current as FlatListRef<ItemT>);
 
   const wrapperAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -101,7 +101,7 @@ function DetailsHeaderFlatListInner<ItemT>(
 }
 
 type DetailsHeaderFlatListType = <ItemT>(
-  props: DetailsHeaderFlatListProps<ItemT> & React.RefAttributes<FlatList<ItemT>>
+  props: DetailsHeaderFlatListProps<ItemT> & React.RefAttributes<FlatListRef<ItemT>>
 ) => React.ReactElement;
 
 export const DetailsHeaderFlatList = React.forwardRef(
