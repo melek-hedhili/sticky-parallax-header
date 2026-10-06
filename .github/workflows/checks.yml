@@ -2,53 +2,127 @@ name: Run checks
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   pull_request:
 
+permissions:
+  contents: read
+
+env:
+  HUSKY: '0'
+  YARN_CACHE_FOLDER: ${{ runner.temp }}/yarn-cache
+
 jobs:
-  install:
+  package:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Install modules
-        uses: actions/setup-node@v2
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global yarn@1.22.22
+      - uses: actions/cache@v6
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
-          cache-dependency-path: '**/yarn.lock'
-      - run: yarn
-      - name: Run Typescript
-        run: yarn typescript
-      - name: Run Lint
-        run: yarn lint
-      - name: Run Tests
-        run: yarn test
+          path: ${{ env.YARN_CACHE_FOLDER }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock', 'example/yarn.lock', 'test-app/yarn.lock') }}
+      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn check:static
+      - run: yarn test:ci
+      - run: yarn test:types
+
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global yarn@1.22.22
+      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn --cwd example install --frozen-lockfile --non-interactive
+      - run: yarn lint:example
+      - run: yarn example:typecheck
+      - run: yarn --cwd example check:dependencies
+      - run: npx --yes expo-doctor@1.20.4
+        working-directory: example
+      - run: yarn --cwd example build:bundles
+
+  bare-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global yarn@1.22.22
+      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn --cwd test-app install --frozen-lockfile --non-interactive
+      - run: yarn lint:test-app
+      - run: yarn --cwd test-app typecheck
+      - run: yarn --cwd test-app bundle:android
+      - run: yarn --cwd test-app bundle:ios
 
   documentation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: '12.x'
-      - name: Test Documentation Build
-        run: |
-          cd docs
-          if [ -e yarn.lock ]; then
-            yarn install --frozen-lockfile
-          elif [ -e package-lock.json ]; then
-            npm ci
-          else
-            npm i
-          fi
-          npm run build
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global yarn@1.22.22
+      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn --cwd docs install --frozen-lockfile --non-interactive
+      - run: yarn lint:docs
+      - run: yarn docs:typecheck
+      - run: yarn --cwd docs build
+
+  native-android:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [example, test-app]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global yarn@1.22.22
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-36' 'platforms;android-37.0' 'build-tools;36.0.0' 'build-tools;37.0.0' 'ndk;27.1.12297006'
+      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn --cwd ${{ matrix.app }} install --frozen-lockfile --non-interactive
+      - run: yarn --cwd ${{ matrix.app }} build:android
+
+  native-ios:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [example, test-app]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global yarn@1.22.22
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.7'
+      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn --cwd ${{ matrix.app }} install --frozen-lockfile --non-interactive
+      - run: bundle install
+        working-directory: ${{ matrix.app }}
+      - run: bundle exec pod install
+        working-directory: ${{ matrix.app }}/ios
+      - run: yarn --cwd ${{ matrix.app }} build:ios

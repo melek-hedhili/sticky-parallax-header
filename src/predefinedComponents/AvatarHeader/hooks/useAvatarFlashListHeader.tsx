@@ -1,14 +1,15 @@
-import type { FlashList } from '@shopify/flash-list';
+import type { FlashListRef } from '@shopify/flash-list';
 import * as React from 'react';
 
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedFlashListHeader } from '../../common/hooks/usePredefinedFlashListHeader';
-import type { AvatarHeaderFlashListProps } from '../AvatarHeaderProps';
+import type { AvatarHeaderFlashListProps } from '../AvatarHeaderFlashListProps';
 import { Foreground } from '../components/HeaderForeground';
 
-export function useAvatarFlashListHeader<ItemT, T extends FlashList<ItemT> = FlashList<ItemT>>(
-  props: AvatarHeaderFlashListProps<ItemT>
-) {
+export function useAvatarFlashListHeader<
+  ItemT,
+  T extends FlashListRef<ItemT> = FlashListRef<ItemT>,
+>(props: AvatarHeaderFlashListProps<ItemT>) {
   const {
     contentBackgroundColor,
     onMomentumScrollEnd,

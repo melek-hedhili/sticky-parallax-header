@@ -1,6 +1,7 @@
 import * as Font from 'expo-font';
 import * as React from 'react';
-import { I18nManager } from 'react-native';
+import { I18nManager, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import AppNavigator from './navigation/AppNavigator';
@@ -21,5 +22,11 @@ export default function App() {
     I18nManager.allowRTL(true);
   }, [loadFonts]);
 
-  return <SafeAreaProvider>{loaded ? <AppNavigator /> : <></>}</SafeAreaProvider>;
+  return (
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>{loaded ? <AppNavigator /> : null}</SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
 }
+
+const styles = StyleSheet.create({ root: { flex: 1 } });

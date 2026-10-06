@@ -1,7 +1,8 @@
 import * as React from 'react';
 import type { ImageSourcePropType, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { Image, Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
-import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { colors, commonStyles, constants } from '../../../constants';
 import { useRTLStyles } from '../../common/hooks/useRTLStyles';
@@ -10,19 +11,19 @@ import { scrollPosition } from '../../common/utils/scrollPosition';
 interface ForegroundProps {
   contentIcon?: ImageSourcePropType;
   contentIconNumber?: number;
-  contentIconNumberStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  contentIconNumberStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   contentIconNumberTestID?: string;
   height: number;
   image?: ImageSourcePropType;
-  scrollValue: Animated.SharedValue<number>;
+  scrollValue: SharedValue<number>;
   subtitle?: string;
-  subtitleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  subtitleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   subtitleTestID?: string;
   tag?: string;
-  tagStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  tagStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   tagTestID?: string;
   title?: string;
-  titleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  titleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   titleTestID?: string;
 }
 
@@ -52,21 +53,21 @@ export const Foreground: React.FC<ForegroundProps> = ({
   const labelInputRange = [0, scrollPosition(height, 19), scrollPosition(height, 25)];
   const labelAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(scrollValue.value, labelInputRange, outputRange, Extrapolate.CLAMP),
+      opacity: interpolate(scrollValue.value, labelInputRange, outputRange, Extrapolation.CLAMP),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollValue, height]);
   const titleInputRange = [0, scrollPosition(height, 45), scrollPosition(height, 55)];
   const titleAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(scrollValue.value, titleInputRange, outputRange, Extrapolate.CLAMP),
+      opacity: interpolate(scrollValue.value, titleInputRange, outputRange, Extrapolation.CLAMP),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollValue, height]);
   const authorInputRange = [0, scrollPosition(height, 55), scrollPosition(height, 70)];
   const authorAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(scrollValue.value, authorInputRange, outputRange, Extrapolate.CLAMP),
+      opacity: interpolate(scrollValue.value, authorInputRange, outputRange, Extrapolation.CLAMP),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollValue, height]);

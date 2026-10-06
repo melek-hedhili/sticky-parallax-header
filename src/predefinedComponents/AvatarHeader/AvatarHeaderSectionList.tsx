@@ -1,9 +1,9 @@
 import * as React from 'react';
-import type { SectionList } from 'react-native';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { commonStyles } from '../../constants';
+import type { SectionListRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderSectionList } from '../../primitiveComponents/StickyHeaderSectionList';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
@@ -13,7 +13,7 @@ import { useAvatarHeader } from './hooks/useAvatarHeader';
 
 function AvatarHeaderSectionListInner<ItemT, SectionT>(
   props: AvatarHeaderSectionListProps<ItemT, SectionT>,
-  ref: React.ForwardedRef<SectionList<ItemT, SectionT>>
+  ref: React.ForwardedRef<SectionListRef<ItemT, SectionT>>
 ) {
   const {
     backgroundColor,
@@ -50,9 +50,9 @@ function AvatarHeaderSectionListInner<ItemT, SectionT>(
     renderHeader: defaultRenderHeader,
     scrollValue,
     scrollViewRef,
-  } = useAvatarHeader<SectionList<ItemT, SectionT>>(props);
+  } = useAvatarHeader<SectionListRef<ItemT, SectionT>>(props);
 
-  React.useImperativeHandle(ref, () => scrollViewRef.current as SectionList<ItemT, SectionT>);
+  React.useImperativeHandle(ref, () => scrollViewRef.current as SectionListRef<ItemT, SectionT>);
 
   const wrapperAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -108,7 +108,7 @@ function AvatarHeaderSectionListInner<ItemT, SectionT>(
 
 type AvatarHeaderSectionListType = <ItemT, SectionT>(
   props: AvatarHeaderSectionListProps<ItemT, SectionT> &
-    React.RefAttributes<SectionList<ItemT, SectionT>>
+    React.RefAttributes<SectionListRef<ItemT, SectionT>>
 ) => React.ReactElement;
 
 export const AvatarHeaderSectionList = React.forwardRef(

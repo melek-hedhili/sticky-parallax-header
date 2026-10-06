@@ -20,7 +20,7 @@ export const StickyHeaderSectionListExample: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={screenStyles.screenContainer}>
+    <SafeAreaView style={[screenStyles.screenContainer, screenStyles.lightBackground]}>
       <StickyHeaderSectionList
         containerStyle={screenStyles.stretchContainer}
         sections={SECTIONS}

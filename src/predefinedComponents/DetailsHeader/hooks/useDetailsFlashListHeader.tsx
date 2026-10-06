@@ -1,16 +1,19 @@
-import type { FlashList } from '@shopify/flash-list';
+import type { FlashListRef } from '@shopify/flash-list';
 import * as React from 'react';
-import { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { ViewStyle } from 'react-native';
+import type { AnimatedStyle } from 'react-native-reanimated';
+import { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedFlashListHeader } from '../../common/hooks/usePredefinedFlashListHeader';
 import { scrollPosition } from '../../common/utils/scrollPosition';
-import type { DetailsHeaderFlashListProps } from '../DetailsHeaderProps';
+import type { DetailsHeaderFlashListProps } from '../DetailsHeaderFlashListProps';
 import { Foreground } from '../components/HeaderForeground';
 
-export function useDetailsFlashListHeader<ItemT, T extends FlashList<ItemT> = FlashList<ItemT>>(
-  props: DetailsHeaderFlashListProps<ItemT>
-) {
+export function useDetailsFlashListHeader<
+  ItemT,
+  T extends FlashListRef<ItemT> = FlashListRef<ItemT>,
+>(props: DetailsHeaderFlashListProps<ItemT>) {
   const {
     contentBackgroundColor,
     onMomentumScrollEnd,
@@ -49,7 +52,12 @@ export function useDetailsFlashListHeader<ItemT, T extends FlashList<ItemT> = Fl
   ];
   const headerTitleContainerAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(scrollValue.value, headerTitleInputRange, [0, 0, 1], Extrapolate.CLAMP),
+      opacity: interpolate(
+        scrollValue.value,
+        headerTitleInputRange,
+        [0, 0, 1],
+        Extrapolation.CLAMP
+      ),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollValue, scrollHeight]);
@@ -111,7 +119,8 @@ export function useDetailsFlashListHeader<ItemT, T extends FlashList<ItemT> = Fl
   ]);
 
   return {
-    headerTitleContainerAnimatedStyle,
+    headerTitleContainerAnimatedStyle:
+      headerTitleContainerAnimatedStyle as AnimatedStyle<ViewStyle>,
     onMomentumScrollEnd,
     onScroll,
     onScrollEndDrag,

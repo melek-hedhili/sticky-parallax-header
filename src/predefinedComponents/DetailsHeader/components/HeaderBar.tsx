@@ -1,6 +1,7 @@
 import * as React from 'react';
-import type { StyleProp, TextStyle } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { Pressable, StyleSheet } from 'react-native';
+import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import type { Edge } from 'react-native-safe-area-context';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,9 +14,9 @@ import { parseAnimatedColorProp } from '../../common/utils/parseAnimatedColorPro
 interface HeaderBarProps extends IconProps {
   backgroundColor?: AnimatedColorProp;
   enableSafeAreaTopInset?: boolean;
-  headerTitleContainerAnimatedStyle: { opacity: number };
+  headerTitleContainerAnimatedStyle: StyleProp<AnimatedStyle<ViewStyle>>;
   title?: string;
-  titleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  titleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   titleTestID?: string;
 }
 
@@ -55,7 +56,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   }
 
   return (
-    <SafeAreaView edges={safeAreaEdges} style={commonStyles.container}>
+    <SafeAreaView edges={safeAreaEdges} style={commonStyles.headerBarContainer}>
       <Animated.View style={[commonStyles.headerWrapper, wrapperAnimatedStyle]}>
         {leftTopIcon ? (
           <Pressable

@@ -15,13 +15,14 @@ const styles = StyleSheet.create({
   sectionFooterContainer: {
     alignItems: 'flex-start',
     alignSelf: 'stretch',
-    padding: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
   },
   sectionFooterLabel: {
-    color: colors.primaryGreen,
-    fontFamily: 'AvertaStd-Semibold',
-    fontSize: 20,
+    color: colors.greyishBrown,
+    fontFamily: 'AvertaStd-Regular',
+    fontSize: 14,
+    lineHeight: 20,
     textAlign: 'left',
-    textTransform: 'uppercase',
   },
 });

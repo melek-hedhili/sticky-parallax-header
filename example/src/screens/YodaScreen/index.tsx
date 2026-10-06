@@ -43,8 +43,8 @@ const YodaScreen: React.FC = () => {
         tabs={TABS}
         renderHeaderBar={() => <HeaderBar scrollValue={scrollValue} />}
         showsVerticalScrollIndicator={false}>
-        {TABS.map((tab, i) => (
-          <View key={i} style={[styles.contentContainer, { height: windowHeight }]}>
+        {TABS.map((tab) => (
+          <View key={tab.testID} style={[styles.contentContainer, { height: windowHeight }]}>
             <Text style={[screenStyles.text, styles.contentText]} testID={tab.contentTestID}>
               {tab.description}
             </Text>

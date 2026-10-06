@@ -1,11 +1,8 @@
 {
-  "name": "react-native-sticky-parallax-header-example",
-  "displayName": "StickyParallaxHeader Example",
   "expo": {
     "name": "react-native-sticky-parallax-header-example",
     "slug": "react-native-sticky-parallax-header-example",
     "description": "Example app for react-native-sticky-parallax-header",
-    "privacy": "public",
     "version": "1.0.0",
     "platforms": [
       "ios",
@@ -14,13 +11,80 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.react-native-sticky-parallax-header-example"
+      "bundleIdentifier": "com.react-native-sticky-parallax-header-example",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.react-native-sticky-parallax-header-example"
+            ]
+          }
+        ],
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
+        },
+        "UIRequiresFullScreen": false,
+        "UIStatusBarStyle": "UIStatusBarStyleDefault",
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ],
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ]
+      },
+      "entitlements": {
+        "aps-environment": "development"
+      }
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "android": {
-      "package": "com.reactnativestickyparallaxheaderexample"
+      "package": "com.reactnativestickyparallaxheaderexample",
+      "versionCode": 1,
+      "allowBackup": true,
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+        "INTERNET",
+        "READ_EXTERNAL_STORAGE",
+        "SYSTEM_ALERT_WINDOW",
+        "VIBRATE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "userInterfaceStyle": "light",
+    "orientation": "default",
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./src/assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "android": {
+            "drawable": {
+              "icon": "./native-assets/splashscreen_logo.xml"
+            }
+          }
+        }
+      ],
+      "./plugins/withNativeSettings.js"
+    ],
+    "experiments": {
+      "tsconfigPaths": false
     }
   }
 }

@@ -1,9 +1,11 @@
 import * as React from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { I18nManager, Platform, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import Animated, { interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { commonStyles } from '../../../constants';
+import type { ScrollViewRef } from '../../../primitiveComponents/ScrollComponent';
 import type { Tab, TabsConfig } from '../../common/SharedProps';
 import { parseAnimatedColorProp } from '../../common/utils/parseAnimatedColorProp';
 
@@ -11,7 +13,7 @@ import { TabItem } from './TabItem';
 
 export interface TabsProps extends TabsConfig {
   activeTab: number;
-  horizontalScrollValue: Animated.SharedValue<number>;
+  horizontalScrollValue: SharedValue<number>;
   onTabPressed: (index: number) => void;
 }
 
@@ -33,7 +35,7 @@ export const Tabs: React.FC<TabsProps> = ({
   tabsContainerHorizontalPadding,
 }) => {
   const { width } = useWindowDimensions();
-  const horizontalScrollRef = React.useRef<ScrollView>(null);
+  const horizontalScrollRef = React.useRef<ScrollViewRef>(null);
 
   const currentPositionX = React.useRef(0);
   const [tabsWidth, setTabsWidth] = React.useState(tabs.map((_) => 0));

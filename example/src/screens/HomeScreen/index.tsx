@@ -133,13 +133,13 @@ const HomeScreen: React.FC = () => {
             />
           ),
         })}>
-        {TABS.map((tab, i) => {
+        {TABS.map((tab) => {
           const title = tab.contentTitle;
           const marginBottom = Platform.select({ ios: calcMargin(title) + 20, android: 10 });
 
           return (
             <View
-              key={i}
+              key={tab.testID}
               onLayout={onLayoutContent(title)}
               style={[screenStyles.content, { marginBottom }]}>
               <Modal

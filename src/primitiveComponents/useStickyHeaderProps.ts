@@ -1,26 +1,19 @@
 import { useMemo, useState } from 'react';
+import type { ViewStyle } from 'react-native';
 import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
+import type { AnimatedStyle } from 'react-native-reanimated';
 import {
-  Extrapolate,
+  Extrapolation,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
 
-import type {
-  StickyHeaderFlatListProps,
-  StickyHeaderScrollViewProps,
-  StickyHeaderSectionListProps,
-} from './StickyHeaderProps';
+import type { StickyHeaderSharedProps } from './StickyHeaderProps';
 
-export function useStickyHeaderProps(
-  props:
-    | StickyHeaderFlatListProps<unknown>
-    | StickyHeaderScrollViewProps
-    | StickyHeaderSectionListProps<unknown, unknown>
-) {
+export function useStickyHeaderProps(props: StickyHeaderSharedProps) {
   const {
     contentContainerStyle,
     onHeaderLayout,
@@ -109,7 +102,7 @@ export function useStickyHeaderProps(
             scrollValue.value,
             [0, headerHeight],
             [0, -headerHeight],
-            stickyTabs ? Extrapolate.CLAMP : Extrapolate.EXTEND
+            stickyTabs ? Extrapolation.CLAMP : Extrapolation.EXTEND
           ),
         },
       ],
@@ -119,7 +112,7 @@ export function useStickyHeaderProps(
   return {
     contentContainerPaddingTop,
     contentContainerPaddingBottom,
-    headerAnimatedStyle,
+    headerAnimatedStyle: headerAnimatedStyle as AnimatedStyle<ViewStyle>,
     headerHeight,
     listPaddingTop,
     onHeaderLayoutInternal,

@@ -11,13 +11,13 @@ import { screenStyles } from '../../constants';
 
 export const StickyHeaderScrollViewExample: React.FC = () => {
   return (
-    <SafeAreaView style={screenStyles.screenContainer}>
+    <SafeAreaView style={[screenStyles.screenContainer, screenStyles.lightBackground]}>
       <StickyHeaderScrollView
         containerStyle={screenStyles.stretchContainer}
         renderHeader={() => <Header />}
         renderTabs={() => <Tabs />}>
         {DATA.map((item, i) => (
-          <Paragraph key={i} text={item} />
+          <Paragraph key={`${item}-${i}`} text={item} />
         ))}
       </StickyHeaderScrollView>
       <StatusBar backgroundColor="transparent" barStyle="dark-content" />

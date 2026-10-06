@@ -1,20 +1,35 @@
 ---
 sidebar_position: 3
 ---
+
 # Rendering icons in tabs
 
-You can pass just React component to `icon` property in tabs object. If you need different active icon use function, example below.
+A tab's `icon` render function receives its active state. This example assumes `SafeAreaProvider` at the app root.
 
 ```tsx
-<TabbedHeaderPager
-  tabs={[
-    {
-      title: 'Development',
-      icon: (active) => (active ? <ActiveIcon /> : <Icon />),
-    },
-  ]}
-  // ...
->
-  {/** content */}
-</TabbedHeaderPager>
+import { Text, View } from 'react-native';
+import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
+
+export default function TabIconsScreen() {
+  return (
+    <TabbedHeaderPager
+      containerStyle={{ flex: 1 }}
+      backgroundColor="#22577a"
+      title="Field notes"
+      tabs={[
+        {
+          title: 'Favorites',
+          icon: (active) => <Text style={{ color: 'white' }}>{active ? '★' : '☆'}</Text>,
+        },
+        { title: 'All notes' },
+      ]}>
+      <View style={{ minHeight: 1200, padding: 24 }}>
+        <Text>Favorite notes</Text>
+      </View>
+      <View style={{ minHeight: 1200, padding: 24 }}>
+        <Text>All notes</Text>
+      </View>
+    </TabbedHeaderPager>
+  );
+}
 ```

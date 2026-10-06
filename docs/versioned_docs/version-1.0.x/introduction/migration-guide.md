@@ -6,7 +6,7 @@ sidebar_position: 4
 
 ## How to upgrade?
 
-To upgrade from version <= 0.4.x to 1.x.x first follow [installation guide](installation.md)
+To upgrade from version &lt;= 0.4.x to 1.x.x first follow [installation guide](installation.md)
 
 After installing all packages replace old components with 1.x.x api
 
@@ -30,7 +30,7 @@ After installing all packages replace old components with 1.x.x api
 - `scrollRef` is removed, use `ref` instead
 - `snapValue` prop is removed
 
-## New apis that were not present in version <= 0.4.x
+## New apis that were not present in version &lt;= 0.4.x
 
 - `(Avatar|Details|Sticky)HeaderFlatList` - `FlatList` version of `(Avatar|Details|Sticky)ScrollView`
 - `(Avatar|Details|Sticky)HeaderSectionList` - `SectionList` version of `(Avatar|Details|Sticky)ScrollView`

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type Animated from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 
 import type { Tab } from '../../common/SharedProps';
 import type { TabsProps } from '../components/Tabs';
@@ -8,7 +8,7 @@ import { Tabs } from '../components/Tabs';
 export function useRenderTabs(
   tabsProps: Omit<TabsProps, 'tabs'> & {
     tabs?: Tab[];
-    horizontalScrollValue: Animated.SharedValue<number>;
+    horizontalScrollValue: SharedValue<number>;
   }
 ) {
   const {

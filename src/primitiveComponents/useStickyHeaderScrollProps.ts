@@ -1,22 +1,20 @@
-import { useEffect, useRef } from 'react';
-import type { FlatList, NativeScrollEvent, ScrollView, SectionList } from 'react-native';
+import { useCallback, useEffect, useRef } from 'react';
+import type { NativeScrollEvent } from 'react-native';
 import { Platform } from 'react-native';
 import {
-  runOnJS,
   scrollTo,
   useAnimatedReaction,
   useAnimatedRef,
   useSharedValue,
-  useWorkletCallback,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { useResponsiveSize } from '../hooks/useResponsiveSize';
 
+import type { ScrollComponent } from './ScrollComponent';
 import type { StickyHeaderSharedProps, StickyHeaderSnapProps } from './StickyHeaderProps';
 
-// FIXME: unknown does not work here :/
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ScrollComponent = ScrollView | FlatList<any> | SectionList<any, any>;
+export type { ScrollComponent } from './ScrollComponent';
 
 const VELOCITY_THRESHOLD = 7;
 
@@ -48,7 +46,7 @@ export function useStickyHeaderScrollProps<T extends ScrollComponent>(
     onTopReachedRef.current = onTopReached;
   }, [onTopReached]);
 
-  function maybeTopReached(value: number) {
+  const maybeTopReached = useCallback((value: number) => {
     if (value <= 0) {
       if (!onTopReachedWasCalled.current && onTopReachedRef.current) {
         onTopReachedRef.current();
@@ -57,20 +55,21 @@ export function useStickyHeaderScrollProps<T extends ScrollComponent>(
     } else {
       onTopReachedWasCalled.current = false;
     }
-  }
+  }, []);
 
   useAnimatedReaction(
     () => scrollValue.value,
     (value) => {
-      runOnJS(maybeTopReached)(value);
+      scheduleOnRN(maybeTopReached, value);
     },
-    [scrollValue]
+    [maybeTopReached, scrollValue]
   );
 
   const scrollHeight = Math.max(parallaxHeight, headerHeight * 2);
 
-  const onSnapToEdge = useWorkletCallback(
+  const onSnapToEdge = useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       const scrollToHeight = snapStopThreshold ?? scrollHeight;
       const snapToEdgeThreshold = snapStartThreshold ?? scrollHeight / 2;
 
@@ -106,19 +105,21 @@ export function useStickyHeaderScrollProps<T extends ScrollComponent>(
         }
       }
     },
-    [snapStartThreshold, snapStopThreshold, scrollHeight, scrollValue]
+    [snapStartThreshold, snapStopThreshold, snapToEdge, scrollHeight, scrollValue, scrollViewRef]
   );
 
-  const onMomentumScrollEndInternal = useWorkletCallback(
+  const onMomentumScrollEndInternal = useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       onMomentumScrollEnd?.(e);
       onSnapToEdge(e);
     },
     [onMomentumScrollEnd, onSnapToEdge]
   );
 
-  const onScrollEndDragInternal = useWorkletCallback(
+  const onScrollEndDragInternal = useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       onScrollEndDrag?.(e);
       if (Platform.OS === 'android' || Math.abs(e.velocity?.y ?? 0) > 0) {
         return;
@@ -129,12 +130,13 @@ export function useStickyHeaderScrollProps<T extends ScrollComponent>(
     [onScrollEndDrag, onSnapToEdge]
   );
 
-  const onScrollInternal = useWorkletCallback(
+  const onScrollInternal = useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       scrollValue.value = e.contentOffset.y;
       onScroll?.(e);
     },
-    [onScroll]
+    [onScroll, scrollValue]
   );
 
   return {

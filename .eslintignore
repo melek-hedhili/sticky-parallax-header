@@ -1,6 +1,0 @@
-/docs/build
-**/metro.config.js
-.eslintrc.js
-/jest/**
-node_modules/
-lib/

@@ -1,22 +1,23 @@
 import * as React from 'react';
 import type { ImageSourcePropType, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { colors, commonStyles, constants } from '../../../constants';
-import { useResponsiveSize } from '../../../hooks/useResponsiveSize';
 import { useRTLStyles } from '../../common/hooks/useRTLStyles';
+import { getForegroundImageSizes } from '../../common/utils/getForegroundImageSizes';
 import { scrollPosition } from '../../common/utils/scrollPosition';
 
 interface ForegroundProps {
   height: number;
   image?: ImageSourcePropType;
-  scrollValue: Animated.SharedValue<number>;
+  scrollValue: SharedValue<number>;
   subtitle?: string;
-  subtitleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  subtitleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   subtitleTestID?: string;
   title?: string;
-  titleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  titleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   titleTestID?: string;
 }
 
@@ -34,16 +35,13 @@ export const Foreground: React.FC<ForegroundProps> = ({
   titleStyle,
   titleTestID = 'AvatarHeaderForegroundTitleTestID',
 }) => {
-  const { responsiveWidth } = useResponsiveSize();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const isLandscape =
     windowWidth > windowHeight && windowHeight <= constants.breakpoints.mediumPhoneShorterEdge;
 
-  const profilePicBorderRadius = responsiveWidth(4.5);
-
-  const startSize = responsiveWidth(18);
-  const endSize = responsiveWidth(12);
+  const { startSize, endSize } = getForegroundImageSizes(windowWidth, height, 12);
+  const profilePicBorderRadius = startSize / 4;
   const [startImgAnimation, finishImgAnimation] = [
     scrollPosition(height, startImgPosition),
     scrollPosition(height, finishImgPosition),
@@ -63,7 +61,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
         scrollValue.value,
         [0, startImgAnimation, finishImgAnimation],
         [1, 0.8, 0],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
     };
   }, [scrollValue, startImgAnimation, finishImgAnimation]);
@@ -72,7 +70,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
       scrollValue.value,
       [0, startImgAnimation, finishImgAnimation],
       [startSize, startSize, endSize],
-      Extrapolate.CLAMP
+      Extrapolation.CLAMP
     );
 
     return {
@@ -94,7 +92,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
         scrollValue.value,
         [0, startAuthorFade, finishAuthorFade],
         [1, 1, 0],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
     };
   }, [scrollValue, startAuthorFade, finishAuthorFade]);
@@ -104,7 +102,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
         scrollValue.value,
         [0, startAboutFade, fininshAboutFade],
         [1, 1, 0],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
     };
   }, [scrollValue, startAboutFade, fininshAboutFade]);

@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import * as React from 'react';
 import { StatusBar, useColorScheme } from 'react-native';
-import { withAvatarHeaderFlashList } from 'react-native-sticky-parallax-header';
+import { withAvatarHeaderFlashList } from 'react-native-sticky-parallax-header/flash-list';
 
 import type { Question } from '../../assets/data/cards';
 import { Brandon } from '../../assets/data/cards';
@@ -77,11 +77,14 @@ export const AvatarHeaderFlashListExample: React.FC = () => {
         titleStyle={screenStyles.text}
         titleTestID={avatarHeaderTestIDs.title}
         data={data}
-        estimatedItemSize={300}
         keyExtractor={(item) => item.id}
         decelerationRate="normal"
         renderItem={({ item, index }) => (
-          <QuizCard data={item} num={index} cardsAmount={Brandon.cards.length} />
+          <QuizCard
+            data={item}
+            num={index % Brandon.cards.length}
+            cardsAmount={Brandon.cards.length}
+          />
         )}
         showsVerticalScrollIndicator={false}
       />

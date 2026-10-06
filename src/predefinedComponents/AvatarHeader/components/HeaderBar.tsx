@@ -1,7 +1,8 @@
 import * as React from 'react';
 import type { ImageSourcePropType, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import type { Edge } from 'react-native-safe-area-context';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -24,9 +25,9 @@ interface HeaderProps extends IconProps {
   enableSafeAreaTopInset?: boolean;
   height: number;
   image?: ImageSourcePropType;
-  scrollValue: Animated.SharedValue<number>;
+  scrollValue: SharedValue<number>;
   title?: string;
-  titleStyle?: StyleProp<Animated.AnimateStyle<TextStyle>>;
+  titleStyle?: StyleProp<AnimatedStyle<TextStyle>>;
   titleTestID?: string;
 }
 
@@ -65,7 +66,7 @@ export const HeaderBar: React.FC<HeaderProps> = ({
         scrollValue.value,
         [0, beforeFadeImg, startFadeImg, finishFadeImg],
         [0, 0, 0.5, 1],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
     };
   }, [scrollValue, beforeFadeImg, startFadeImg, finishFadeImg]);
@@ -75,7 +76,7 @@ export const HeaderBar: React.FC<HeaderProps> = ({
         scrollValue.value,
         [0, beforeFadeName, startFadeName, finishFadeName],
         [0, 0, 0.5, 1],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
     };
   }, [scrollValue, beforeFadeName, startFadeName, finishFadeName]);
@@ -98,7 +99,7 @@ export const HeaderBar: React.FC<HeaderProps> = ({
   }
 
   return (
-    <SafeAreaView edges={safeAreaEdges} style={commonStyles.container}>
+    <SafeAreaView edges={safeAreaEdges} style={commonStyles.headerBarContainer}>
       <Animated.View style={[commonStyles.headerWrapper, wrapperAnimatedStyle]}>
         {leftTopIcon ? (
           <Pressable

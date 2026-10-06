@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { FlashList, ViewToken } from '@shopify/flash-list';
+import type { FlashListRef, ViewToken } from '@shopify/flash-list';
 import * as React from 'react';
 import type { NativeScrollEvent } from 'react-native';
 import { Platform } from 'react-native';
-import { runOnJS, useSharedValue, useWorkletCallback } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedFlashListHeader } from '../../common/hooks/usePredefinedFlashListHeader';
 import { debounce } from '../../common/utils/debounce';
 import { isNotEmpty } from '../../common/utils/isNotEmpty';
-import type { TabbedHeaderFlashListProps } from '../TabbedHeaderProps';
+import type { TabbedHeaderFlashListProps } from '../TabbedHeaderFlashListProps';
 import { Foreground } from '../components/HeaderForeground';
 
 import { useRenderTabs } from './useRenderTabs';
 
-function useRenderFlashListHeader<T extends FlashList<any>>(
+function useRenderFlashListHeader<T extends FlashListRef<any>>(
   props: TabbedHeaderFlashListProps<any>
 ) {
   const {
@@ -39,9 +40,13 @@ function useRenderFlashListHeader<T extends FlashList<any>>(
     titleTestID,
   } = props;
   const horizontalScrollValue = useSharedValue(0);
-  const onHorizontalPagerScroll = useWorkletCallback((e: NativeScrollEvent) => {
-    horizontalScrollValue.value = e.contentOffset.x;
-  }, []);
+  const onHorizontalPagerScroll = React.useCallback(
+    (e: NativeScrollEvent) => {
+      'worklet';
+      horizontalScrollValue.value = e.contentOffset.x;
+    },
+    [horizontalScrollValue]
+  );
 
   const renderHeader = React.useCallback(() => {
     return (
@@ -93,9 +98,10 @@ function useRenderFlashListHeader<T extends FlashList<any>>(
   };
 }
 
-export function useTabbedFlashListHeader<ItemT, T extends FlashList<ItemT> = FlashList<ItemT>>(
-  props: TabbedHeaderFlashListProps<ItemT>
-) {
+export function useTabbedFlashListHeader<
+  ItemT,
+  T extends FlashListRef<ItemT> = FlashListRef<ItemT>,
+>(props: TabbedHeaderFlashListProps<ItemT>) {
   const {
     innerScrollHeight,
     horizontalScrollValue,
@@ -110,7 +116,7 @@ export function useTabbedFlashListHeader<ItemT, T extends FlashList<ItemT> = Fla
   const [activeSection, setActiveSection] = React.useState(0);
   const ignoreViewabilityItemsChangedEvent = useSharedValue(false);
   const onViewableItemsChanged = React.useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+    ({ viewableItems }: { viewableItems: ViewToken<ItemT>[]; changed: ViewToken<ItemT>[] }) => {
       if (
         !viewableItems.length ||
         ignoreViewabilityItemsChangedEvent.value ||
@@ -158,26 +164,37 @@ export function useTabbedFlashListHeader<ItemT, T extends FlashList<ItemT> = Fla
     },
     [ignoreViewabilityItemsChangedEvent, scrollViewRef, stickyHeaderIndices]
   );
-  const onMomentumScrollEndInternal = useWorkletCallback(
+  const onMomentumScrollEndInternal = React.useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       ignoreViewabilityItemsChangedEvent.value = false;
       onMomentumScrollEnd?.(e);
     },
-    [onMomentumScrollEnd]
+    [ignoreViewabilityItemsChangedEvent, onMomentumScrollEnd]
   );
-  const debouncedIgnoreViewabilityItemsChangedCallback = debounce(() => {
-    ignoreViewabilityItemsChangedEvent.value = false;
-  }, 100);
-  const onScrollInternal = useWorkletCallback(
+  const debouncedIgnoreViewabilityItemsChangedCallback = React.useMemo(
+    () =>
+      debounce(() => {
+        ignoreViewabilityItemsChangedEvent.value = false;
+      }, 100),
+    [ignoreViewabilityItemsChangedEvent]
+  );
+
+  React.useEffect(
+    () => () => debouncedIgnoreViewabilityItemsChangedCallback.cancel(),
+    [debouncedIgnoreViewabilityItemsChangedCallback]
+  );
+  const onScrollInternal = React.useCallback(
     (e: NativeScrollEvent) => {
+      'worklet';
       if (Platform.OS === 'web') {
         // On web there is no onMomentumScrollEnd
-        runOnJS(debouncedIgnoreViewabilityItemsChangedCallback)();
+        scheduleOnRN(debouncedIgnoreViewabilityItemsChangedCallback);
       }
 
       onScroll?.(e);
     },
-    [onScroll]
+    [debouncedIgnoreViewabilityItemsChangedCallback, onScroll]
   );
 
   const renderTabs = useRenderTabs({

@@ -1,5 +1,4 @@
-import type { FlashListProps } from '@shopify/flash-list';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type {
   FlatListProps,
   LayoutChangeEvent,
@@ -10,9 +9,10 @@ import type {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import type { AnimateProps } from 'react-native-reanimated';
+import type { AnimatedProps } from 'react-native-reanimated';
 
 export interface StickyHeaderSharedProps {
+  children?: ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   onHeaderLayout?: (e: LayoutChangeEvent) => void;
@@ -42,9 +42,11 @@ export interface StickyHeaderSnapProps {
   snapToEdge?: boolean;
 }
 export interface StickyHeaderScrollViewProps
-  extends StickyHeaderSharedProps,
+  extends
+    StickyHeaderSharedProps,
     Omit<
-      AnimateProps<ScrollViewProps>,
+      AnimatedProps<ScrollViewProps>,
+      | 'children'
       | 'contentContainerStyle'
       | 'onMomentumScrollBegin'
       | 'onMomentumScrollEnd'
@@ -55,9 +57,11 @@ export interface StickyHeaderScrollViewProps
     > {}
 
 export interface StickyHeaderFlatListProps<ItemT>
-  extends StickyHeaderSharedProps,
+  extends
+    StickyHeaderSharedProps,
     Omit<
-      AnimateProps<FlatListProps<ItemT>>,
+      AnimatedProps<FlatListProps<ItemT>>,
+      | 'children'
       | 'contentContainerStyle'
       | 'data'
       | 'onMomentumScrollBegin'
@@ -71,9 +75,11 @@ export interface StickyHeaderFlatListProps<ItemT>
 }
 
 export interface StickyHeaderSectionListProps<ItemT, SectionT>
-  extends StickyHeaderSharedProps,
+  extends
+    StickyHeaderSharedProps,
     Omit<
-      AnimateProps<SectionListProps<ItemT, SectionT>>,
+      AnimatedProps<SectionListProps<ItemT, SectionT>>,
+      | 'children'
       | 'contentContainerStyle'
       | 'onMomentumScrollBegin'
       | 'onMomentumScrollEnd'
@@ -84,31 +90,4 @@ export interface StickyHeaderSectionListProps<ItemT, SectionT>
       | 'style'
     > {
   sections: ReadonlyArray<SectionListData<ItemT, SectionT>>;
-}
-
-export interface StickyHeaderFlashListProps<ItemT>
-  extends Omit<StickyHeaderSharedProps, 'contentContainerStyle' | 'style'>,
-    Omit<
-      AnimateProps<FlashListProps<ItemT>>,
-      | 'contentContainerStyle'
-      | 'data'
-      | 'renderItem'
-      | 'onScroll'
-      | 'onScrollBeginDrag'
-      | 'onScrollEndDrag'
-      | 'onMomentumScrollBegin'
-      | 'onMomentumScrollEnd'
-      | 'onViewableItemsChanged'
-      | 'stickyHeaderIndices'
-      | 'style'
-    >,
-    Pick<
-      FlashListProps<ItemT>,
-      | 'contentContainerStyle'
-      | 'renderItem'
-      | 'onViewableItemsChanged'
-      | 'stickyHeaderIndices'
-      | 'style'
-    > {
-  data: ReadonlyArray<ItemT>;
 }

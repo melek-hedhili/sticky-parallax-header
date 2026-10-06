@@ -1,66 +1,54 @@
 ---
 sidebar_position: 2
 ---
+
 # Pull to refresh
 
-All exported components inherits props of their underlying scroll component, to use default refresh control, just pass `onRefresh` & `refreshing` props. If you want to have custom setup (e.g. custom style), pass component as `refreshControl` prop
+`FlatList`, `SectionList` and FlashList headers inherit the list's `onRefresh`
+and `refreshing` props. A `ScrollView` header instead takes an explicit
+`refreshControl` element. Do not pass list-only refresh props to
+`StickyHeaderScrollView`.
 
 ```tsx
-  <StickyHeaderScrollView
-    // ...
-    onRefresh={onRefresh}
-    refreshing={refreshing}
-    // ...
-  >
-    {/** content */}
-  </StickyHeaderScrollView>
-```
+import { useCallback, useState } from 'react';
+import { Platform, RefreshControl, Text } from 'react-native';
+import { StickyHeaderScrollView } from 'react-native-sticky-parallax-header';
 
-```tsx
-  <StickyHeaderScrollView
-    // ...
-    refreshControl={
-      <RefreshControl
-        // z Index is required on IOS, to refresh indicator be visible
-        style={{ zIndex: 1 }}
-        refreshing={refreshing}
-        titleColor="white"
-        tintColor="white"
-        title="Refreshing"
-        onRefresh={onRefresh}
-      />
+export function RefreshableHeader() {
+  const [refreshing, setRefreshing] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState(() => new Date().toLocaleTimeString());
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await new Promise<void>((resolve) => setTimeout(resolve, 500));
+      setUpdatedAt(new Date().toLocaleTimeString());
+    } finally {
+      setRefreshing(false);
     }
-    // ...
-  >
-    {/** content */}
-  </StickyHeaderScrollView>
-```
+  }, []);
 
-:::warning
-using `RefreshControl` on web, can break sticky header layout, because web implementation is just stubbed and doubles ScrollView's margin/padding
-
-to handle that, use it only when platform is not web
-
-```tsx
-{...Platform.select({ default: { onRefresh, refreshing }, web: undefined })}
-```
-
-```tsx
-refreshControl={
-  Platform.select({
-    default: (
-      <RefreshControl
-        // z Index is required on IOS, to refresh indicator be visible
-        style={{ zIndex: 1 }}
-        refreshing={refreshing}
-        titleColor="white"
-        tintColor="white"
-        title="Refreshing"
-        onRefresh={onRefresh}
-      />
-    ),
-    web: undefined,
-  })
+  return (
+    <StickyHeaderScrollView
+      containerStyle={{ flex: 1 }}
+      renderHeader={() => <Text style={{ height: 200, padding: 24 }}>Updates</Text>}
+      refreshControl={
+        Platform.OS === 'web' ? undefined : (
+          <RefreshControl style={{ zIndex: 1 }} refreshing={refreshing} onRefresh={onRefresh} />
+        )
+      }>
+      <Text style={{ minHeight: 1000, padding: 24 }}>Updated at {updatedAt}</Text>
+    </StickyHeaderScrollView>
+  );
 }
 ```
-:::
+
+Keep the refresh indicator above the header overlay on iOS with the shown
+`zIndex`. The sample delays briefly to demonstrate the refreshing state; replace
+that asynchronous operation with your application's data reload.
+
+## Web
+
+Native pull-to-refresh is not part of the web compatibility contract. Omit
+`refreshControl` on web; for list components, omit `onRefresh` there as well.
+The legacy web implementation could duplicate list padding. Use a separate
+refresh button for a web-specific interaction.

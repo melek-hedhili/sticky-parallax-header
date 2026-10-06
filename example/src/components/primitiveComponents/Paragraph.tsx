@@ -18,25 +18,20 @@ export const Paragraph: React.FC<{ text: string }> = ({ text }) => {
 
 const styles = StyleSheet.create({
   paragraph: {
-    color: colors.primaryGreen,
-    fontSize: 18,
+    color: colors.greyishBrown,
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: 'left',
   },
   paragraphContainer: {
     alignItems: 'flex-start',
+    backgroundColor: colors.white,
     borderColor: colors.paleGrey,
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    elevation: 2,
-    margin: 10,
-    padding: 10,
-    shadowColor: Platform.select({
-      ios: colors.paleGrey,
-      default: undefined,
-    }),
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.7,
-    shadowRadius: 0.8,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginHorizontal: 24,
+    marginVertical: 8,
+    padding: 16,
   },
   pressedTab: {
     opacity: Platform.select({
