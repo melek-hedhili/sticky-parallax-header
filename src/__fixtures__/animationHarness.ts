@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { NativeScrollEvent } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import * as Reanimated from 'react-native-reanimated';
+import * as Worklets from 'react-native-worklets';
 
 type ScrollHandlers = Partial<
   Record<
@@ -9,7 +10,16 @@ type ScrollHandlers = Partial<
     (event: NativeScrollEvent) => void
   >
 >;
-type Reaction = { prepare: () => unknown; react: (value: unknown, previous: unknown) => void };
+type Reaction = {
+  prepare: () => unknown;
+  react: (value: unknown, previous: unknown) => void;
+  initialized: boolean;
+  previous: unknown;
+};
+
+interface AnimationHarnessOptions {
+  deferRNScheduling?: boolean;
+}
 
 export function createAnimatedRef<T>() {
   const ref = Object.assign(
@@ -22,10 +32,34 @@ export function createAnimatedRef<T>() {
   return ref;
 }
 
-/** Simulates callback delivery only; this does not run a native UI worklet runtime. */
-export function installAnimationHarness() {
+/**
+ * Models direct scalar scroll-value reactions and RN callback delivery. Raw value
+ * equality follows the shared-value setter's === check. This does not model
+ * arbitrary prepared objects, native mapper dependencies, commits, or timing.
+ */
+export function installAnimationHarness({
+  deferRNScheduling = false,
+}: AnimationHarnessOptions = {}) {
   const scrollHandlers: { current: ScrollHandlers }[] = [];
   const reactions = new Set<Reaction>();
+  const rnQueue: (() => void)[] = [];
+  const rnScheduler = jest
+    .spyOn(Worklets, 'scheduleOnRN')
+    .mockImplementation((callback, ...args) => {
+      const deliver = () => {
+        if (typeof callback !== 'function') {
+          throw new Error('The animation harness expects an RN callback function.');
+        }
+
+        callback(...args);
+      };
+
+      if (deferRNScheduling) {
+        rnQueue.push(deliver);
+      } else {
+        deliver();
+      }
+    });
 
   jest.spyOn(Reanimated, 'useSharedValue').mockImplementation(function useSharedValue<T>(
     initial: T
@@ -40,7 +74,12 @@ export function installAnimationHarness() {
   jest
     .spyOn(Reanimated, 'useAnimatedReaction')
     .mockImplementation(function useAnimatedReaction(prepare, react) {
-      const reaction = React.useRef({ prepare, react });
+      const reaction = React.useRef<Reaction>({
+        prepare,
+        react,
+        initialized: false,
+        previous: null,
+      });
 
       reaction.current.prepare = prepare;
       reaction.current.react = react;
@@ -79,9 +118,27 @@ export function installAnimationHarness() {
   return {
     scrollTo,
     scrollHandlers,
+    rnScheduler,
+    pendingRNJobs: () => rnQueue.length,
+    flushRNQueue: (limit = Infinity) => {
+      let delivered = 0;
+
+      while (rnQueue.length && delivered < limit) {
+        rnQueue.shift()?.();
+        delivered += 1;
+      }
+    },
     reactToSharedValues: () => {
       for (const reaction of reactions) {
-        reaction.react(reaction.prepare(), null);
+        const value = reaction.prepare();
+
+        if (reaction.initialized && value === reaction.previous) {
+          continue;
+        }
+
+        reaction.react(value, reaction.initialized ? reaction.previous : null);
+        reaction.previous = value;
+        reaction.initialized = true;
       }
     },
   };

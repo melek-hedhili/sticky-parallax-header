@@ -131,4 +131,235 @@ describe.each([
     expect(first).toHaveBeenCalledTimes(1);
     expect(next).toHaveBeenCalledTimes(1);
   });
+
+  test.each([true, false])(
+    'schedules only one reset during a positive scroll run (callback present: %s)',
+    async (hasCallback) => {
+      const harness = installAnimationHarness({ deferRNScheduling: true });
+      const onTopReached = jest.fn();
+      const hook = await renderHook(() =>
+        useScroll({ onTopReached: hasCallback ? onTopReached : undefined, snapToEdge: false })
+      );
+
+      await act(() => harness.reactToSharedValues());
+      expect(harness.pendingRNJobs()).toBe(1);
+      await act(() => harness.flushRNQueue());
+      harness.rnScheduler.mockClear();
+      await act(() => {
+        for (let y = 1; y <= 1000; y += 1) {
+          hook.result.current.onScroll(scrollEvent(y));
+          harness.reactToSharedValues();
+        }
+      });
+      expect(harness.rnScheduler).toHaveBeenCalledTimes(1);
+      expect(harness.pendingRNJobs()).toBe(1);
+      await act(() => harness.flushRNQueue());
+      expect(onTopReached).toHaveBeenCalledTimes(hasCallback ? 1 : 0);
+    }
+  );
+
+  test('retains ordered top returns while RN delivery is delayed', async () => {
+    const harness = installAnimationHarness({ deferRNScheduling: true });
+    const onTopReached = jest.fn();
+    const hook = await renderHook(() => useScroll({ onTopReached }));
+
+    await act(() => {
+      harness.reactToSharedValues();
+      for (const y of [1, 2, 0, -1, 3, 4, -2]) {
+        hook.result.current.onScroll(scrollEvent(y));
+        harness.reactToSharedValues();
+      }
+    });
+    expect(onTopReached).not.toHaveBeenCalled();
+    expect(harness.rnScheduler.mock.calls.map(([, value]) => value)).toEqual([0, 1, 0, -1, 3, -2]);
+    await act(() => harness.flushRNQueue(1));
+    expect(onTopReached).toHaveBeenCalledTimes(1);
+    await act(() => harness.flushRNQueue(1));
+    expect(onTopReached).toHaveBeenCalledTimes(1);
+    await act(() => harness.flushRNQueue(2));
+    expect(onTopReached).toHaveBeenCalledTimes(2);
+    await act(() => harness.flushRNQueue());
+    expect(onTopReached).toHaveBeenCalledTimes(3);
+    expect(harness.pendingRNJobs()).toBe(0);
+  });
+
+  test('queued top checks read callback replacement and removal at delivery', async () => {
+    const harness = installAnimationHarness({ deferRNScheduling: true });
+    const first = jest.fn();
+    const next = jest.fn();
+    const hook = await renderHook((props: Props) => useScroll(props), {
+      initialProps: { onTopReached: first },
+    });
+
+    await act(() => harness.reactToSharedValues());
+    await hook.rerender({ onTopReached: next });
+    await act(() => harness.flushRNQueue());
+    expect(first).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(10));
+      harness.reactToSharedValues();
+      hook.result.current.onScroll(scrollEvent(-1));
+      harness.reactToSharedValues();
+    });
+    await hook.rerender({});
+    await act(() => harness.flushRNQueue());
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  test('a pending initial check can notify a callback added before delivery', async () => {
+    const harness = installAnimationHarness({ deferRNScheduling: true });
+    const added = jest.fn();
+    const hook = await renderHook((props: Props) => useScroll(props), { initialProps: {} });
+
+    await act(() => harness.reactToSharedValues());
+    await hook.rerender({ onTopReached: added });
+    expect(added).not.toHaveBeenCalled();
+    await act(() => harness.flushRNQueue());
+    expect(added).toHaveBeenCalledTimes(1);
+  });
+
+  test('adding a callback while already top waits for a distinct top-side offset', async () => {
+    const harness = installAnimationHarness({ deferRNScheduling: true });
+    const added = jest.fn();
+    const replacement = jest.fn();
+    const hook = await renderHook((props: Props) => useScroll(props), { initialProps: {} });
+
+    await act(() => {
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+    });
+    await hook.rerender({ onTopReached: added });
+    await act(() => harness.reactToSharedValues());
+    expect(harness.pendingRNJobs()).toBe(0);
+    expect(added).not.toHaveBeenCalled();
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(-1));
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+    });
+    expect(added).toHaveBeenCalledTimes(1);
+    await hook.rerender({});
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(-2));
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+    });
+    await hook.rerender({ onTopReached: replacement });
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(-3));
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+    });
+    expect(replacement).not.toHaveBeenCalled();
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(1));
+      harness.reactToSharedValues();
+      hook.result.current.onScroll(scrollEvent(0));
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+    });
+    expect(replacement).toHaveBeenCalledTimes(1);
+  });
+
+  test('a queued top-side offset can notify a callback added after the offset', async () => {
+    const harness = installAnimationHarness({ deferRNScheduling: true });
+    const added = jest.fn();
+    const hook = await renderHook((props: Props) => useScroll(props), { initialProps: {} });
+
+    await act(() => {
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+      hook.result.current.onScroll(scrollEvent(-1));
+      harness.reactToSharedValues();
+    });
+    await hook.rerender({ onTopReached: added });
+    await act(() => harness.flushRNQueue());
+    expect(added).toHaveBeenCalledTimes(1);
+  });
+
+  test('a throwing top callback retries on the next observed top-side offset', async () => {
+    const harness = installAnimationHarness({ deferRNScheduling: true });
+    const failure = new Error('Callback failed');
+    const onTopReached = jest
+      .fn()
+      .mockImplementationOnce(() => {
+        throw failure;
+      })
+      .mockImplementation(() => undefined);
+    const hook = await renderHook(() => useScroll({ onTopReached }));
+
+    await act(() => harness.reactToSharedValues());
+    expect(() => harness.flushRNQueue()).toThrow(failure);
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(-1));
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+      hook.result.current.onScroll(scrollEvent(-2));
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+    });
+    expect(onTopReached).toHaveBeenCalledTimes(2);
+  });
+
+  test('raw scalar delivery suppresses signed-zero changes in both directions', async () => {
+    const harness = installAnimationHarness({ deferRNScheduling: true });
+    const onTopReached = jest.fn();
+    const hook = await renderHook(() => useScroll({ onTopReached }));
+
+    await act(() => {
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+    });
+    harness.rnScheduler.mockClear();
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(-0));
+      harness.reactToSharedValues();
+    });
+    expect(harness.pendingRNJobs()).toBe(0);
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(-1));
+      harness.reactToSharedValues();
+      hook.result.current.onScroll(scrollEvent(-0));
+      harness.reactToSharedValues();
+    });
+    expect(harness.pendingRNJobs()).toBe(2);
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(0));
+      harness.reactToSharedValues();
+    });
+    expect(harness.pendingRNJobs()).toBe(2);
+    await act(() => harness.flushRNQueue());
+    expect(onTopReached).toHaveBeenCalledTimes(1);
+  });
+
+  test('repeated NaN observations retain queued resets and the next top notification', async () => {
+    const harness = installAnimationHarness({ deferRNScheduling: true });
+    const onTopReached = jest.fn();
+    const hook = await renderHook(() => useScroll({ onTopReached }));
+
+    await act(() => {
+      harness.reactToSharedValues();
+      harness.flushRNQueue();
+    });
+    harness.rnScheduler.mockClear();
+    await act(() => {
+      hook.result.current.onScroll(scrollEvent(Number.NaN));
+      harness.reactToSharedValues();
+      hook.result.current.onScroll(scrollEvent(Number.NaN));
+      harness.reactToSharedValues();
+      hook.result.current.onScroll(scrollEvent(0));
+      harness.reactToSharedValues();
+    });
+    expect(harness.pendingRNJobs()).toBe(3);
+    expect(harness.rnScheduler.mock.calls.map(([, value]) => value)).toEqual([
+      Number.NaN,
+      Number.NaN,
+      0,
+    ]);
+    await act(() => harness.flushRNQueue(2));
+    expect(onTopReached).toHaveBeenCalledTimes(1);
+    await act(() => harness.flushRNQueue());
+    expect(onTopReached).toHaveBeenCalledTimes(2);
+  });
 });

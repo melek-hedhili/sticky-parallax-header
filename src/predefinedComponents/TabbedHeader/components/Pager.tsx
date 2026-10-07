@@ -65,7 +65,6 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
     const containerWidthRef = React.useRef(containerWidth);
     const currentPageRef = React.useRef(initialPage);
     const horizontalFlatListRef = useAnimatedRef<FlatListRef<Page>>();
-    const horizontalScrollValue = useSharedValue(initialPage * Dimensions.get('window').width);
 
     const scrollToTabPositionTimeoutValue = useSharedValue(1);
 
@@ -226,7 +225,6 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
 
     const scrollHandler = useAnimatedScrollHandler({
       onScroll: (e) => {
-        horizontalScrollValue.value = e.contentOffset.x;
         onScroll?.(e);
         if (Platform.OS === 'web') {
           // On web there is no onMomentumScrollEnd

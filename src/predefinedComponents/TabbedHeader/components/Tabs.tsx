@@ -108,6 +108,10 @@ export const Tabs: React.FC<TabsProps> = ({
       const tabWidth = e.nativeEvent.layout.width;
 
       setTabsWidth((prevTabsWidth) => {
+        if (Object.is(prevTabsWidth[page], tabWidth)) {
+          return prevTabsWidth;
+        }
+
         const newTabsWidth = prevTabsWidth.slice();
 
         newTabsWidth[page] = tabWidth;

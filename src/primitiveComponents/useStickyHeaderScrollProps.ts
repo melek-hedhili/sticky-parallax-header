@@ -59,7 +59,13 @@ export function useStickyHeaderScrollProps<T extends ScrollComponent>(
 
   useAnimatedReaction(
     () => scrollValue.value,
-    (value) => {
+    (value, previous) => {
+      // Positive offsets only reset the RN latch. Keep every top-side check so
+      // callbacks added while already at the top still run on the next offset.
+      if (value > 0 && previous !== null && previous > 0) {
+        return;
+      }
+
       scheduleOnRN(maybeTopReached, value);
     },
     [maybeTopReached, scrollValue]
