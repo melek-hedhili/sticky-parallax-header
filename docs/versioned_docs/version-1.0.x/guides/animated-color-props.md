@@ -6,7 +6,7 @@ sidebar_position: 6
 
 To make animated color props use Reanimated hooks to produce shared values that will be applied as a color/background color.
 
-Full example code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/TabbedHeaderWithAnimatedColors.tsx)
+Full example code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/cdba82e5d76cb02bb4c1e17ae9dceb57d4610d80/example/src/screens/additionalExamples/TabbedHeaderWithAnimatedColors.tsx)
 
 ```tsx
 const TabbedHeaderWithAnimatedColorsExample: React.FC = () => {

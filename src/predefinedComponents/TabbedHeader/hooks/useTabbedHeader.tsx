@@ -200,22 +200,32 @@ export function useTabbedHeaderList<
     [debouncedIgnoreViewabilityItemsChangedCallback, onScroll]
   );
 
-  const { backgroundColor, sections, tabsContainerBackgroundColor } = props;
+  const {
+    backgroundColor,
+    sections,
+    stickySectionHeadersEnabled = true,
+    tabsContainerBackgroundColor,
+  } = props;
 
   const [activeSection, setActiveSection] = React.useState(0);
 
   const goToSection = React.useCallback(
     (sectionIndex: number) => {
+      const section = sections[sectionIndex] as { data: readonly ItemT[] } | undefined;
+
       ignoreViewabilityItemsChangedEvent.value = true;
       scrollViewRef.current?.scrollToLocation({
         animated: true,
-        itemIndex: 0,
+        // RN's cell 0 is the section header. Its sticky layout can report offset
+        // 0; cell 1 is the first data row and RN compensates for the header height.
+        // Empty/nonsticky sections must still target their header, not a footer/row.
+        itemIndex: stickySectionHeadersEnabled && section?.data.length ? 1 : 0,
         sectionIndex,
         viewPosition: 0,
       });
       setActiveSection(sectionIndex);
     },
-    [ignoreViewabilityItemsChangedEvent, scrollViewRef]
+    [ignoreViewabilityItemsChangedEvent, scrollViewRef, sections, stickySectionHeadersEnabled]
   );
 
   const onViewableItemsChanged = React.useCallback<

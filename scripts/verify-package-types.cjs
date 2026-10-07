@@ -216,7 +216,10 @@ function verifyArchiveContents(archive) {
     return (
       !/^(?:package\.json|README(?:\.[^/]*)?|LICENSE(?:\.[^/]*)?|(?:src|lib)(?:\/.*)?)$/i.test(
         relative
-      ) || /(?:^|\/)(?:__tests__|__fixtures__|__mocks__|node_modules)(?:\/|$)/.test(relative)
+      ) ||
+      /(?:^|\/)(?:demo|__tests__|__fixtures__|__mocks__|node_modules|\.agents|\.claude)(?:\/|$)/.test(
+        relative
+      )
     );
   });
 

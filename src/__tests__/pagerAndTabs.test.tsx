@@ -174,7 +174,7 @@ test('tab presses and section viewability cooperate without overriding programma
   await act(() => hook.result.current.goToSection(1));
   expect(scrollToLocation).toHaveBeenCalledWith({
     animated: true,
-    itemIndex: 0,
+    itemIndex: 1,
     sectionIndex: 1,
     viewPosition: 0,
   });

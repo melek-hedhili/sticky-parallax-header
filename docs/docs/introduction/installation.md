@@ -13,18 +13,19 @@ this branch's compatibility target.
 Install one complete set. Expo's supported native dependencies can differ from
 the newest bare React Native packages.
 
-| Dependency            | Expo example | Bare React Native example |
-| --------------------- | ------------ | ------------------------- |
-| Expo                  | 57.0.26      | Not required              |
-| React Native          | 0.86.3       | 0.87.1                    |
-| React                 | 19.2.3       | 19.2.3                    |
-| Reanimated            | 4.5.1        | 4.7.1                     |
-| React Native Worklets | 0.10.1       | 0.13.0                    |
-| Safe Area Context     | 5.7.x        | 5.10.1                    |
-| FlashList, optional   | 2.0.2        | 2.3.3                     |
+| Dependency            | Expo demo | Bare consumer type lane |
+| --------------------- | --------- | ----------------------- |
+| Expo                  | 57.0.27   | Not required            |
+| React Native          | 0.86.3    | 0.87.1                  |
+| React                 | 19.2.3    | 19.2.3                  |
+| Reanimated            | 4.5.1     | 4.7.1                   |
+| React Native Worklets | 0.10.1    | 0.13.0                  |
+| Safe Area Context     | 5.7.x     | 5.10.1                  |
+| FlashList, optional   | 2.0.2     | 2.3.3                   |
 
-These are the repository's migration targets. A successful JavaScript bundle or
-unit test does not replace building and running your app on its native targets.
+These are the repository's dependency targets. The Expo demo provides runtime
+scenarios; the bare lane is retained in isolated package type checks. A successful
+JavaScript bundle or unit test does not establish native animation behavior.
 Use Node 24.21.0 and Yarn Classic 1.22.22 when contributing to this repository.
 
 ## Use this checkout before publication
@@ -51,8 +52,9 @@ npx expo install react-native-reanimated react-native-worklets react-native-safe
 
 Keep `babel-preset-expo` in the application's Babel config. It configures the
 Worklets transform for the installed Expo/Reanimated stack. Do not configure the
-old Reanimated plugin as a second copy of the same transform. Rebuild the native
-application after changing native dependencies.
+old Reanimated plugin as a second copy of the same transform. The repository demo
+runs in Expo Go without prebuild or native projects. Custom consumer applications
+need a new native binary when they change native dependencies.
 
 ## Bare React Native
 

@@ -4,6 +4,9 @@ sidebar_position: 3
 
 # Custom FlashList Header
 
+The Expo Router demo contains a complete
+[custom FlashList screen](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/sticky-header-flash-list-example.tsx).
+
 Use the optional `/flash-list` entry to wrap FlashList 2. The primitive adapter
 provides sticky layout; the accompanying hook supplies snapping handlers and a
 `FlashListRef`. Install the [matching dependencies](../introduction/installation.md)

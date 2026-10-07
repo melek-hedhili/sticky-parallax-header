@@ -7,7 +7,7 @@
 <!-- State any impact on public exports, props, refs, worklets, or dependency requirements. -->
 
 - [ ] Library
-- [ ] Example app
+- [ ] Expo Router demo
 - [ ] Documentation or tooling
 - [ ] Android
 - [ ] iOS
@@ -16,7 +16,7 @@
 ## Validation
 
 <!-- Follow CONTRIBUTING.md. Record exact commands and outcomes;
-     distinguish new failures from existing limitations.
+     distinguish new failures from its verification record.
      Report JS regressions, strict packed-consumer results, and actual native/browser interactions separately. -->
 
 | Command or scenario | Result | Existing failure or new issue |

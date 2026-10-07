@@ -4,8 +4,11 @@
 **/__mocks__/**
 **/*.test.*
 **/*.spec.*
-example/**
-test-app/**
+.agents/**
+.claude/**
+demo/**
 docs/**
+maintainer/**
 node_modules/**
 package-lock.json
+skills-lock.json

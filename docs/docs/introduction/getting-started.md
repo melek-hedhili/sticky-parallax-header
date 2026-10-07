@@ -62,9 +62,13 @@ application. Core imports do not require FlashList.
 
 ## In Use
 
-The repository contains an Expo application in `example/` and a separate React
-Native application in `test-app/`. Each exercises the modern library with its
-own supported dependency set.
+The repository contains one [Expo Router demo](https://github.com/netguru/sticky-parallax-header/tree/master/demo)
+with 21 showcase screens, 15 deterministic validation cases and nine performance
+workloads. Run `yarn demo ios`, `yarn demo android` or `yarn demo web` from the
+repository root after installing its independent dependencies. Native launch uses
+Expo Go without prebuild or maintained native projects. The bare dependency lane
+remains in isolated package type checks; Expo Go workloads do not establish
+physical-device release performance.
 
 The [original Expo Snack](https://snack.expo.dev/@netguru_rnd/sticky-parallax-header-example)
 is a historical demonstration; it is not the modern compatibility reference.

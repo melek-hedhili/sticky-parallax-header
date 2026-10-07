@@ -8,16 +8,17 @@ const prettierPlugin = require('eslint-plugin-prettier');
 module.exports = [
   {
     ignores: [
+      '.agents/**',
+      '.claude/**',
       '**/node_modules/**',
       'lib/**',
       '**/build/**',
       '**/dist/**',
       'docs/.docusaurus/**',
       '**/.expo/**',
-      '**/ios/Pods/**',
-      '**/vendor/**',
-      '**/android/.gradle/**',
-      '**/android/.cxx/**',
+      'demo/expo-env.d.ts',
+      'demo/ios/**',
+      'demo/android/**',
     ],
   },
   ...reactNative.filter((config) => !config.plugins?.['ft-flow']),

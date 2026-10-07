@@ -47,7 +47,7 @@ In order to do this, we save vertical content offset in a Reanimated's shared va
 
 ## Example
 
-Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/YodaScreen/index.tsx).
+Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/cdba82e5d76cb02bb4c1e17ae9dceb57d4610d80/example/src/screens/YodaScreen/index.tsx).
 
 ```tsx
 const text = {

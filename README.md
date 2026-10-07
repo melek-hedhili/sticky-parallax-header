@@ -10,22 +10,24 @@ pack this checkout to evaluate the modern implementation; publication is a separ
 
 ## Supported stacks
 
-New Architecture is required. The two validation lanes are:
+New Architecture is required. Runtime demos use the Expo lane; isolated package
+consumer checks retain both dependency lanes:
 
-| Dependency            | Expo example         | Bare React Native test app |
-| --------------------- | -------------------- | -------------------------- |
-| Expo                  | 57.0.26              | Not used                   |
-| React Native          | 0.86.3               | 0.87.1                     |
-| React                 | 19.2.3               | 19.2.3                     |
-| Reanimated / Worklets | 4.5.1 / 0.10.1       | 4.7.1 / 0.13.0             |
-| FlashList, when used  | 2.0.2                | 2.3.3                      |
-| Safe Area Context     | Expo-supported 5.7.x | 5.10.1                     |
+| Dependency            | Expo Router demo     | Bare consumer type lane |
+| --------------------- | -------------------- | ----------------------- |
+| Expo                  | 57.0.27              | Not used                |
+| React Native          | 0.86.3               | 0.87.1                  |
+| React                 | 19.2.3               | 19.2.3                  |
+| Reanimated / Worklets | 4.5.1 / 0.10.1       | 4.7.1 / 0.13.0          |
+| FlashList, when used  | 2.0.2                | 2.3.3                   |
+| Safe Area Context     | Expo-supported 5.7.x | 5.10.1                  |
 
 Use the paired animation dependencies for your lane. Expo projects should use
 `expo install` for SDK-managed dependencies. React stays aligned with the native
 renderer; an independent npm latest tag is not a compatibility guarantee.
 
-Package static checks, 28 regression tests, both app source typechecks, and the documentation build pass locally. Android interaction checks cover selected example screens. Strict packed-consumer type checks remain blocked by upstream declarations in the selected React Native, Reanimated, and FlashList versions; the gate remains enabled. iOS/web interaction coverage, RTL, rotation, and accessibility font sizes require further validation.
+See the [verification results and limits](CONTRIBUTING.md#verification-record)
+for the demo consolidation.
 
 ## Usage
 
@@ -77,7 +79,7 @@ API pages remain archived under `docs/versioned_docs/`.
 
 Use Node **24.21.0** (`.nvmrc`) and Yarn Classic **1.22.22**. Each project has its
 own manifest, dependencies, and Yarn lockfile. Read [CONTRIBUTING.md](CONTRIBUTING.md)
-for explicit setup and native prerequisites.
+for explicit setup and validation instructions.
 
 ```sh
 yarn check:static
@@ -90,15 +92,26 @@ packages. It verifies both supported stacks, including core consumption without
 FlashList. Unit tests use JS/native mocks and do not prove UI-thread animations.
 
 ```sh
-yarn example ios
-yarn example android
-yarn example web
-yarn test-app ios
-yarn test-app android
+yarn demo ios
+yarn demo android
+yarn demo web
+yarn demo:typecheck
+yarn lint:demo
+yarn --cwd demo test:ci
 yarn --cwd docs start
 ```
 
-The [Expo example](example/README.md) provides the full demo. The
-[bare test app](test-app/README.md) provides deterministic cases for current RN.
-The checks workflow covers static checks, regression tests, package declarations,
-bundles, docs, and native builds. Actual interaction evidence is recorded separately.
+The [Expo Router demo](demo/README.md) combines 21 showcase screens, 15
+deterministic validation cases and nine performance workloads. It runs in Expo Go
+and on web without prebuild, a development client or maintained native projects.
+The library, demo and docs have independent dependency trees and Yarn lockfiles.
+The checks workflow covers static checks, regression tests, strict package
+consumers, JavaScript exports and docs. Actual interaction evidence is recorded
+separately. Bare RN runtime coverage has been retired; Expo Go performance
+workloads do not establish physical-device release benchmarks.
+
+## Agent collaboration
+
+Follow [CONTRIBUTING.md](CONTRIBUTING.md) for setup, compatibility boundaries,
+validation commands and reporting requirements for humans and coding agents.
+Personal agent skills and plugins are optional.
