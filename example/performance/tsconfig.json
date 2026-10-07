@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["../../test-app/performance/App.tsx"],
+  "exclude": ["../node_modules", "../build"]
+}

@@ -139,8 +139,14 @@ test('web paging debounces scroll completion and cancels pending callbacks on un
   );
   expect(onChangeTab).not.toHaveBeenCalled();
   await act(() => {
-    jest.advanceTimersByTime(100);
+    jest.advanceTimersByTime(50);
+    harness.scrollHandlers[0].current.onScroll?.(
+      scrollEvent(0, 0, Dimensions.get('window').width * 1.1)
+    );
+    jest.advanceTimersByTime(99);
   });
+  expect(onChangeTab).not.toHaveBeenCalled();
+  await act(() => jest.advanceTimersByTime(1));
   expect(onChangeTab).toHaveBeenLastCalledWith(0, 1);
   await act(() => harness.scrollHandlers[0].current.onScroll?.(scrollEvent(0, 0, 0)));
   await screen.unmount();
