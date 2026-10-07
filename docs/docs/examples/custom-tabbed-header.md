@@ -4,6 +4,9 @@ sidebar_position: 1
 
 # Custom Tabbed Header
 
+The Expo Router demo contains a complete
+[custom tabbed header screen](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/yoda-screen/index.tsx).
+
 ![Tabbed Header Gif](@site/static/img/assets/readme_yoda.gif)
 
 ## Custom scrollable tabs

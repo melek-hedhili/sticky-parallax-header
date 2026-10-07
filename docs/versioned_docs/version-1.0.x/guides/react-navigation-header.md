@@ -6,7 +6,7 @@ sidebar_position: 5
 
 If react-navigation header inside the screen is used, sticky header component should have `enableSafeAreaTopInset` prop set to `false`, to prevent duplicated margin between react-navigation header and sticky header layout.
 
-Full example code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/TabbedHeaderWithSectionLists.tsx)
+Full example code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/cdba82e5d76cb02bb4c1e17ae9dceb57d4610d80/example/src/screens/additionalExamples/TabbedHeaderWithSectionLists.tsx)
 
 ```tsx
 const TabbedHeaderWithSectionListsExample: React.FC = () => {

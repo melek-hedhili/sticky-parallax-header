@@ -1,12 +1,13 @@
+.agents/
+.claude/
 **/node_modules/
 lib/
 **/build/
 **/dist/
 docs/.docusaurus/
 **/.expo/
-**/ios/Pods/
-**/android/.gradle/
-**/android/build/
-**/android/app/build/
+demo/ios/
+demo/android/
+demo/expo-env.d.ts
 package-lock.json
 **/yarn.lock

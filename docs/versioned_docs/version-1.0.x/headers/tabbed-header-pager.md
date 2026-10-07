@@ -8,7 +8,7 @@ sidebar_position: 1
 
 ## Example usage
 
-Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/TabbedHeaderPagerExample.tsx).
+Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/cdba82e5d76cb02bb4c1e17ae9dceb57d4610d80/example/src/screens/additionalExamples/TabbedHeaderPagerExample.tsx).
 
 ```tsx
 const TabbedHeaderPagerExample: React.FC = () => {

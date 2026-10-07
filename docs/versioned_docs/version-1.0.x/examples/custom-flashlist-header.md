@@ -9,7 +9,7 @@ Analogically to [custom headers](./custom-header.md), react-native-sticky-parall
 - `useStickyHeaderFlashListScrollProps` equivalent for [`useStickyHeaderScrollProps`](./custom-header.md#scroll-props)
 - `withStickyHeaderFlashList` equivalent for `withStickyHeader`
 
-Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/StickyHeaderFlashListExample.tsx)
+Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/cdba82e5d76cb02bb4c1e17ae9dceb57d4610d80/example/src/screens/additionalExamples/StickyHeaderFlashListExample.tsx)
 
 ```tsx
 const PARALLAX_HEIGHT = 330;

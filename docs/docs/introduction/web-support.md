@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # Web support
 
-The Expo example includes a React Native Web target. Use the Expo-supported
+The Expo Router demo includes a React Native Web target. Use the Expo-supported
 React Native Web version for that application and keep React and React DOM on
 the same version.
 

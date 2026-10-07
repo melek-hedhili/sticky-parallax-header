@@ -106,7 +106,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
       ),
     };
   }, [scrollValue, startAboutFade, fininshAboutFade]);
-  const foregroundTitleRTLStyle = useRTLStyles<ViewStyle>(
+  const foregroundTitleRTLStyle = useRTLStyles<TextStyle>(
     styles.foregroundTitlePaddingRight,
     styles.foregroundTitlePaddingLeft,
     styles.foregroundTitlePaddingEnd

@@ -1,0 +1,178 @@
+# Expo Go validation smoke: render, scroll ref, refresh state, pager/tab navigation.
+# Metro must stay available; the caller supplies the explicit Expo Go project URL.
+open "${PROJECT_URL}"
+wait 'label="Validation cases"' 30000
+scroll down --until 'id="case-primitive-scrollview"'
+wait 'id="case-primitive-scrollview"' 15000
+press 'id="case-primitive-scrollview"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-primitive-flatlist"'
+wait 'id="case-primitive-flatlist"' 15000
+press 'id="case-primitive-flatlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-primitive-sectionlist"'
+wait 'id="case-primitive-sectionlist"' 15000
+press 'id="case-primitive-sectionlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-avatar-scrollview"'
+wait 'id="case-avatar-scrollview"' 15000
+press 'id="case-avatar-scrollview"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-avatar-flatlist"'
+wait 'id="case-avatar-flatlist"' 15000
+press 'id="case-avatar-flatlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-avatar-sectionlist"'
+wait 'id="case-avatar-sectionlist"' 15000
+press 'id="case-avatar-sectionlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-details-scrollview"'
+wait 'id="case-details-scrollview"' 15000
+press 'id="case-details-scrollview"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-details-flatlist"'
+wait 'id="case-details-flatlist"' 15000
+press 'id="case-details-flatlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-details-sectionlist"'
+wait 'id="case-details-sectionlist"' 15000
+press 'id="case-details-sectionlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-tabbed-sectionlist"'
+wait 'id="case-tabbed-sectionlist"' 15000
+press 'id="case-tabbed-sectionlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="tab-second"'
+wait 'label="Row 13"' 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-tabbed-pager"'
+wait 'id="case-tabbed-pager"' 15000
+press 'id="case-tabbed-pager"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="second-page"'
+wait text "Page 2" 10000
+wait 'label="Second Row 1"' 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-primitive-flashlist"'
+wait 'id="case-primitive-flashlist"' 15000
+press 'id="case-primitive-flashlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-avatar-flashlist"'
+wait 'id="case-avatar-flashlist"' 15000
+press 'id="case-avatar-flashlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-details-flashlist"'
+wait 'id="case-details-flashlist"' 15000
+press 'id="case-details-flashlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="all-cases"'
+wait stable 300 10000
+scroll down --until 'id="case-tabbed-flashlist"'
+wait 'id="case-tabbed-flashlist"' 15000
+press 'id="case-tabbed-flashlist"'
+wait 'id="scroll-to-top"' 10000
+scroll down 0.35
+press 'id="scroll-to-top"'
+wait 'label="Row 1"' 10000
+press 'id="refresh"'
+wait text "Refresh complete" 10000
+press 'id="tab-second"'
+wait 'label="Row 13"' 10000
+press 'id="all-cases"'
+wait stable 300 10000
+wait 'label="Validation cases"' 10000
+close

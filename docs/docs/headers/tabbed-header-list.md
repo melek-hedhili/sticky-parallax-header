@@ -10,7 +10,7 @@ sidebar_position: 2
 
 These examples assume a `SafeAreaProvider` at the app root, as shown in the [installation guide](../introduction/installation.md).
 
-Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/TabbedHeaderListExample.tsx).
+Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/tabbed-header-list-example.tsx).
 
 ```tsx
 import { Text } from 'react-native';

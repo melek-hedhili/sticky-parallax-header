@@ -10,7 +10,7 @@ sidebar_position: 3
 
 These examples assume a `SafeAreaProvider` at the app root, as shown in the [installation guide](../introduction/installation.md).
 
-Check out DetailsHeader examples for [ScrollView](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/DetailsHeaderScrollViewExample.tsx), [FlatList](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/DetailsHeaderFlatListExample.tsx), [SectionList](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/DetailsHeaderSectionListExample.tsx) & [FlashList](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/DetailsHeaderFlashListExample.tsx)
+Check out DetailsHeader examples for [ScrollView](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-scroll-view-example.tsx), [FlatList](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-flat-list-example.tsx), [SectionList](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-section-list-example.tsx) & [FlashList](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-flash-list-example.tsx)
 
 ```tsx
 import { Text, View } from 'react-native';

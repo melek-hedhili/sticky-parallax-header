@@ -2,12 +2,7 @@ module.exports = {
   preset: '@react-native/jest-preset',
   testEnvironment: 'jest-environment-node',
   testEnvironmentOptions: { customExportConditions: ['require', 'react-native'] },
-  modulePathIgnorePatterns: [
-    '<rootDir>/example/',
-    '<rootDir>/test-app/',
-    '<rootDir>/docs/',
-    '<rootDir>/lib/',
-  ],
+  modulePathIgnorePatterns: ['<rootDir>/docs/', '<rootDir>/demo/', '<rootDir>/lib/'],
   setupFilesAfterEnv: ['./jest/setupTests.js'],
   transform: { '^.+\\.[jt]sx?$': 'babel-jest' },
   transformIgnorePatterns: [

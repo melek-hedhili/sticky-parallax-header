@@ -14,9 +14,9 @@ To make [FlashList](https://shopify.github.io/flash-list/docs/) work with react-
 
 For full examples check:
 
-- [AvatarHeaderFlashList](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/AvatarHeaderFlashListExample.tsx)
-- [DetailsHeaderFlashList](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/DetailsHeaderFlashListExample.tsx)
-- [TabbedHeaderFlashList](https://github.com/netguru/sticky-parallax-header/blob/master/example/src/screens/additionalExamples/TabbedHeaderFlashListExample.tsx)
+- [AvatarHeaderFlashList](https://github.com/netguru/sticky-parallax-header/blob/cdba82e5d76cb02bb4c1e17ae9dceb57d4610d80/example/src/screens/additionalExamples/AvatarHeaderFlashListExample.tsx)
+- [DetailsHeaderFlashList](https://github.com/netguru/sticky-parallax-header/blob/cdba82e5d76cb02bb4c1e17ae9dceb57d4610d80/example/src/screens/additionalExamples/DetailsHeaderFlashListExample.tsx)
+- [TabbedHeaderFlashList](https://github.com/netguru/sticky-parallax-header/blob/cdba82e5d76cb02bb4c1e17ae9dceb57d4610d80/example/src/screens/additionalExamples/TabbedHeaderFlashListExample.tsx)
 
 ## Props
 
