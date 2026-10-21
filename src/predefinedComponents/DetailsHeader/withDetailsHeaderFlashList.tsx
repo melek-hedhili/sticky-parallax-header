@@ -32,6 +32,7 @@ export function withDetailsHeaderFlashList<ItemT>(
     const {
       backgroundColor,
       decelerationRate = 'fast',
+      enableHeaderBounce = true,
       enableSafeAreaTopInset = true,
       leftTopIcon,
       leftTopIconAccessibilityLabel,
@@ -93,6 +94,7 @@ export function withDetailsHeaderFlashList<ItemT>(
             ref={scrollViewRef}
             {...rest}
             decelerationRate={decelerationRate}
+            enableHeaderBounce={enableHeaderBounce}
             nestedScrollEnabled={nestedScrollEnabled}
             onScroll={onScroll}
             onMomentumScrollEnd={onMomentumScrollEnd}

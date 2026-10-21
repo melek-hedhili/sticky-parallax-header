@@ -1,11 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FlashList, FlashListProps, FlashListRef } from '@shopify/flash-list';
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
+import { ElasticHeaderProvider } from './ElasticHeaderContext';
+import {
+  HeaderScrollView,
+  NativeScrollProvider,
+  hasSupportedRefreshControl,
+} from './NativeScrollHost';
 import type { StickyHeaderFlashListProps } from './StickyHeaderFlashListProps';
-import { useStickyHeaderProps } from './useStickyHeaderProps';
+import { useInternalStickyHeaderProps } from './useInternalStickyHeaderProps';
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const NOOP = () => {};
 
@@ -39,9 +46,11 @@ export function withStickyHeaderFlashList<ItemT>(
     const {
       containerStyle,
       contentContainerStyle,
+      enableHeaderBounce = false,
       overScrollMode = 'never',
       maintainVisibleContentPosition = DEFAULT_MAINTAIN_VISIBLE_CONTENT_POSITION,
       renderHeader,
+      renderScrollComponent,
       renderTabs,
       scrollEventThrottle = 16,
       ...rest
@@ -49,13 +58,21 @@ export function withStickyHeaderFlashList<ItemT>(
     const {
       contentContainerPaddingTop,
       contentContainerPaddingBottom,
+      elasticity,
       headerAnimatedStyle,
       headerHeight,
       onHeaderLayoutInternal,
       onTabsLayoutInternal,
       scrollHandler,
       tabsHeight,
-    } = useStickyHeaderProps(props);
+    } = useInternalStickyHeaderProps(
+      { ...props, enableHeaderBounce },
+      (renderScrollComponent === undefined ||
+        ([ScrollView, Animated.ScrollView] as readonly unknown[]).includes(
+          renderScrollComponent
+        )) &&
+        hasSupportedRefreshControl(props.refreshControl)
+    );
     const flattenContentContainerStyle = React.useMemo(() => {
       return StyleSheet.flatten([
         contentContainerStyle,
@@ -72,7 +89,25 @@ export function withStickyHeaderFlashList<ItemT>(
       tabsHeight,
     ]);
 
-    return (
+    const scrollable = (
+      <AnimatedFlashList
+        ref={ref}
+        {...rest}
+        renderScrollComponent={elasticity.supported ? HeaderScrollView : renderScrollComponent}
+        contentContainerStyle={flattenContentContainerStyle}
+        maintainVisibleContentPosition={maintainVisibleContentPosition}
+        onScroll={scrollHandler}
+        onScrollBeginDrag={NOOP}
+        onScrollEndDrag={NOOP}
+        onMomentumScrollBegin={NOOP}
+        onMomentumScrollEnd={NOOP}
+        overScrollMode={overScrollMode}
+        progressViewOffset={headerHeight}
+        scrollEventThrottle={scrollEventThrottle}
+      />
+    );
+
+    const content = (
       <View style={[styles.container, containerStyle]}>
         <Animated.View pointerEvents="box-none" style={[styles.header, headerAnimatedStyle]}>
           {renderHeader ? (
@@ -86,23 +121,27 @@ export function withStickyHeaderFlashList<ItemT>(
             </View>
           ) : null}
         </Animated.View>
-        <View style={[styles.container, { paddingTop: tabsHeight }]}>
-          <AnimatedFlashList
-            ref={ref}
-            {...rest}
-            contentContainerStyle={flattenContentContainerStyle}
-            maintainVisibleContentPosition={maintainVisibleContentPosition}
-            onScroll={scrollHandler}
-            onScrollBeginDrag={NOOP}
-            onScrollEndDrag={NOOP}
-            onMomentumScrollBegin={NOOP}
-            onMomentumScrollEnd={NOOP}
-            overScrollMode={overScrollMode}
-            progressViewOffset={headerHeight}
-            scrollEventThrottle={scrollEventThrottle}
-          />
-        </View>
+        {Platform.OS === 'android' ? (
+          <Animated.View
+            style={[styles.container, { paddingTop: tabsHeight }, elasticity.contentAnimatedStyle]}>
+            {scrollable}
+          </Animated.View>
+        ) : (
+          <View style={[styles.container, { paddingTop: tabsHeight }]}>{scrollable}</View>
+        )}
       </View>
+    );
+
+    return (
+      <ElasticHeaderProvider value={elasticity.contextValue}>
+        <NativeScrollProvider value={elasticity.supported ? elasticity.nativeGesture : null}>
+          {elasticity.supported ? (
+            <GestureDetector gesture={elasticity.containerGesture}>{content}</GestureDetector>
+          ) : (
+            content
+          )}
+        </NativeScrollProvider>
+      </ElasticHeaderProvider>
     );
   });
 }

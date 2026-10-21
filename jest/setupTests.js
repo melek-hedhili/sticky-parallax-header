@@ -1,3 +1,5 @@
+require('react-native-gesture-handler/jestSetup');
+
 // The official mock loads the package barrel. Its native CSS initializer is not
 // implemented by JSReanimated, so keep native bootstrap out of mocked JS tests.
 jest.mock('react-native-reanimated/src/initializers.native', () => ({

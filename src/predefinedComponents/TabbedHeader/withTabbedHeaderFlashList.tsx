@@ -34,6 +34,7 @@ export function withTabbedHeaderFlashList<ItemT>(
     const {
       backgroundColor,
       decelerationRate = 'fast',
+      enableHeaderBounce = true,
       enableSafeAreaTopInset = true,
       logo,
       logoContainerStyle,
@@ -89,6 +90,7 @@ export function withTabbedHeaderFlashList<ItemT>(
             ref={scrollViewRef}
             {...rest}
             decelerationRate={decelerationRate}
+            enableHeaderBounce={enableHeaderBounce}
             nestedScrollEnabled={nestedScrollEnabled}
             overScrollMode={overScrollMode}
             scrollEventThrottle={scrollEventThrottle}

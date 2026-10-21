@@ -2,7 +2,7 @@
 
 This website uses [Docusaurus 3](https://docusaurus.io/) with React 19 and MDX 3.
 Use Node 24.21.0 and Yarn Classic 1.22.22. Its dependencies are installed separately
-from the library and example applications.
+from the library and Expo Router demo.
 
 ## Installation
 

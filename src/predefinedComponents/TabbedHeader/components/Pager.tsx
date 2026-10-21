@@ -13,6 +13,7 @@ import Animated, {
 import { scheduleOnRN, scheduleOnUI } from 'react-native-worklets';
 
 import { commonStyles } from '../../../constants';
+import { useHeaderElasticity } from '../../../primitiveComponents/ElasticHeaderContext';
 import type { FlatListRef } from '../../../primitiveComponents/ScrollComponent';
 import { debounce } from '../../common/utils/debounce';
 import type { InternalPagerProps } from '../InternalTabbedHeaderProps';
@@ -65,6 +66,7 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
     const containerWidthRef = React.useRef(containerWidth);
     const currentPageRef = React.useRef(initialPage);
     const horizontalFlatListRef = useAnimatedRef<FlatListRef<Page>>();
+    const { reset: resetElasticity } = useHeaderElasticity();
 
     const scrollToTabPositionTimeoutValue = useSharedValue(1);
 
@@ -110,15 +112,22 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
 
     const handleScrollToTabPosition = React.useCallback(
       (prevPage: number, newPage: number) => {
-        if (!data.length || scrollValue.value === 0 || disableScrollToPosition) {
+        if (!data.length || disableScrollToPosition) {
           return;
         }
 
-        tabsScrollPosition.current[prevPage] = scrollValue.value;
+        // Native iOS pull offsets describe temporary elasticity, not a saved page position.
+        const currentPosition = Math.max(0, scrollValue.value);
+
+        tabsScrollPosition.current[prevPage] = currentPosition;
+        if (currentPosition === 0) {
+          return;
+        }
+
         const savedPosition = tabsScrollPosition.current[newPage];
         const scrollTargetPosition =
           rememberTabScrollPosition && savedPosition !== undefined && savedPosition !== -1
-            ? savedPosition
+            ? Math.max(0, savedPosition)
             : scrollHeight;
 
         scrollToTabPositionTimeoutValue.value = withDelay(
@@ -142,6 +151,11 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
       ]
     );
 
+    const cancelPreviousPageMotion = React.useCallback(() => {
+      cancelAnimation(scrollToTabPositionTimeoutValue);
+      scheduleOnUI(resetElasticity);
+    }, [resetElasticity, scrollToTabPositionTimeoutValue]);
+
     const goToPage = React.useCallback(
       (pageNumber: number) => {
         if (!Number.isInteger(pageNumber) || pageNumber < 0 || pageNumber >= data.length) {
@@ -151,12 +165,16 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
         const previousPage = currentPageRef.current;
         const offset = pageNumber * containerWidthRef.current;
 
+        if (previousPage !== pageNumber) {
+          cancelPreviousPageMotion();
+        }
+
         handleScrollToTabPosition(previousPage, pageNumber);
         scheduleOnUI(scrollToPage, offset);
         currentPageRef.current = pageNumber;
         onChangeTab?.(previousPage, pageNumber);
       },
-      [data.length, handleScrollToTabPosition, onChangeTab, scrollToPage]
+      [cancelPreviousPageMotion, data.length, handleScrollToTabPosition, onChangeTab, scrollToPage]
     );
 
     React.useEffect(() => {
@@ -204,13 +222,14 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
         const previousPage = currentPageRef.current;
 
         if (previousPage !== newPage && newPage >= 0 && newPage < data.length) {
+          cancelPreviousPageMotion();
           currentPageRef.current = newPage;
           swipedPage?.(newPage);
           onChangeTab?.(previousPage, newPage);
           handleScrollToTabPosition(previousPage, newPage);
         }
       },
-      [data.length, handleScrollToTabPosition, onChangeTab, swipedPage]
+      [cancelPreviousPageMotion, data.length, handleScrollToTabPosition, onChangeTab, swipedPage]
     );
 
     const handlePossiblePageChangeOnWeb = React.useMemo(

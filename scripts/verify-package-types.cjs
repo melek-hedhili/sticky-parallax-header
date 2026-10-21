@@ -61,20 +61,22 @@ export const commonJSAvatar: typeof CommonJS.AvatarHeaderScrollView = AvatarHead
 
 export function CoreConsumer() {
   const scroll = useStickyHeaderScrollProps<React.ComponentRef<typeof ScrollView>>({ parallaxHeight: 180, snapToEdge: true });
-  useStickyHeaderProps({ stickyTabs: true });
+  const layout = useStickyHeaderProps({ stickyTabs: true });
+  // @ts-expect-error Internal gesture state is not part of the public layout hook.
+  layout.elasticity;
   return <View>
     <StickyHeaderScrollView onScroll={scroll.onScroll} onMomentumScrollEnd={scroll.onMomentumScrollEnd} onScrollEndDrag={scroll.onScrollEndDrag} ref={scroll.scrollViewRef} renderHeader={header}><Text>Body</Text></StickyHeaderScrollView>
     <CustomScroll ref={scrollRef} renderHeader={header}><Text>Custom body</Text></CustomScroll>
     <StickyHeaderFlatList<Item> ref={flatRef} data={data} renderItem={({ item }) => <Text>{item.label}</Text>} renderHeader={header} />
     <StickyHeaderSectionList<Item, Section> ref={sectionRef} sections={sections} renderItem={renderItem} />
-    <AvatarHeaderScrollView ref={scrollRef} title="Avatar"><Text>Body</Text></AvatarHeaderScrollView>
+    <AvatarHeaderScrollView ref={scrollRef} title="Avatar" enableHeaderBounce={false}><Text>Body</Text></AvatarHeaderScrollView>
     <AvatarHeaderFlatList<Item> ref={flatRef} title="Avatar" data={data} renderItem={renderItem} />
     <AvatarHeaderSectionList<Item, Section> ref={sectionRef} title="Avatar" sections={sections} renderItem={renderItem} />
-    <DetailsHeaderScrollView ref={scrollRef} title="Details"><Text>Body</Text></DetailsHeaderScrollView>
+    <DetailsHeaderScrollView ref={scrollRef} title="Details" enableHeaderBounce={true}><Text>Body</Text></DetailsHeaderScrollView>
     <DetailsHeaderFlatList<Item> ref={flatRef} title="Details" data={data} renderItem={renderItem} />
     <DetailsHeaderSectionList<Item, Section> ref={sectionRef} title="Details" sections={sections} renderItem={renderItem} />
     <TabbedHeaderList<Item, Section> ref={sectionRef} sections={sections} renderItem={renderItem} tabs={[{title: 'One'}]} />
-    <TabbedHeaderPager ref={scrollRef} pagerProps={{ref: pagerRef}} tabs={[{title: 'One'}]}><Text>Page</Text></TabbedHeaderPager>
+    <TabbedHeaderPager ref={scrollRef} enableHeaderBounce={false} pagerProps={{ref: pagerRef}} tabs={[{title: 'One'}]}><Text>Page</Text></TabbedHeaderPager>
   </View>;
 }
 
@@ -97,6 +99,7 @@ import * as React from 'react';
 import type * as CommonJS from 'react-native-sticky-parallax-header/flash-list' with { 'resolution-mode': 'require' };
 import { Text, View } from 'react-native';
 import { FlashList, type FlashListRef } from '@shopify/flash-list';
+import { useStickyHeaderProps } from 'react-native-sticky-parallax-header';
 import {
   useStickyHeaderFlashListScrollProps, withStickyHeaderFlashList,
   withAvatarHeaderFlashList, withDetailsHeaderFlashList, withTabbedHeaderFlashList,
@@ -116,11 +119,14 @@ export const commonJSAdapter: typeof CommonJS.withAvatarHeaderFlashList = withAv
 
 export function FlashConsumer() {
   const scroll = useStickyHeaderFlashListScrollProps<FlashListRef<Item>>({snapToEdge: true});
+  const layout = useStickyHeaderProps({ stickyTabs: true });
+  // @ts-expect-error Internal gesture state is not part of the public layout hook.
+  layout.elasticity;
   return <View>
     <Sticky onScroll={scroll.onScroll} onMomentumScrollEnd={scroll.onMomentumScrollEnd} onScrollEndDrag={scroll.onScrollEndDrag} ref={scroll.scrollViewRef} data={data} renderItem={renderItem} />
-    <Avatar ref={ref} title="Avatar" data={data} renderItem={renderItem} />
-    <Details ref={ref} title="Details" data={data} renderItem={renderItem} />
-    <Tabs ref={ref} data={data} renderItem={renderItem} stickyHeaderIndices={[0]} tabs={[{title:'One'}]} />
+    <Avatar ref={ref} title="Avatar" enableHeaderBounce={false} data={data} renderItem={renderItem} />
+    <Details ref={ref} title="Details" enableHeaderBounce={true} data={data} renderItem={renderItem} />
+    <Tabs ref={ref} enableHeaderBounce={false} data={data} renderItem={renderItem} stickyHeaderIndices={[0]} tabs={[{title:'One'}]} />
   </View>;
 }
 
@@ -312,6 +318,7 @@ try {
         'react-native-sticky-parallax-header': `file:${archive}`,
         'react': '19.2.3',
         'react-native': lane.native,
+        'react-native-gesture-handler': '2.32.0',
         'react-native-reanimated': lane.reanimated,
         'react-native-worklets': lane.worklets,
         'react-native-safe-area-context': lane.safeArea,

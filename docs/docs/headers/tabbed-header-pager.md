@@ -8,9 +8,9 @@ sidebar_position: 1
 
 ## Example usage
 
-These examples assume a `SafeAreaProvider` at the app root, as shown in the [installation guide](../introduction/installation.md).
+These examples assume app-owned gesture and safe-area roots, as shown in the [installation guide](../introduction/installation.md#gesture-handling-and-safe-areas).
 
-Full source code can be found in [example repo](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/tabbed-header-pager-example.tsx).
+Full source code can be found in [example repo](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/tabbed-header-pager-example.tsx).
 
 ```tsx
 import { Text, View } from 'react-native';
@@ -94,6 +94,7 @@ Inherits [ScrollViewProps](https://reactnative.dev/docs/scrollview#props)
 | renderHeaderBar                | render function                                          | -                      |
 | snapStartThreshold             | number                                                   | -                      |
 | snapStopThreshold              | number                                                   | -                      |
+| enableHeaderBounce | boolean | true |
 | snapToEdge                     | boolean                                                  | true                   |
 | stickyTabs                     | boolean                                                  | true                   |
 | tabTextActiveStyle             | style - `StyleProp<TextStyle>`                           | -                      |

@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FocusedScene } from '@/components/focused-scene';
 import { RouteError } from '@/components/route-error';
 import { validationCases } from '@/validation/catalogue';
+import { ElasticAvatarFixture } from '@/validation/elastic-avatar-fixture';
 import { ValidationFixture } from '@/validation/validation-fixture';
 
 export default function ValidationCaseRoute() {
@@ -24,7 +25,11 @@ export default function ValidationCaseRoute() {
           testID="all-cases"
           onPress={() => router.replace('/validation')}
         />
-        <ValidationFixture key={selected.id} name={selected.label} />
+        {selected.label === 'Elastic Avatar' ? (
+          <ElasticAvatarFixture />
+        ) : (
+          <ValidationFixture key={selected.id} name={selected.label} />
+        )}
       </SafeAreaView>
     </FocusedScene>
   );

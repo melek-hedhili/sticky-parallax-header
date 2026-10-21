@@ -19,6 +19,7 @@ export const DetailsHeaderScrollView: React.ForwardRefExoticComponent<
     children,
     contentContainerStyle,
     decelerationRate = 'fast',
+    enableHeaderBounce = true,
     enableSafeAreaTopInset = true,
     leftTopIcon,
     leftTopIconAccessibilityLabel,
@@ -81,6 +82,7 @@ export const DetailsHeaderScrollView: React.ForwardRefExoticComponent<
           {...rest}
           contentContainerStyle={contentContainerStyle}
           decelerationRate={decelerationRate}
+          enableHeaderBounce={enableHeaderBounce}
           nestedScrollEnabled={nestedScrollEnabled}
           onMomentumScrollEnd={onMomentumScrollEnd}
           onScroll={onScroll}

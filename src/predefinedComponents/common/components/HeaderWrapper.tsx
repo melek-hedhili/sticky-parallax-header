@@ -1,10 +1,11 @@
 import * as React from 'react';
 import type { ImageSourcePropType } from 'react-native';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { colors } from '../../../constants';
+import { useHeaderElasticity } from '../../../primitiveComponents/ElasticHeaderContext';
 import type { AnimatedColorProp } from '../SharedProps';
 import { parseAnimatedColorProp } from '../utils/parseAnimatedColorProp';
 
@@ -34,7 +35,16 @@ export const HeaderWrapper: React.FC<React.PropsWithChildren<HeaderWrapperProps>
   tabsContainerBackgroundColor,
 }) => {
   const { width } = useWindowDimensions();
+  const { displacement } = useHeaderElasticity();
   const hasBackgroundImage = !!backgroundImage;
+  const backdropAnimatedStyle = useAnimatedStyle(() => {
+    const pull = scrollHeight > 0 ? Math.max(0, displacement.value) : 0;
+
+    // The overlay moves down with the pull; extend its backdrop back to the original top.
+    return {
+      transform: [{ translateY: -pull / 2 }, { scaleY: 1 + pull / Math.max(scrollHeight, 1) }],
+    };
+  }, [displacement, scrollHeight]);
   const contentAnimatedStyle = useAnimatedStyle(() => {
     // TypeScript complains about AnimatedNode<StyleProp<ViewStyle>> from reanimated v1
     return { backgroundColor: parseAnimatedColorProp(contentBackgroundColor) as string };
@@ -51,8 +61,11 @@ export const HeaderWrapper: React.FC<React.PropsWithChildren<HeaderWrapperProps>
 
   return (
     <Animated.View pointerEvents="box-none" style={contentAnimatedStyle}>
-      {backgroundImage ? (
-        <View pointerEvents="none">
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.headerStyle, { height: scrollHeight, width }, backdropAnimatedStyle]}
+        testID="HeaderBackdrop">
+        {backgroundImage ? (
           <HeaderBackgroundImage
             background={
               <HeaderBackground
@@ -65,19 +78,15 @@ export const HeaderWrapper: React.FC<React.PropsWithChildren<HeaderWrapperProps>
             backgroundHeight={scrollHeight}
             backgroundImage={backgroundImage}
           />
-        </View>
-      ) : (
-        <View
-          pointerEvents="none"
-          style={[styles.headerStyle, { height: scrollHeight }, { width }]}>
+        ) : (
           <HeaderBackground
             backgroundColor={backgroundColor}
             hasBorderRadius={hasBorderRadius}
             height={parallaxHeight}
             scrollValue={scrollValue}
           />
-        </View>
-      )}
+        )}
+      </Animated.View>
       <Animated.View
         pointerEvents="box-none"
         style={[

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { SectionListData } from 'react-native';
-import { SectionList, StyleSheet, View, useColorScheme } from 'react-native';
+import { Platform, SectionList, StyleSheet, View, useColorScheme } from 'react-native';
 import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
 
 import type { Question } from '@/showcase/assets/data/cards';
@@ -70,6 +70,8 @@ export const TabbedHeaderWithSectionListsExample: React.FC = () => {
         containerStyle={screenStyles.stretchContainer}
         foregroundImage={photosPortraitMe}
         disableScrollToPosition={true}
+        // Inner native lists own Android vertical gestures and their independent offsets.
+        enableHeaderBounce={Platform.OS !== 'android'}
         enableSafeAreaTopInset={false}
         rememberTabScrollPosition={false}
         logo={logo}

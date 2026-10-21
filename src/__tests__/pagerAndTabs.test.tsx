@@ -2,6 +2,8 @@ import { act, fireEvent, render, renderHook, screen } from '@testing-library/rea
 import * as React from 'react';
 import { Dimensions, Platform, Text } from 'react-native';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
+import * as Reanimated from 'react-native-reanimated';
+import * as Worklets from 'react-native-worklets';
 
 import {
   createAnimatedRef,
@@ -12,6 +14,7 @@ import type { PagerMethods } from '../predefinedComponents/TabbedHeader/TabbedHe
 import { Pager } from '../predefinedComponents/TabbedHeader/components/Pager';
 import { Tabs } from '../predefinedComponents/TabbedHeader/components/Tabs';
 import { useTabbedHeaderList } from '../predefinedComponents/TabbedHeader/hooks/useTabbedHeader';
+import { ElasticHeaderProvider } from '../primitiveComponents/ElasticHeaderContext';
 import type { ScrollViewRef, SectionListRef } from '../primitiveComponents/ScrollComponent';
 
 beforeEach(() => {
@@ -21,6 +24,32 @@ afterEach(() => {
   jest.restoreAllMocks();
   jest.useRealTimers();
 });
+
+// Model this pager's single delayed restoration and cancellation. Actual native
+// animation frames and gesture arbitration are covered by mobile validation.
+function deferPagerRestoration() {
+  let pending: { timer: ReturnType<typeof setTimeout>; cancel: () => void } | undefined;
+
+  jest.spyOn(Reanimated, 'withTiming').mockImplementation((value, _config, callback) => {
+    pending = {
+      timer: setTimeout(() => {
+        pending = undefined;
+        callback?.(true, value);
+      }, 250),
+      cancel: () => callback?.(false, value),
+    };
+
+    return value;
+  });
+  jest.spyOn(Reanimated, 'withDelay').mockImplementation((_delay, animation) => animation);
+  jest.spyOn(Reanimated, 'cancelAnimation').mockImplementation(() => {
+    if (pending) {
+      clearTimeout(pending.timer);
+      pending.cancel();
+      pending = undefined;
+    }
+  });
+}
 
 test('imperative page changes remember each page scroll position and use the requested page', async () => {
   const { scrollTo } = installAnimationHarness();
@@ -59,6 +88,126 @@ test('imperative page changes remember each page scroll position and use the req
   await act(() => ref.current?.goToPage(2));
   expect(onChangeTab).toHaveBeenCalledTimes(calls);
 });
+
+test('page changes discard pull offsets and restore the remembered semantic top', async () => {
+  const { scrollTo } = installAnimationHarness();
+  const scheduleOnUI = jest.spyOn(Worklets, 'scheduleOnUI');
+  const ref = React.createRef<PagerMethods>();
+  const scrollRef = createAnimatedRef<ScrollViewRef>() as AnimatedRef<ScrollViewRef>;
+  const scrollValue = { value: -80 } as SharedValue<number>;
+  const displacement = { value: 80 } as SharedValue<number>;
+  const reset = jest.fn(() => {
+    displacement.value = 0;
+  });
+
+  await render(
+    <ElasticHeaderProvider value={{ displacement, reset }}>
+      <Pager
+        ref={ref}
+        page={-1}
+        minScrollHeight={300}
+        scrollHeight={400}
+        scrollRef={scrollRef}
+        scrollValue={scrollValue}
+        rememberTabScrollPosition>
+        <Text>First</Text>
+        <Text>Second</Text>
+      </Pager>
+    </ElasticHeaderProvider>
+  );
+  await act(() => ref.current?.goToPage(1));
+  expect(scheduleOnUI).toHaveBeenCalledWith(reset);
+  expect(displacement.value).toBe(0);
+  expect(scrollTo).not.toHaveBeenCalledWith(scrollRef, 0, expect.any(Number), true);
+
+  scrollValue.value = 220;
+  await act(() => ref.current?.goToPage(0));
+  expect(scrollTo).toHaveBeenCalledWith(scrollRef, 0, 0, true);
+  expect(scrollTo).not.toHaveBeenCalledWith(scrollRef, 0, -80, true);
+  expect(reset).toHaveBeenCalledTimes(2);
+});
+
+test('rapid page changes cancel the previous delayed restoration and apply only the latest target', async () => {
+  jest.useFakeTimers();
+  const { scrollTo } = installAnimationHarness();
+
+  deferPagerRestoration();
+  const ref = React.createRef<PagerMethods>();
+  const scrollRef = createAnimatedRef<ScrollViewRef>() as AnimatedRef<ScrollViewRef>;
+  const scrollValue = { value: 120 } as SharedValue<number>;
+
+  await render(
+    <Pager
+      ref={ref}
+      page={-1}
+      minScrollHeight={300}
+      scrollHeight={400}
+      scrollRef={scrollRef}
+      scrollValue={scrollValue}
+      rememberTabScrollPosition>
+      <Text>First</Text>
+      <Text>Second</Text>
+    </Pager>
+  );
+  await act(() => ref.current?.goToPage(1));
+  await act(() => jest.advanceTimersByTime(100));
+  scrollValue.value = 220;
+  await act(() => ref.current?.goToPage(0));
+  await act(() => jest.advanceTimersByTime(250));
+
+  expect(scrollTo).toHaveBeenCalledWith(scrollRef, 0, 120, true);
+  expect(scrollTo).not.toHaveBeenCalledWith(scrollRef, 0, 400, true);
+  expect(scrollTo.mock.calls.filter(([target]) => Object.is(target, scrollRef))).toHaveLength(1);
+});
+
+test.each(['pull at the top', 'restoration disabled'] as const)(
+  'a native page change cancels stale restoration even with %s',
+  async (condition) => {
+    jest.useFakeTimers();
+    const harness = installAnimationHarness();
+
+    deferPagerRestoration();
+    const ref = React.createRef<PagerMethods>();
+    const scrollRef = createAnimatedRef<ScrollViewRef>() as AnimatedRef<ScrollViewRef>;
+    const scrollValue = { value: 120 } as SharedValue<number>;
+    const reset = jest.fn();
+    const props = {
+      ref,
+      page: -1,
+      minScrollHeight: 300,
+      scrollHeight: 400,
+      scrollRef,
+      scrollValue,
+    };
+    const pages = [<Text key="first">First</Text>, <Text key="second">Second</Text>];
+    const providerValue = { displacement: { value: 0 } as SharedValue<number>, reset };
+
+    await render(
+      <ElasticHeaderProvider value={providerValue}>
+        <Pager {...props}>{pages}</Pager>
+      </ElasticHeaderProvider>
+    );
+    await act(() => ref.current?.goToPage(1));
+    await act(() => jest.advanceTimersByTime(100));
+    if (condition === 'pull at the top') {
+      scrollValue.value = -80;
+    } else {
+      await screen.rerender(
+        <ElasticHeaderProvider value={providerValue}>
+          <Pager {...props} disableScrollToPosition>
+            {pages}
+          </Pager>
+        </ElasticHeaderProvider>
+      );
+    }
+
+    await act(() => harness.scrollHandlers[0].current.onMomentumEnd?.(scrollEvent(0, 0, 0)));
+    await act(() => jest.advanceTimersByTime(500));
+
+    expect(harness.scrollTo).not.toHaveBeenCalledWith(scrollRef, 0, expect.any(Number), true);
+    expect(reset).toHaveBeenCalledTimes(2);
+  }
+);
 
 test('a native swipe updates the page used by the next imperative navigation', async () => {
   const harness = installAnimationHarness();

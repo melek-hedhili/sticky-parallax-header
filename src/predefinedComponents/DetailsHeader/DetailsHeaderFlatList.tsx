@@ -20,6 +20,7 @@ function DetailsHeaderFlatListInner<ItemT>(
     contentContainerStyle,
     data,
     decelerationRate = 'fast',
+    enableHeaderBounce = true,
     enableSafeAreaTopInset = true,
     keyExtractor,
     leftTopIcon,
@@ -85,6 +86,7 @@ function DetailsHeaderFlatListInner<ItemT>(
           contentContainerStyle={contentContainerStyle}
           data={data}
           decelerationRate={decelerationRate}
+          enableHeaderBounce={enableHeaderBounce}
           keyExtractor={keyExtractor}
           nestedScrollEnabled={nestedScrollEnabled}
           onScroll={onScroll}

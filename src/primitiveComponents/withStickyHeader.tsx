@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { FlatList, Platform, ScrollView, SectionList, StyleSheet, View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
 import type { AnimatedProps } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 
+import { ElasticHeaderProvider } from './ElasticHeaderContext';
+import { hasSupportedRefreshControl } from './NativeScrollHost';
 import type { StickyHeaderSharedProps } from './StickyHeaderProps';
-import { useStickyHeaderProps } from './useStickyHeaderProps';
+import { useInternalStickyHeaderProps } from './useInternalStickyHeaderProps';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const NOOP = () => {};
@@ -26,6 +29,9 @@ const createCellRenderer = (itemLayoutAnimation: any) => {
 };
 
 export function withStickyHeader<T extends React.ComponentType<any>>(component: T) {
+  const nativeComponent = ([ScrollView, FlatList, SectionList] as readonly unknown[]).includes(
+    component
+  );
   const AnimatedComponent = Animated.createAnimatedComponent(
     component as React.FunctionComponent<any>
   ) as any;
@@ -35,6 +41,7 @@ export function withStickyHeader<T extends React.ComponentType<any>>(component: 
       const {
         containerStyle,
         contentContainerStyle,
+        enableHeaderBounce = false,
         itemLayoutAnimation,
         overScrollMode = 'never',
         renderHeader,
@@ -46,6 +53,7 @@ export function withStickyHeader<T extends React.ComponentType<any>>(component: 
       const {
         contentContainerPaddingTop,
         contentContainerPaddingBottom,
+        elasticity,
         headerAnimatedStyle,
         headerHeight,
         listPaddingTop,
@@ -53,14 +61,43 @@ export function withStickyHeader<T extends React.ComponentType<any>>(component: 
         onTabsLayoutInternal,
         scrollHandler,
         tabsHeight,
-      } = useStickyHeaderProps(props);
-
+      } = useInternalStickyHeaderProps(
+        { ...props, enableHeaderBounce },
+        nativeComponent &&
+          !props.renderScrollComponent &&
+          hasSupportedRefreshControl(props.refreshControl)
+      );
       const cellRenderer = React.useMemo(
         () => createCellRenderer(itemLayoutAnimation),
         [itemLayoutAnimation]
       );
 
-      return (
+      const scrollable = (
+        <AnimatedComponent
+          ref={ref}
+          {...rest}
+          CellRendererComponent={cellRenderer}
+          contentContainerStyle={[
+            contentContainerStyle,
+            { paddingTop: headerHeight + contentContainerPaddingTop },
+            { paddingBottom: tabsHeight + contentContainerPaddingBottom },
+          ]}
+          onScroll={scrollHandler}
+          /**
+           * Workaround for reanimated v2.3+ bug
+           * https://github.com/software-mansion/react-native-reanimated/issues/2735#issuecomment-1001714779
+           */
+          onScrollBeginDrag={NOOP}
+          onScrollEndDrag={NOOP}
+          onMomentumScrollBegin={NOOP}
+          onMomentumScrollEnd={NOOP}
+          overScrollMode={overScrollMode}
+          progressViewOffset={headerHeight}
+          scrollEventThrottle={scrollEventThrottle}
+          style={[style, { paddingTop: tabsHeight + listPaddingTop }]}
+        />
+      );
+      const content = (
         <View style={[styles.container, containerStyle]}>
           <Animated.View pointerEvents="box-none" style={[styles.header, headerAnimatedStyle]}>
             {renderHeader ? (
@@ -74,31 +111,28 @@ export function withStickyHeader<T extends React.ComponentType<any>>(component: 
               </View>
             ) : null}
           </Animated.View>
-          <AnimatedComponent
-            ref={ref}
-            {...rest}
-            CellRendererComponent={cellRenderer}
-            contentContainerStyle={[
-              contentContainerStyle,
-              { paddingTop: headerHeight + contentContainerPaddingTop },
-              { paddingBottom: tabsHeight + contentContainerPaddingBottom },
-            ]}
-            onScroll={scrollHandler}
-            /**
-             * Workaround for reanimated v2.3+ bug
-             *
-             * https://github.com/software-mansion/react-native-reanimated/issues/2735#issuecomment-1001714779
-             */
-            onScrollBeginDrag={NOOP}
-            onScrollEndDrag={NOOP}
-            onMomentumScrollBegin={NOOP}
-            onMomentumScrollEnd={NOOP}
-            overScrollMode={overScrollMode}
-            progressViewOffset={headerHeight}
-            scrollEventThrottle={scrollEventThrottle}
-            style={[style, { paddingTop: tabsHeight + listPaddingTop }]}
-          />
+          {Platform.OS === 'android' ? (
+            <Animated.View style={[styles.content, elasticity.contentAnimatedStyle]}>
+              {elasticity.supported ? (
+                <GestureDetector gesture={elasticity.nativeGesture}>{scrollable}</GestureDetector>
+              ) : (
+                scrollable
+              )}
+            </Animated.View>
+          ) : (
+            scrollable
+          )}
         </View>
+      );
+
+      return (
+        <ElasticHeaderProvider value={elasticity.contextValue}>
+          {elasticity.supported ? (
+            <GestureDetector gesture={elasticity.containerGesture}>{content}</GestureDetector>
+          ) : (
+            content
+          )}
+        </ElasticHeaderProvider>
       );
     }
   ) as React.ForwardRefExoticComponent<
@@ -111,6 +145,7 @@ export function withStickyHeader<T extends React.ComponentType<any>>(component: 
 }
 
 export const styles = StyleSheet.create({
+  content: { flex: 1 },
   container: {
     alignSelf: 'stretch',
     flex: 1,

@@ -24,6 +24,7 @@ export const TabbedHeaderPager: React.ForwardRefExoticComponent<
     contentContainerStyle,
     disableScrollToPosition,
     decelerationRate = 'fast',
+    enableHeaderBounce = true,
     enableSafeAreaTopInset = true,
     initialPage,
     logo,
@@ -107,6 +108,7 @@ export const TabbedHeaderPager: React.ForwardRefExoticComponent<
           {...rest}
           contentContainerStyle={contentContainerStyle}
           decelerationRate={decelerationRate}
+          enableHeaderBounce={enableHeaderBounce}
           nestedScrollEnabled={nestedScrollEnabled}
           onMomentumScrollEnd={onMomentumScrollEnd}
           onScrollEndDrag={onScrollEndDrag}

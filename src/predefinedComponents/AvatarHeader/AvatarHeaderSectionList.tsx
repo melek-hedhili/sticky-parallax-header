@@ -19,6 +19,7 @@ function AvatarHeaderSectionListInner<ItemT, SectionT>(
     backgroundColor,
     contentContainerStyle,
     decelerationRate = 'fast',
+    enableHeaderBounce = true,
     enableSafeAreaTopInset = true,
     image,
     leftTopIcon,
@@ -89,6 +90,7 @@ function AvatarHeaderSectionListInner<ItemT, SectionT>(
           {...rest}
           contentContainerStyle={contentContainerStyle}
           decelerationRate={decelerationRate}
+          enableHeaderBounce={enableHeaderBounce}
           nestedScrollEnabled={nestedScrollEnabled}
           onMomentumScrollEnd={onMomentumScrollEnd}
           onScrollEndDrag={onScrollEndDrag}
