@@ -34,6 +34,7 @@ export interface SharedPredefinedProps {
   backgroundColor?: AnimatedColorProp;
   backgroundImage?: ImageSourcePropType;
   contentContainerStyle?: StyleProp<ViewStyle>;
+  enableHeaderBounce?: boolean;
   headerHeight?: number;
   onMomentumScrollEnd?: (e: NativeScrollEvent) => void;
   onScroll?: (e: NativeScrollEvent) => void;

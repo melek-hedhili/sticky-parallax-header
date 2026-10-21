@@ -62,7 +62,7 @@ application. Core imports do not require FlashList.
 
 ## In Use
 
-The repository contains one [Expo Router demo](https://github.com/netguru/sticky-parallax-header/tree/master/demo)
+The repository contains one [Expo Router demo](https://github.com/melek-hedhili/sticky-parallax-header/tree/master/demo)
 with 21 showcase screens, 15 deterministic validation cases and nine performance
 workloads. Run `yarn demo ios`, `yarn demo android` or `yarn demo web` from the
 repository root after installing its independent dependencies. Native launch uses

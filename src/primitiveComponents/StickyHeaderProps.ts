@@ -13,6 +13,8 @@ import type { AnimatedProps } from 'react-native-reanimated';
 
 export interface StickyHeaderSharedProps {
   children?: ReactNode;
+  /** Elastic pull at the expanded top. Custom primitives default to false. */
+  enableHeaderBounce?: boolean;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   onHeaderLayout?: (e: LayoutChangeEvent) => void;

@@ -18,10 +18,17 @@ const labels = [
   'Tabbed FlashList',
 ] as const;
 
-export const validationCases = labels.map((label) => {
-  const id = label.replaceAll(' ', '-').toLowerCase();
+export const validationCases = [
+  ...labels.map((label) => {
+    const id = label.replaceAll(' ', '-').toLowerCase();
 
-  return { id, label, href: `/validation/${id}` as Href };
-});
+    return { id, label, href: `/validation/${id}` as Href };
+  }),
+  {
+    id: 'elastic-avatar',
+    label: 'Elastic Avatar' as const,
+    href: '/validation/elastic-avatar' as Href,
+  },
+];
 
 export type ValidationCaseName = (typeof labels)[number];

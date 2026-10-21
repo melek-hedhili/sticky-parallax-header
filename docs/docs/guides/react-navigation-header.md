@@ -7,11 +7,16 @@ sidebar_position: 5
 When a visible, opaque navigation header already handles the top safe area, set `enableSafeAreaTopInset={false}` to avoid adding that inset twice. Keep the default when your sticky header draws behind a hidden or transparent navigation header, unless your surrounding layout handles the inset itself.
 
 The same rule applies to Expo Router's native Stack headers. The demo's
-[SectionList tabs screen](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/tabbed-header-with-section-lists.tsx)
+[SectionList tabs screen](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/tabbed-header-with-section-lists.tsx)
 uses a visible navigation header and disables the library's top inset. Other
 showcase screens hide the navigation header and keep their library-owned bars.
 
-Use this screen inside your navigation setup with `SafeAreaProvider` at the app root:
+In the current iOS Expo demo, deep scrolling in this nested-list showcase can
+settle at the first card. This also reproduces in the pre-bounce checkout; verify
+nested scrolling separately from the navigation header and safe-area placement.
+
+Use this screen inside your navigation setup with app-owned gesture and safe-area
+roots, as shown in the [installation guide](../introduction/installation.md#gesture-handling-and-safe-areas):
 
 ```tsx
 import { Text, View } from 'react-native';

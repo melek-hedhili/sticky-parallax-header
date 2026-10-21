@@ -1,12 +1,8 @@
-node_modules
 .history
 
 # OSX
 #
 .DS_Store
-
-# XDE
-.expo/
 
 # VSCode
 .vscode/
@@ -26,7 +22,7 @@ yarn-debug.log
 yarn-error.log
 
 # Expo
-.expo/*
+.expo/
 # The demo runs in Expo Go; native projects must not become maintained sources.
 /demo/ios/
 /demo/android/

@@ -36,7 +36,7 @@ module.exports = {
           position: 'right',
         },
         {
-          href: 'https://github.com/netguru/sticky-parallax-header',
+          href: 'https://github.com/melek-hedhili/sticky-parallax-header',
           label: 'GitHub',
           position: 'right',
         },
@@ -72,7 +72,7 @@ module.exports = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/netguru/sticky-parallax-header',
+              href: 'https://github.com/melek-hedhili/sticky-parallax-header',
             },
           ],
         },
@@ -94,7 +94,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/netguru/sticky-parallax-header/tree/master/docs/',
+          editUrl: 'https://github.com/melek-hedhili/sticky-parallax-header/tree/master/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

@@ -2,13 +2,16 @@ import type { FlashListRef } from '@shopify/flash-list';
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react-native';
 import * as ReactNative from 'react-native';
 import { Platform, StyleSheet, Text, View } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
 import { installAnimationHarness, scrollEvent } from '../__fixtures__/animationHarness';
 import { useAvatarHeader } from '../predefinedComponents/AvatarHeader/hooks/useAvatarHeader';
 import type { SharedPredefinedProps } from '../predefinedComponents/common/SharedProps';
+import { HeaderWrapper } from '../predefinedComponents/common/components/HeaderWrapper';
 import { usePredefinedFlashListHeader } from '../predefinedComponents/common/hooks/usePredefinedFlashListHeader';
 import { usePredefinedHeader } from '../predefinedComponents/common/hooks/usePredefinedHeader';
 import { getForegroundImageSizes } from '../predefinedComponents/common/utils/getForegroundImageSizes';
+import { ElasticHeaderProvider } from '../primitiveComponents/ElasticHeaderContext';
 import type { ScrollViewRef } from '../primitiveComponents/ScrollComponent';
 import { useStickyHeaderScrollProps } from '../primitiveComponents/useStickyHeaderScrollProps';
 import { withStickyHeader } from '../primitiveComponents/withStickyHeader';
@@ -139,10 +142,94 @@ test('rendered predefined header measurement supplies compact content padding', 
     </StickyHeader>
   );
   expect(screen.getByTestId('HeaderForeground')).toHaveStyle({ height: 280 });
+  expect(screen.getByTestId('HeaderBackdrop')).toHaveStyle({
+    transform: [{ translateY: expect.closeTo(0) }, { scaleY: 1 }],
+  });
   await fireEvent(screen.getByTestId('HeaderForeground'), 'layout', {
     nativeEvent: { layout: { x: 0, y: 0, width: 390, height: 280 } },
   });
   expect(contentPadding).toBe(280);
+});
+
+test.each(['color', 'image'] as const)(
+  '%s backdrop remains anchored while a pull stretches it independently of foreground layout',
+  async (background) => {
+    installAnimationHarness();
+    const header = await renderHook(() =>
+      useAvatarHeader<ScrollViewRef>({
+        backgroundColor: '#246',
+        backgroundImage:
+          background === 'image' ? { uri: 'https://example.com/header.png' } : undefined,
+        title: 'Unscaled profile',
+      })
+    );
+    const displacement = { value: 80 } as SharedValue<number>;
+    const reset = jest.fn();
+    const renderHeader = header.result.current.renderHeader;
+
+    await render(
+      <ElasticHeaderProvider value={{ displacement, reset }}>
+        {renderHeader()}
+      </ElasticHeaderProvider>
+    );
+
+    const backdrop = screen.getByTestId('HeaderBackdrop');
+    const foreground = screen.getByTestId('HeaderForeground');
+    const title = screen.getByText('Unscaled profile');
+    const backdropStyle = StyleSheet.flatten(backdrop.props.style);
+    const [{ translateY }, { scaleY }] = backdropStyle.transform as [
+      { translateY: number },
+      { scaleY: number },
+    ];
+    const height = 280;
+
+    // RN transforms around the center. Adding the parent overlay's pull must
+    // leave the backdrop top fixed and put its bottom at the extended header edge.
+    expect(displacement.value + height / 2 - (height / 2) * scaleY + translateY).toBeCloseTo(0);
+    expect(displacement.value + height / 2 + (height / 2) * scaleY + translateY).toBeCloseTo(360);
+    expect(backdrop).toHaveStyle({ height, width: 390 });
+    expect(foreground).toHaveStyle({ height });
+    expect(StyleSheet.flatten(foreground.props.style).transform).toBeUndefined();
+    expect(foreground).toContainElement(title);
+    expect(backdrop).not.toContainElement(title);
+
+    if (background === 'image') {
+      expect(backdrop).toContainElement(screen.getByTestId('HeaderBackgroundImage'));
+      expect(screen.getByTestId('HeaderBackgroundImage')).toHaveStyle({ height, width: 390 });
+    }
+
+    displacement.value = 0;
+    await screen.rerender(
+      <ElasticHeaderProvider value={{ displacement, reset }}>
+        {renderHeader()}
+      </ElasticHeaderProvider>
+    );
+    expect(screen.getByTestId('HeaderBackdrop')).toHaveStyle({
+      height,
+      transform: [{ translateY: expect.closeTo(0) }, { scaleY: 1 }],
+    });
+    expect(screen.getByTestId('HeaderForeground')).toHaveStyle({ height });
+  }
+);
+
+test('zero-height backdrop does not produce a nonfinite elastic transform', async () => {
+  await render(
+    <ElasticHeaderProvider
+      value={{ displacement: { value: 80 } as SharedValue<number>, reset: jest.fn() }}>
+      <HeaderWrapper
+        parallaxHeight={0}
+        scrollHeight={0}
+        scrollValue={{ value: 0 } as SharedValue<number>}>
+        <Text>Empty header</Text>
+      </HeaderWrapper>
+    </ElasticHeaderProvider>
+  );
+
+  expect(screen.getByTestId('HeaderBackdrop')).toHaveStyle({
+    height: 0,
+    transform: [{ translateY: expect.closeTo(0) }, { scaleY: 1 }],
+  });
+  expect(screen.getByTestId('HeaderForeground')).toHaveStyle({ height: 0 });
 });
 
 test('primitive custom-header defaults retain the existing 53 percent sizing', async () => {

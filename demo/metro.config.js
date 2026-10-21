@@ -10,6 +10,7 @@ const runtimePackages = [
   'react-dom',
   'react-native',
   'react-native-web',
+  'react-native-gesture-handler',
   'react-native-reanimated',
   'react-native-worklets',
   'react-native-safe-area-context',

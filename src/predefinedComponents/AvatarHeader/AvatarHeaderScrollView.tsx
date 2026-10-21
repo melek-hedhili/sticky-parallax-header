@@ -19,6 +19,7 @@ export const AvatarHeaderScrollView: React.ForwardRefExoticComponent<
     children,
     contentContainerStyle,
     decelerationRate = 'fast',
+    enableHeaderBounce = true,
     enableSafeAreaTopInset = true,
     image,
     leftTopIcon,
@@ -85,6 +86,7 @@ export const AvatarHeaderScrollView: React.ForwardRefExoticComponent<
           {...rest}
           contentContainerStyle={contentContainerStyle}
           decelerationRate={decelerationRate}
+          enableHeaderBounce={enableHeaderBounce}
           nestedScrollEnabled={nestedScrollEnabled}
           onMomentumScrollEnd={onMomentumScrollEnd}
           onScrollEndDrag={onScrollEndDrag}

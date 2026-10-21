@@ -21,6 +21,7 @@ the newest bare React Native packages.
 | Reanimated            | 4.5.1     | 4.7.1                   |
 | React Native Worklets | 0.10.1    | 0.13.0                  |
 | Safe Area Context     | 5.7.x     | 5.10.1                  |
+| Gesture Handler       | 2.32.x    | 2.32.x                  |
 | FlashList, optional   | 2.0.2     | 2.3.3                   |
 
 These are the repository's dependency targets. The Expo demo provides runtime
@@ -47,7 +48,7 @@ installation command is not a compatibility guarantee.
 Within an Expo 57 application, let Expo select its compatible native packages:
 
 ```sh
-npx expo install react-native-reanimated react-native-worklets react-native-safe-area-context
+npx expo install react-native-reanimated react-native-worklets react-native-safe-area-context react-native-gesture-handler
 ```
 
 Keep `babel-preset-expo` in the application's Babel config. It configures the
@@ -61,7 +62,7 @@ need a new native binary when they change native dependencies.
 For the React Native 0.87.1 target:
 
 ```sh
-yarn add react-native-reanimated@4.7.1 react-native-worklets@0.13.0 react-native-safe-area-context@5.10.1
+yarn add react-native-reanimated@4.7.1 react-native-worklets@0.13.0 react-native-safe-area-context@5.10.1 react-native-gesture-handler@2.32.0
 ```
 
 Configure the Worklets plugin **last** in the application's Babel plugins:
@@ -77,30 +78,58 @@ Follow the [Reanimated installation guide](https://docs.swmansion.com/react-nati
 install iOS Pods, and rebuild the native app. Restart Metro with its cache reset
 after changing the Babel configuration.
 
-## Safe areas
+## Gesture handling and safe areas
 
-Place a `SafeAreaProvider` above your navigation/screens. If the application
-already has one, use that provider.
+Wrap the app/navigation in an app-owned `GestureHandlerRootView` with `flex: 1`,
+then provide safe areas. Reuse existing providers when present. Native modal
+content also needs a gesture root in its own native hierarchy. The library does
+not create gesture roots for you. Android's standard scroll hosts keep their
+gesture hierarchy mounted when bounce is toggled off, so this root setup is
+required even with `enableHeaderBounce={false}`.
 
 ```tsx
 import { Text } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <AvatarHeaderScrollView
-        containerStyle={{ flex: 1 }}
-        title="My profile"
-        subtitle="A sticky header"
-        backgroundColor="#126b5e">
-        <Text style={{ padding: 24, minHeight: 1000 }}>Scroll to collapse the header.</Text>
-      </AvatarHeaderScrollView>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <AvatarHeaderScrollView
+          containerStyle={{ flex: 1 }}
+          title="My profile"
+          subtitle="A sticky header"
+          backgroundColor="#126b5e">
+          <Text style={{ padding: 24, minHeight: 1000 }}>Scroll to collapse the header.</Text>
+        </AvatarHeaderScrollView>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 ```
+
+## Expanded-header pull bounce
+
+Avatar, Details and Tabbed headers enable elastic pull beyond the top by default,
+including their predefined FlashList variants. Set `enableHeaderBounce={false}`
+to disable the custom effect; `bounces={false}` or `scrollEnabled={false}` also
+turns it off. Primitive/custom sticky headers keep their existing behavior.
+
+On iOS, native negative scroll offsets drive the effect. On Android, gestures
+handle the visual pull while preserving native refresh ownership. Refresh uses
+the original `refreshControl` or `onRefresh`/`refreshing` props; bounce does not
+invoke `onRefresh`. Web keeps its existing behavior. On Android, opaque/custom
+scroll renderers and custom `RefreshControl` roots retain native behavior rather
+than receiving an automatic gesture wrapper. Preserve their native scroll props
+and forwarded refs.
+
+For Android pages with independently scrolling vertical lists nested inside a
+header's outer scroll view, set `enableHeaderBounce={false}` on the outer header.
+Its zero offset cannot establish whether an inner list is at its own top, so the
+outer pull gesture cannot safely arbitrate that touch stream. Horizontal pager
+navigation and native refresh remain separate from this opt-out.
 
 ## Optional FlashList integration
 

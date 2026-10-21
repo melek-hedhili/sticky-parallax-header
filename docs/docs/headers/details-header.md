@@ -8,9 +8,9 @@ sidebar_position: 3
 
 ## Example usage
 
-These examples assume a `SafeAreaProvider` at the app root, as shown in the [installation guide](../introduction/installation.md).
+These examples assume app-owned gesture and safe-area roots, as shown in the [installation guide](../introduction/installation.md#gesture-handling-and-safe-areas).
 
-Check out DetailsHeader examples for [ScrollView](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-scroll-view-example.tsx), [FlatList](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-flat-list-example.tsx), [SectionList](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-section-list-example.tsx) & [FlashList](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-flash-list-example.tsx)
+Check out DetailsHeader examples for [ScrollView](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-scroll-view-example.tsx), [FlatList](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-flat-list-example.tsx), [SectionList](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-section-list-example.tsx) & [FlashList](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/demo/src/showcase/screens/additional-examples/details-header-flash-list-example.tsx)
 
 ```tsx
 import { Text, View } from 'react-native';
@@ -108,6 +108,7 @@ Inherits [SectionListProps](https://reactnative.dev/docs/sectionlist#props) and 
 | rightTopIconTestID             | string                                              | -                      |
 | snapStartThreshold             | number                                              | -                      |
 | snapStopThreshold              | number                                              | -                      |
+| enableHeaderBounce | boolean | true |
 | snapToEdge                     | boolean                                             | true                   |
 | stickyTabs                     | boolean                                             | true                   |
 | subtitle                       | string                                              | -                      |

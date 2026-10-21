@@ -32,6 +32,7 @@ export function withAvatarHeaderFlashList<ItemT>(
     const {
       backgroundColor,
       decelerationRate = 'fast',
+      enableHeaderBounce = true,
       enableSafeAreaTopInset = true,
       image,
       leftTopIcon,
@@ -97,6 +98,7 @@ export function withAvatarHeaderFlashList<ItemT>(
             ref={scrollViewRef}
             {...rest}
             decelerationRate={decelerationRate}
+            enableHeaderBounce={enableHeaderBounce}
             nestedScrollEnabled={nestedScrollEnabled}
             onMomentumScrollEnd={onMomentumScrollEnd}
             onScrollEndDrag={onScrollEndDrag}

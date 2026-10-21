@@ -42,9 +42,8 @@ jobs:
       - run: npm install --global yarn@1.22.22
       - run: yarn install --frozen-lockfile --non-interactive
       - run: yarn --cwd demo install --frozen-lockfile --non-interactive
-      - run: yarn --cwd demo generate:routes
-      - run: yarn lint:demo
       - run: yarn demo:typecheck
+      - run: yarn lint:demo
       - run: yarn --cwd demo test:ci
       - run: yarn --cwd demo check:dependencies
       - run: yarn --cwd demo doctor

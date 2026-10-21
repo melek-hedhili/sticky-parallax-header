@@ -5,7 +5,7 @@ sidebar_position: 2
 # Custom Header
 
 The Expo Router demo contains a complete
-[custom header screen](https://github.com/netguru/sticky-parallax-header/blob/master/demo/src/showcase/screens/sims-screen/index.tsx).
+[custom header screen](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/demo/src/showcase/screens/sims-screen/index.tsx).
 
 Use `StickyHeaderScrollView`, `StickyHeaderFlatList`, or `StickyHeaderSectionList` to supply your own `renderHeader` and `renderTabs`. Wrap another compatible scroll component with `withStickyHeader` when needed. FlashList has a [separate adapter](custom-flashlist-header.md).
 

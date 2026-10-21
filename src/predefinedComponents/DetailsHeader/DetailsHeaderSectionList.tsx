@@ -19,6 +19,7 @@ function DetailsHeaderSectionListInner<ItemT, SectionT>(
     backgroundColor,
     contentContainerStyle,
     decelerationRate = 'fast',
+    enableHeaderBounce = true,
     enableSafeAreaTopInset = true,
     leftTopIcon,
     leftTopIconAccessibilityLabel,
@@ -85,6 +86,7 @@ function DetailsHeaderSectionListInner<ItemT, SectionT>(
           {...rest}
           contentContainerStyle={contentContainerStyle}
           decelerationRate={decelerationRate}
+          enableHeaderBounce={enableHeaderBounce}
           nestedScrollEnabled={nestedScrollEnabled}
           onMomentumScrollEnd={onMomentumScrollEnd}
           onScroll={onScroll}

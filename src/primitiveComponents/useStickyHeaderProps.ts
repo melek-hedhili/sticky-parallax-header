@@ -1,123 +1,34 @@
-import { useMemo, useState } from 'react';
-import type { ViewStyle } from 'react-native';
-import type { LayoutChangeEvent } from 'react-native';
-import { StyleSheet } from 'react-native';
-import type { AnimatedStyle } from 'react-native-reanimated';
-import {
-  Extrapolation,
-  interpolate,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from 'react-native-reanimated';
+import type { LayoutChangeEvent, ViewStyle } from 'react-native';
+import type { AnimatedStyle, ScrollHandlerProcessed } from 'react-native-reanimated';
 
 import type { StickyHeaderSharedProps } from './StickyHeaderProps';
+import { useInternalStickyHeaderProps } from './useInternalStickyHeaderProps';
 
-export function useStickyHeaderProps(props: StickyHeaderSharedProps) {
-  const {
-    contentContainerStyle,
-    onHeaderLayout,
-    onMomentumScrollBegin,
-    onMomentumScrollEnd,
-    onScroll,
-    onScrollBeginDrag,
-    onScrollEndDrag,
-    onTabsLayout,
-    stickyTabs = true,
-    style,
-  } = props;
+interface StickyHeaderLayout {
+  contentContainerPaddingTop: number;
+  contentContainerPaddingBottom: number;
+  headerAnimatedStyle: AnimatedStyle<ViewStyle>;
+  headerHeight: number;
+  listPaddingTop: number;
+  onHeaderLayoutInternal: (event: LayoutChangeEvent) => void;
+  onTabsLayoutInternal: (event: LayoutChangeEvent) => void;
+  scrollHandler: ScrollHandlerProcessed<Record<string, unknown>>;
+  tabsHeight: number;
+}
 
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const [tabsHeight, setTabsHeight] = useState(0);
-
-  const scrollValue = useSharedValue(0);
-
-  function onHeaderLayoutInternal(e: LayoutChangeEvent) {
-    setHeaderHeight(e.nativeEvent.layout.height);
-    onHeaderLayout?.(e);
-  }
-
-  function onTabsLayoutInternal(e: LayoutChangeEvent) {
-    setTabsHeight(e.nativeEvent.layout.height);
-    onTabsLayout?.(e);
-  }
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onBeginDrag: (e) => {
-      onScrollBeginDrag?.(e);
-    },
-    onEndDrag: (e) => {
-      onScrollEndDrag?.(e);
-    },
-    onMomentumBegin: (e) => {
-      onMomentumScrollBegin?.(e);
-    },
-    onMomentumEnd: (e) => {
-      onMomentumScrollEnd?.(e);
-    },
-    onScroll: (e) => {
-      scrollValue.value = e.contentOffset.y;
-      onScroll?.(e);
-    },
-  });
-
-  const contentContainerPaddingTop = useMemo(() => {
-    const paddingTop = StyleSheet.flatten(contentContainerStyle)?.paddingTop;
-
-    if (typeof paddingTop === 'number') {
-      return paddingTop;
-    }
-
-    // We do not support string values
-    return 0;
-  }, [contentContainerStyle]);
-
-  const contentContainerPaddingBottom = useMemo(() => {
-    const paddingBottom = StyleSheet.flatten(contentContainerStyle)?.paddingBottom;
-
-    if (typeof paddingBottom === 'number') {
-      return paddingBottom;
-    }
-
-    // We do not support string values
-    return 0;
-  }, [contentContainerStyle]);
-
-  const listPaddingTop = useMemo(() => {
-    const paddingTop = StyleSheet.flatten(style)?.paddingTop;
-
-    if (typeof paddingTop === 'number') {
-      return paddingTop;
-    }
-
-    // We do not support string values
-    return 0;
-  }, [style]);
-
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollValue.value,
-            [0, headerHeight],
-            [0, -headerHeight],
-            stickyTabs ? Extrapolation.CLAMP : Extrapolation.EXTEND
-          ),
-        },
-      ],
-    };
-  }, [scrollValue, headerHeight, stickyTabs]);
+/** Public layout contract; gesture state belongs to the component wrappers. */
+export function useStickyHeaderProps(props: StickyHeaderSharedProps): StickyHeaderLayout {
+  const layout = useInternalStickyHeaderProps(props);
 
   return {
-    contentContainerPaddingTop,
-    contentContainerPaddingBottom,
-    headerAnimatedStyle: headerAnimatedStyle as AnimatedStyle<ViewStyle>,
-    headerHeight,
-    listPaddingTop,
-    onHeaderLayoutInternal,
-    onTabsLayoutInternal,
-    scrollHandler,
-    tabsHeight,
+    contentContainerPaddingTop: layout.contentContainerPaddingTop,
+    contentContainerPaddingBottom: layout.contentContainerPaddingBottom,
+    headerAnimatedStyle: layout.headerAnimatedStyle,
+    headerHeight: layout.headerHeight,
+    listPaddingTop: layout.listPaddingTop,
+    onHeaderLayoutInternal: layout.onHeaderLayoutInternal,
+    onTabsLayoutInternal: layout.onTabsLayoutInternal,
+    scrollHandler: layout.scrollHandler,
+    tabsHeight: layout.tabsHeight,
   };
 }

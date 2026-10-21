@@ -38,7 +38,8 @@ export function ReadingList() {
 }
 ```
 
-As with other predefined headers, provide `SafeAreaProvider` at the app root.
+As with other predefined headers, provide app-owned gesture and safe-area roots;
+see [root setup](../introduction/installation.md#gesture-handling-and-safe-areas).
 
 Predefined FlashList adapters use the same compact `parallaxHeight` defaults as
 their core header families: 200 dp for short phone landscape windows, otherwise
@@ -51,6 +52,13 @@ guidance in [Avatar](./avatar-header.md#expanded-header-height),
 `Math.max(parallaxHeight, headerHeight * 2)`.
 
 ## Props and refs
+
+Predefined Avatar, Details and Tabbed adapters enable `enableHeaderBounce` by
+default. Set it to `false` to disable the custom pull effect. Native
+`bounces={false}` and `scrollEnabled={false}` also disable it. Custom scroll
+renderers or custom refresh roots retain their native behavior on Android. Nested
+vertical scroll hosts require `enableHeaderBounce={false}` on the outer header. See
+[gesture setup and pull bounce](../introduction/installation.md#expanded-header-pull-bounce).
 
 The adapters accept the relevant [FlashList props](https://shopify.github.io/flash-list/docs/usage/)
 and the shared props of their header family. Sticky layout replaces the list's
@@ -71,7 +79,11 @@ explicit caller value passes through.
 `withTabbedHeaderFlashList` uses flat `data` and `stickyHeaderIndices`. Supply
 one tab per sticky index in ascending order. It does **not** accept SectionList
 `sections`; use `TabbedHeaderList` for a SectionList data model. The tab selection
-tracks the visible range, and pressing a tab scrolls to its corresponding index.
+tracks the visible range, and pressing a tab requests a scroll to its corresponding
+index. In the current iOS Expo demo, a later-tab jump can remain at the first
+section with First selected. This also reproduces in the pre-bounce checkout;
+Android validation reaches the second section. Verify the visible destination,
+since offscreen accessibility nodes can exist before a jump succeeds.
 
 ## Custom layout
 

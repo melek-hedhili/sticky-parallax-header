@@ -20,6 +20,7 @@ function AvatarHeaderFlatListInner<ItemT>(
     contentContainerStyle,
     data,
     decelerationRate = 'fast',
+    enableHeaderBounce = true,
     enableSafeAreaTopInset = true,
     image,
     keyExtractor,
@@ -89,6 +90,7 @@ function AvatarHeaderFlatListInner<ItemT>(
           contentContainerStyle={contentContainerStyle}
           data={data}
           decelerationRate={decelerationRate}
+          enableHeaderBounce={enableHeaderBounce}
           keyExtractor={keyExtractor}
           nestedScrollEnabled={nestedScrollEnabled}
           onMomentumScrollEnd={onMomentumScrollEnd}
