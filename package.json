@@ -17,6 +17,7 @@
     "lib"
   ],
   "repository": "https://github.com/melek-hedhili/sticky-parallax-header",
+  "homepage": "https://github.com/melek-hedhili/sticky-parallax-header",
   "author": "IdaszakDaniel <idaszak1@gmail.com>",
   "license": "MIT",
   "scripts": {
