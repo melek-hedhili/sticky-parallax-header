@@ -14,7 +14,7 @@ Check out AvatarHeader examples for [ScrollView](https://github.com/melek-hedhil
 
 ```tsx
 import { Text, View } from 'react-native';
-import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
+import { AvatarHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 
 export default function ProfileScreen() {
   return (

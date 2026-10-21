@@ -1,8 +1,3 @@
-import { FlashList } from '@shopify/flash-list';
-import type { FlashListRef } from '@shopify/flash-list';
-import React, { useCallback, useRef, useState } from 'react';
-import type { ScrollView } from 'react-native';
-import { Button, StyleSheet, Text, View } from 'react-native';
 import {
   AvatarHeaderFlatList,
   DetailsHeaderFlatList,
@@ -10,15 +5,20 @@ import {
   TabbedHeaderList,
   TabbedHeaderPager,
   useStickyHeaderScrollProps,
-} from 'react-native-sticky-parallax-header';
-import type { PagerMethods } from 'react-native-sticky-parallax-header';
+} from '@mhedhili/react-native-sticky-parallax-header';
+import type { PagerMethods } from '@mhedhili/react-native-sticky-parallax-header';
 import {
   useStickyHeaderFlashListScrollProps,
   withAvatarHeaderFlashList,
   withDetailsHeaderFlashList,
   withStickyHeaderFlashList,
   withTabbedHeaderFlashList,
-} from 'react-native-sticky-parallax-header/flash-list';
+} from '@mhedhili/react-native-sticky-parallax-header/flash-list';
+import { FlashList } from '@shopify/flash-list';
+import type { FlashListRef } from '@shopify/flash-list';
+import React, { useCallback, useRef, useState } from 'react';
+import type { ScrollView } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 
 import type { PerformanceScenarioName } from '@/performance/catalogue';
 

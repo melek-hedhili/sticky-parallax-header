@@ -11,7 +11,7 @@ The headers forward their ref to the underlying scroll component. Infer modern n
 ```tsx
 import { type ComponentRef, useRef } from 'react';
 import { Button, ScrollView, Text } from 'react-native';
-import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
+import { AvatarHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 
 export default function ScrollReferenceScreen() {
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);

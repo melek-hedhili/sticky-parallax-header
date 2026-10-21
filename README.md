@@ -15,12 +15,20 @@ for component usage and examples.
 ## This fork
 
 - New Architecture support for React Native 0.86/0.87 and Reanimated 4 with Worklets.
-- FlashList v2 integrations at `react-native-sticky-parallax-header/flash-list`.
+- FlashList v2 integrations at `@mhedhili/react-native-sticky-parallax-header/flash-list`.
 - One Expo SDK 57 / Expo Router demo, running in Expo Go without prebuild.
 - Elastic header pull on Android and iOS, with an `enableHeaderBounce` opt-out.
 
-These changes are unreleased. See the [fork's setup guide](docs/docs/introduction/installation.md)
-and [migration notes](docs/docs/introduction/modernization-guide.md) for requirements and API differences.
+## Install the beta
+
+```sh
+yarn add @mhedhili/react-native-sticky-parallax-header@next
+```
+
+The `2.0.0-beta.0` line contains breaking changes from Netguru's `1.1.1` release.
+See the [fork's setup guide](docs/docs/introduction/installation.md) and
+[migration notes](docs/docs/introduction/modernization-guide.md) for required
+peer dependencies and API differences.
 
 ## Try the demo
 

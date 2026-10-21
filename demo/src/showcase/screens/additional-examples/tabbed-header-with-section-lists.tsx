@@ -1,7 +1,7 @@
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 import * as React from 'react';
 import type { SectionListData } from 'react-native';
 import { Platform, SectionList, StyleSheet, View, useColorScheme } from 'react-native';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
 
 import type { Question } from '@/showcase/assets/data/cards';
 import { Brandon, Ewa, Jennifer } from '@/showcase/assets/data/cards';

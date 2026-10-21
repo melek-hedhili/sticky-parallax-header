@@ -8,7 +8,7 @@ sidebar_position: 4
 
 ```tsx
 import { Alert, Text } from 'react-native';
-import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
+import { AvatarHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 
 export default function IconsScreen() {
   return (

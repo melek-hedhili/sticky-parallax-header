@@ -1,8 +1,8 @@
+import { DetailsHeaderSectionList } from '@mhedhili/react-native-sticky-parallax-header';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import type { SectionListData } from 'react-native';
 import { StyleSheet, useColorScheme } from 'react-native';
-import { DetailsHeaderSectionList } from 'react-native-sticky-parallax-header';
 
 import { Brandon } from '@/showcase/assets/data/cards';
 import { CardsBlack, IconMenu, iconCloseWhite } from '@/showcase/assets/icons';

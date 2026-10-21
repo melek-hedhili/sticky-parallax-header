@@ -1,6 +1,6 @@
 {
-  "name": "react-native-sticky-parallax-header",
-  "version": "1.1.1",
+  "name": "@mhedhili/react-native-sticky-parallax-header",
+  "version": "2.0.0-beta.0",
   "packageManager": "yarn@1.22.22",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
@@ -86,7 +86,9 @@
     "@typescript-eslint/parser": "8.71.1"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "tag": "next"
   },
   "release-it": {
     "hooks": {

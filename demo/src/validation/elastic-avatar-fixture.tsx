@@ -1,7 +1,7 @@
+import { AvatarHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { ScrollView } from 'react-native';
 import { Button, Platform, RefreshControl, StyleSheet, Text, View } from 'react-native';
-import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
 
 const avatar = require('../../assets/validation/avatar.png');
 

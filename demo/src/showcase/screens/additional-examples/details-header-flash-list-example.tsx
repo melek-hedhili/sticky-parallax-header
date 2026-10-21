@@ -1,8 +1,8 @@
+import { withDetailsHeaderFlashList } from '@mhedhili/react-native-sticky-parallax-header/flash-list';
 import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { useColorScheme } from 'react-native';
-import { withDetailsHeaderFlashList } from 'react-native-sticky-parallax-header/flash-list';
 
 import type { Question } from '@/showcase/assets/data/cards';
 import { Brandon } from '@/showcase/assets/data/cards';

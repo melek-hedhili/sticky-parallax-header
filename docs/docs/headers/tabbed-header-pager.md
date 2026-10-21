@@ -14,7 +14,7 @@ Full source code can be found in [example repo](https://github.com/melek-hedhili
 
 ```tsx
 import { Text, View } from 'react-native';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 
 const tabs = [{ title: 'Overview' }, { title: 'Notes' }];
 

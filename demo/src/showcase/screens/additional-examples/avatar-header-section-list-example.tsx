@@ -1,8 +1,8 @@
+import { AvatarHeaderSectionList } from '@mhedhili/react-native-sticky-parallax-header';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import type { SectionListData } from 'react-native';
 import { StyleSheet, useColorScheme } from 'react-native';
-import { AvatarHeaderSectionList } from 'react-native-sticky-parallax-header';
 
 import { Brandon } from '@/showcase/assets/data/cards';
 import { IconMenu, iconCloseWhite } from '@/showcase/assets/icons';

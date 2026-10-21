@@ -1,7 +1,7 @@
+import { AvatarHeaderFlatList } from '@mhedhili/react-native-sticky-parallax-header';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
-import { AvatarHeaderFlatList } from 'react-native-sticky-parallax-header';
 
 import { Brandon } from '@/showcase/assets/data/cards';
 import { IconMenu, iconCloseWhite } from '@/showcase/assets/icons';

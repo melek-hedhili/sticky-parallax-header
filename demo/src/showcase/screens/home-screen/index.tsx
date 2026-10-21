@@ -1,3 +1,4 @@
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import type { LayoutChangeEvent } from 'react-native';
@@ -9,7 +10,6 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
 
 import type { User } from '@/showcase/assets/data/cards';
 import { logo, photosPortraitMe } from '@/showcase/assets/images';

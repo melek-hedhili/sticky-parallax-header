@@ -1,7 +1,7 @@
+import { withTabbedHeaderFlashList } from '@mhedhili/react-native-sticky-parallax-header/flash-list';
 import { FlashList } from '@shopify/flash-list';
 import * as React from 'react';
 import { Platform, RefreshControl, StyleSheet } from 'react-native';
-import { withTabbedHeaderFlashList } from 'react-native-sticky-parallax-header/flash-list';
 
 import type { ItemType, SectionType } from '@/showcase/assets/data/tabbed-sections';
 import { FLASHLIST_TABBED_SECTIONS } from '@/showcase/assets/data/tabbed-sections';

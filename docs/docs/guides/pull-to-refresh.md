@@ -12,7 +12,7 @@ and `refreshing` props. A `ScrollView` header instead takes an explicit
 ```tsx
 import { useCallback, useState } from 'react';
 import { Platform, RefreshControl, Text } from 'react-native';
-import { StickyHeaderScrollView } from 'react-native-sticky-parallax-header';
+import { StickyHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 
 export function RefreshableHeader() {
   const [refreshing, setRefreshing] = useState(false);

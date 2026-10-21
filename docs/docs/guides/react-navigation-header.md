@@ -20,7 +20,7 @@ roots, as shown in the [installation guide](../introduction/installation.md#gest
 
 ```tsx
 import { Text, View } from 'react-native';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 
 export default function NotesScreen() {
   return (

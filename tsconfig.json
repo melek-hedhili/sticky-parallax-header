@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "paths": {
-      "react-native-sticky-parallax-header": ["./src/index.tsx"],
-      "react-native-sticky-parallax-header/flash-list": ["./src/flash-list.ts"]
+      "@mhedhili/react-native-sticky-parallax-header": ["./src/index.tsx"],
+      "@mhedhili/react-native-sticky-parallax-header/flash-list": ["./src/flash-list.ts"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

@@ -33,7 +33,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 
 const tabs = [{ title: 'Overview' }, { title: 'Trails' }];
 

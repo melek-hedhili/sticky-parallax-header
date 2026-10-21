@@ -15,7 +15,7 @@ import { useCallback } from 'react';
 import type { NativeScrollEvent } from 'react-native';
 import { Text, View, useWindowDimensions } from 'react-native';
 import { interpolateColor, useDerivedValue, useSharedValue } from 'react-native-reanimated';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 
 export function AnimatedColorsScreen() {
   const { width } = useWindowDimensions();

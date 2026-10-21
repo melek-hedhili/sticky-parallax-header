@@ -29,19 +29,29 @@ scenarios; the bare lane is retained in isolated package type checks. A successf
 JavaScript bundle or unit test does not establish native animation behavior.
 Use Node 24.21.0 and Yarn Classic 1.22.22 when contributing to this repository.
 
-## Use this checkout before publication
+## Install the beta
 
-The Next documentation does not imply that the modern branch has been published
-to npm. To test the checkout, build and pack it from the repository root:
+```sh
+yarn add @mhedhili/react-native-sticky-parallax-header@next
+```
+
+The `next` tag currently targets the `2.0.0-beta` line. Pin an exact prerelease
+version when reproducible installs are required.
+
+To test an unpublished checkout, build and pack it from the repository root:
 
 ```sh
 yarn build
-yarn pack --filename react-native-sticky-parallax-header.tgz
+yarn pack --filename mhedhili-react-native-sticky-parallax-header.tgz
 ```
 
-Install that archive in your application using its actual local path. Once a
-modern release is published, use that release's explicit version; the old `@rc`
-installation command is not a compatibility guarantee.
+Install that archive in your application using its actual local path. The old
+unscoped package's `@rc` command is not a compatibility guarantee.
+
+Strict consumers with `skipLibCheck: false` currently encounter declaration
+errors from the supported React Native, Reanimated and optional FlashList
+versions. The package declarations build without package-owned diagnostics, but
+this beta does not claim that those upstream declaration errors are resolved.
 
 ## Expo
 
@@ -91,7 +101,7 @@ required even with `enableHeaderBounce={false}`.
 import { Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
+import { AvatarHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 
 export default function App() {
   return (

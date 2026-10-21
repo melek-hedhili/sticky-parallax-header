@@ -1,13 +1,13 @@
+import type { StickyHeaderFlashListProps } from '@mhedhili/react-native-sticky-parallax-header/flash-list';
+import {
+  useStickyHeaderFlashListScrollProps,
+  withStickyHeaderFlashList,
+} from '@mhedhili/react-native-sticky-parallax-header/flash-list';
 import type { FlashListRef } from '@shopify/flash-list';
 import { FlashList } from '@shopify/flash-list';
 import * as React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { StickyHeaderFlashListProps } from 'react-native-sticky-parallax-header/flash-list';
-import {
-  useStickyHeaderFlashListScrollProps,
-  withStickyHeaderFlashList,
-} from 'react-native-sticky-parallax-header/flash-list';
 
 import { DATA } from '@/showcase/assets/data/paragraphs';
 import { Header } from '@/showcase/components/primitive-components/header';

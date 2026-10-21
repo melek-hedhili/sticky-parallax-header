@@ -1,6 +1,6 @@
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 import * as React from 'react';
 import { StyleSheet, View, useColorScheme } from 'react-native';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
 
 import { Brandon, Ewa, Jennifer } from '@/showcase/assets/data/cards';
 import { TABBED_SECTIONS } from '@/showcase/assets/data/tabbed-sections';

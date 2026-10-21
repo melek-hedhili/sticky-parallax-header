@@ -6,7 +6,7 @@ sidebar_position: 6
 
 FlashList 2 integration is optional and requires the New Architecture. Import
 all its adapters, hook and prop types from
-`react-native-sticky-parallax-header/flash-list`. Import core components from the
+`@mhedhili/react-native-sticky-parallax-header/flash-list`. Import core components from the
 main entry as usual; applications using only core components do not need
 `@shopify/flash-list` installed.
 
@@ -19,7 +19,7 @@ main entry as usual; applications using only core components do not need
 ```tsx
 import { FlashList } from '@shopify/flash-list';
 import { Text } from 'react-native';
-import { withDetailsHeaderFlashList } from 'react-native-sticky-parallax-header/flash-list';
+import { withDetailsHeaderFlashList } from '@mhedhili/react-native-sticky-parallax-header/flash-list';
 
 const DetailsFlashList = withDetailsHeaderFlashList<string>(FlashList);
 

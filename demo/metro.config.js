@@ -17,8 +17,11 @@ const runtimePackages = [
   '@shopify/flash-list',
 ];
 const libraryEntries = {
-  'react-native-sticky-parallax-header': path.join(libraryRoot, 'index.tsx'),
-  'react-native-sticky-parallax-header/flash-list': path.join(libraryRoot, 'flash-list.ts'),
+  '@mhedhili/react-native-sticky-parallax-header': path.join(libraryRoot, 'index.tsx'),
+  '@mhedhili/react-native-sticky-parallax-header/flash-list': path.join(
+    libraryRoot,
+    'flash-list.ts'
+  ),
 };
 
 config.watchFolders = [libraryRoot];

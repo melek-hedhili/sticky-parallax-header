@@ -1,6 +1,6 @@
+import { StickyHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 import * as React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StickyHeaderScrollView } from 'react-native-sticky-parallax-header';
 
 import { DATA } from '@/showcase/assets/data/paragraphs';
 import { Header } from '@/showcase/components/primitive-components/header';

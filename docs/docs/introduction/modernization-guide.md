@@ -19,7 +19,7 @@ import { FlashList } from '@shopify/flash-list';
 import type { FlashListRef } from '@shopify/flash-list';
 import { useRef } from 'react';
 import { Text } from 'react-native';
-import { withAvatarHeaderFlashList } from 'react-native-sticky-parallax-header/flash-list';
+import { withAvatarHeaderFlashList } from '@mhedhili/react-native-sticky-parallax-header/flash-list';
 
 const AvatarFlashList = withAvatarHeaderFlashList<string>(FlashList);
 

@@ -1,7 +1,7 @@
+import { AvatarHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
 
 import type { User } from '@/showcase/assets/data/cards';
 import { IconMenu, iconCloseWhite } from '@/showcase/assets/icons';

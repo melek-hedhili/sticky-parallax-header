@@ -1,8 +1,8 @@
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 import * as React from 'react';
 import type { NativeScrollEvent } from 'react-native';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
 
 import { ShowcaseStatusBar } from '@/showcase/components/showcase-status-bar';
 import { colors, screenStyles } from '@/showcase/constants';

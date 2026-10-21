@@ -10,7 +10,7 @@ const GetStartedSection: React.FC = () => {
       <div className={styles.description}>
         Check out the full documentation for
         <br />
-        <code className={styles.libName}>react-native-sticky-parallax-header</code>
+        <code className={styles.libName}>@mhedhili/react-native-sticky-parallax-header</code>
         <br />
         and start using it in your projects.
       </div>

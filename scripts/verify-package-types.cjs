@@ -36,7 +36,7 @@ function run(args, cwd = root) {
 
 const coreSource = `
 import * as React from 'react';
-import type * as CommonJS from 'react-native-sticky-parallax-header' with { 'resolution-mode': 'require' };
+import type * as CommonJS from '@mhedhili/react-native-sticky-parallax-header' with { 'resolution-mode': 'require' };
 import { FlatList, ScrollView, SectionList, Text, View } from 'react-native';
 import {
   AvatarHeaderFlatList, AvatarHeaderScrollView, AvatarHeaderSectionList,
@@ -44,7 +44,7 @@ import {
   StickyHeaderFlatList, StickyHeaderScrollView, StickyHeaderSectionList,
   TabbedHeaderList, TabbedHeaderPager, useStickyHeaderProps, useStickyHeaderScrollProps, withStickyHeader,
   type PagerMethods,
-} from 'react-native-sticky-parallax-header';
+} from '@mhedhili/react-native-sticky-parallax-header';
 
 type Item = { id: string; label: string };
 type Section = { key: string; title: string };
@@ -91,21 +91,21 @@ const badSection = <TabbedHeaderList<Item, Section> sections={[{ data, key: 'one
 // @ts-expect-error Pager navigation requires a numeric page.
 pagerRef.current?.goToPage('one');
 // @ts-expect-error FlashList adapters must not leak through the core entry point.
-import { withStickyHeaderFlashList } from 'react-native-sticky-parallax-header';
+import { withStickyHeaderFlashList } from '@mhedhili/react-native-sticky-parallax-header';
 `;
 
 const flashSource = `
 import * as React from 'react';
-import type * as CommonJS from 'react-native-sticky-parallax-header/flash-list' with { 'resolution-mode': 'require' };
+import type * as CommonJS from '@mhedhili/react-native-sticky-parallax-header/flash-list' with { 'resolution-mode': 'require' };
 import { Text, View } from 'react-native';
 import { FlashList, type FlashListRef } from '@shopify/flash-list';
-import { useStickyHeaderProps } from 'react-native-sticky-parallax-header';
+import { useStickyHeaderProps } from '@mhedhili/react-native-sticky-parallax-header';
 import {
   useStickyHeaderFlashListScrollProps, withStickyHeaderFlashList,
   withAvatarHeaderFlashList, withDetailsHeaderFlashList, withTabbedHeaderFlashList,
   type StickyHeaderFlashListProps, type AvatarHeaderFlashListProps,
   type DetailsHeaderFlashListProps, type TabbedHeaderFlashListProps,
-} from 'react-native-sticky-parallax-header/flash-list';
+} from '@mhedhili/react-native-sticky-parallax-header/flash-list';
 
 type Item = { id: string; label: string };
 const data: Item[] = [{ id: 'one', label: 'One' }];
@@ -193,7 +193,7 @@ function verifyDeclarationResolution(cwd, entry) {
     const filename = entry.endsWith('/flash-list') ? 'flash-list.d.ts' : 'index.d.ts';
     const expected = path.join(
       cwd,
-      'node_modules/react-native-sticky-parallax-header/lib/typescript',
+      'node_modules/@mhedhili/react-native-sticky-parallax-header/lib/typescript',
       format,
       filename
     );
@@ -315,7 +315,7 @@ try {
       private: true,
       packageManager: 'yarn@1.22.22',
       dependencies: {
-        'react-native-sticky-parallax-header': `file:${archive}`,
+        '@mhedhili/react-native-sticky-parallax-header': `file:${archive}`,
         'react': '19.2.3',
         'react-native': lane.native,
         'react-native-gesture-handler': '2.32.0',
@@ -357,13 +357,13 @@ try {
       throw new Error(`${lane.name}: core consumer unexpectedly has FlashList installed`);
     }
 
-    verifyDeclarationResolution(cwd, 'react-native-sticky-parallax-header');
+    verifyDeclarationResolution(cwd, '@mhedhili/react-native-sticky-parallax-header');
     checkConsumer(cwd, `${lane.name} core without FlashList`);
     manifest.dependencies['@shopify/flash-list'] = lane.flash;
     fs.writeFileSync(path.join(cwd, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`);
     fs.writeFileSync(path.join(cwd, 'flash.tsx'), flashSource);
     install(cwd);
-    verifyDeclarationResolution(cwd, 'react-native-sticky-parallax-header/flash-list');
+    verifyDeclarationResolution(cwd, '@mhedhili/react-native-sticky-parallax-header/flash-list');
     checkConsumer(cwd, `${lane.name} optional FlashList`);
   }
 

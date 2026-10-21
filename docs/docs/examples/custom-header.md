@@ -20,7 +20,7 @@ import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-na
 import {
   StickyHeaderScrollView,
   useStickyHeaderScrollProps,
-} from 'react-native-sticky-parallax-header';
+} from '@mhedhili/react-native-sticky-parallax-header';
 
 export default function CustomHeaderScreen() {
   const {

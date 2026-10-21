@@ -1,6 +1,6 @@
 {
   "name": "sticky-parallax-header-demo",
-  "description": "Unified Expo Go and web demo for react-native-sticky-parallax-header",
+  "description": "Unified Expo Go and web demo for @mhedhili/react-native-sticky-parallax-header",
   "version": "0.0.1",
   "private": true,
   "main": "expo-router/entry",

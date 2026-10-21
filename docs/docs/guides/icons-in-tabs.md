@@ -8,7 +8,7 @@ A tab's `icon` render function receives its active state. This example assumes `
 
 ```tsx
 import { Text, View } from 'react-native';
-import { TabbedHeaderPager } from 'react-native-sticky-parallax-header';
+import { TabbedHeaderPager } from '@mhedhili/react-native-sticky-parallax-header';
 
 export default function TabIconsScreen() {
   return (

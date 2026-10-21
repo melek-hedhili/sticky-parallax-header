@@ -14,7 +14,7 @@ Check out DetailsHeader examples for [ScrollView](https://github.com/melek-hedhi
 
 ```tsx
 import { Text, View } from 'react-native';
-import { DetailsHeaderScrollView } from 'react-native-sticky-parallax-header';
+import { DetailsHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 
 export default function DetailsScreen() {
   return (

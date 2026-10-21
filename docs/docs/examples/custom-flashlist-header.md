@@ -19,7 +19,7 @@ import { Text, View } from 'react-native';
 import {
   useStickyHeaderFlashListScrollProps,
   withStickyHeaderFlashList,
-} from 'react-native-sticky-parallax-header/flash-list';
+} from '@mhedhili/react-native-sticky-parallax-header/flash-list';
 
 const StickyFlashList = withStickyHeaderFlashList<string>(FlashList);
 const items = Array.from({ length: 40 }, (_, index) => `Article ${index + 1}`);

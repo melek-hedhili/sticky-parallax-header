@@ -1,5 +1,5 @@
+import { TabbedHeaderList } from '@mhedhili/react-native-sticky-parallax-header';
 import * as React from 'react';
-import { TabbedHeaderList } from 'react-native-sticky-parallax-header';
 
 import { TABBED_SECTIONS } from '@/showcase/assets/data/tabbed-sections';
 import { TabbedSectionHeader } from '@/showcase/components/predefined-components/tabbed-section-header';

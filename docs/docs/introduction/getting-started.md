@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Getting Started
 
-`react-native-sticky-parallax-header` is a simple React Native library, enabling to create a fully custom header layout for your iOS, Android and web apps.
+`@mhedhili/react-native-sticky-parallax-header` is a simple React Native library, enabling to create a fully custom header layout for your iOS, Android and web apps.
 
 :::info Modern branch
 These **Next** docs describe the React 19, New Architecture and Reanimated 4
@@ -15,7 +15,7 @@ pairs and [migration](./modernization-guide.md) before updating an existing app.
 
 ## Features
 
-`react-native-sticky-parallax-header` provides two different type of components
+`@mhedhili/react-native-sticky-parallax-header` provides two different type of components
 
 - primitive components - components with sticky header setup
 - predefined components - ready sticky header layouts
@@ -57,7 +57,7 @@ Library also provides higher-order-components to enhance [FlashList](https://sho
 As with primitive components, FlashList can also be customized to create its own "sticky header" layout, thanks to `withStickyHeaderFlashList` & `useStickyHeaderFlashListScrollProps`
 
 FlashList is optional. Import its HOCs, hook and prop types from
-`react-native-sticky-parallax-header/flash-list`, and install FlashList 2 in your
+`@mhedhili/react-native-sticky-parallax-header/flash-list`, and install FlashList 2 in your
 application. Core imports do not require FlashList.
 
 ## In Use

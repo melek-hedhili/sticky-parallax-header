@@ -14,7 +14,7 @@ Full source code can be found in [example repo](https://github.com/melek-hedhili
 
 ```tsx
 import { Text } from 'react-native';
-import { TabbedHeaderList } from 'react-native-sticky-parallax-header';
+import { TabbedHeaderList } from '@mhedhili/react-native-sticky-parallax-header';
 
 const sections = ['Trails', 'Campsites'].map((title) => ({
   key: title,

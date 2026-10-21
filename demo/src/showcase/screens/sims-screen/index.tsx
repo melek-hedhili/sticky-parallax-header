@@ -1,11 +1,11 @@
+import {
+  StickyHeaderScrollView,
+  useStickyHeaderScrollProps,
+} from '@mhedhili/react-native-sticky-parallax-header';
 import * as React from 'react';
 import type { ScrollView } from 'react-native';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  StickyHeaderScrollView,
-  useStickyHeaderScrollProps,
-} from 'react-native-sticky-parallax-header';
 
 import { Tabs } from '@/showcase/components/primitive-components/tabs';
 import { ShowcaseStatusBar } from '@/showcase/components/showcase-status-bar';

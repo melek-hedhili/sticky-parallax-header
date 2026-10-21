@@ -1,7 +1,7 @@
+import { DetailsHeaderScrollView } from '@mhedhili/react-native-sticky-parallax-header';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { View } from 'react-native';
-import { DetailsHeaderScrollView } from 'react-native-sticky-parallax-header';
 
 import type { User } from '@/showcase/assets/data/cards';
 import { CardsBlack, IconMenu, iconCloseWhite } from '@/showcase/assets/icons';
