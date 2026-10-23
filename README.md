@@ -30,6 +30,18 @@ See the [fork's setup guide](docs/docs/introduction/installation.md) and
 [migration notes](docs/docs/introduction/modernization-guide.md) for required
 peer dependencies and API differences.
 
+## AI agent skill
+
+The repository includes a portable
+[Agent Skill](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/skills/react-native-sticky-parallax-header/SKILL.md) that helps coding
+agents choose, implement, customize and migrate the package's public header APIs.
+Install the skill directly from this repository:
+
+```sh
+npx skills add melek-hedhili/sticky-parallax-header \
+  --skill react-native-sticky-parallax-header
+```
+
 ## Try the demo
 
 Use Node **24.21.0** and Yarn Classic **1.22.22**:
