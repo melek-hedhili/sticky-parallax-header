@@ -35,6 +35,7 @@ peer dependencies and API differences.
 The repository includes a portable
 [Agent Skill](https://github.com/melek-hedhili/sticky-parallax-header/blob/master/skills/react-native-sticky-parallax-header/SKILL.md) that helps coding
 agents choose, implement, customize and migrate the package's public header APIs.
+Install the skill directly from this repository:
 
 ```sh
 npx skills add melek-hedhili/sticky-parallax-header \
