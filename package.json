@@ -1,6 +1,6 @@
 {
   "name": "@mhedhili/react-native-sticky-parallax-header",
-  "version": "2.0.0-beta.0",
+  "version": "2.0.0-beta.1",
   "packageManager": "yarn@1.22.22",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",

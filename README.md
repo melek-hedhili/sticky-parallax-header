@@ -25,7 +25,7 @@ for component usage and examples.
 yarn add @mhedhili/react-native-sticky-parallax-header@next
 ```
 
-The `2.0.0-beta.0` line contains breaking changes from Netguru's `1.1.1` release.
+The `2.0.0` beta line contains breaking changes from Netguru's `1.1.1` release.
 See the [fork's setup guide](docs/docs/introduction/installation.md) and
 [migration notes](docs/docs/introduction/modernization-guide.md) for required
 peer dependencies and API differences.
