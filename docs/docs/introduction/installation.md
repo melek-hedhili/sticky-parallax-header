@@ -10,7 +10,7 @@ this branch's compatibility target.
 
 ## Dependency compatibility targets
 
-Keep the React version required by your application. The compatibility update
+Keep the React version required by your application. Version `2.0.0-beta.2`
 accepts React `^19.0.0`; React Native still imposes its own React requirements.
 Expo is not a peer dependency of this library. The SDK labels below identify
 representative combinations, not a requirement to adopt Expo or upgrade an app.
@@ -65,11 +65,17 @@ npm install @mhedhili/react-native-sticky-parallax-header@next
 yarn add @mhedhili/react-native-sticky-parallax-header@next
 ```
 
-The `next` tag currently targets the `2.0.0-beta` line. Pin an exact prerelease
-version when reproducible installs are required. Published beta.1 still requires
-its narrower peer versions; the targets above apply to the compatibility update
-in this checkout and become available from npm only after a new release. Do not
-use `--force` or `--legacy-peer-deps` to bypass a version conflict.
+The matrix above describes `2.0.0-beta.2`. Version `2.0.0-beta.1` has narrower
+React, React Native and Gesture Handler peers. Check the version and peers
+currently selected by `next` before assuming it includes the compatibility fix:
+
+```sh
+npm view @mhedhili/react-native-sticky-parallax-header@next version peerDependencies
+```
+
+Pin an exact available prerelease when reproducible installs are required. A Git
+version change does not publish that version to npm. Do not use `--force` or
+`--legacy-peer-deps` to bypass a version conflict.
 
 To test an unpublished checkout, build and pack it from the repository root:
 

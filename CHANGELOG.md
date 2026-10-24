@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — 2.0.0-beta.2 preparation
+## 2.0.0-beta.2 — prepared, unreleased
 
 ### Fixes
 
@@ -11,6 +11,10 @@
   passes expression validation and can start its jobs.
 - Align the demo's six outdated Expo SDK 57 dependencies and Yarn lockfile with
   Expo's recommended patches; retain its React and React Native versions.
+- Prepare the release workflow to publish the reviewed package version to `next`
+  without incrementing it again. Require `master` and an exact beta-version
+  confirmation, create the normal version tag and GitHub prerelease, and remove
+  the extra release-branch hook. Promoting npm `latest` remains a separate step.
 
 ### Verification
 
@@ -29,6 +33,9 @@
 - The patched demo passes online dependency validation, all 21 Expo Doctor
   checks, frozen-lockfile installation, TypeScript, lint, seven Jest tests,
   and iOS/Android/web JavaScript exports.
+- The compatibility change passed hosted package, demo and docs checks on
+  [`04e353a`](https://github.com/melek-hedhili/sticky-parallax-header/actions/runs/40129818958).
+  Release preparation is validated separately from that baseline.
 
 ### Release status and limits
 
@@ -40,6 +47,7 @@
   Reanimated and FlashList declaration errors, reproduced without this package's
   imports. The scoped CI policy does not fix those upstream declarations or
   change consumers' TypeScript configuration.
-- Native verification of the added RN 0.83/0.88 combinations and a passing GitHub
-  Actions run remain outstanding. This entry is not a published release; the
-  package version and npm tags remain at 2.0.0-beta.1 until release gates pass.
+- Native verification of the added RN 0.83/0.88 combinations remains outstanding.
+  Installation and type checks do not establish native compatibility.
+- This entry records release preparation. Updating the version in Git does not
+  publish the package or move npm dist-tags; publication is a separate operation.
