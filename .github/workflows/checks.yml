@@ -10,12 +10,13 @@ permissions:
 
 env:
   HUSKY: '0'
-  YARN_CACHE_FOLDER: ${{ runner.temp }}/yarn-cache
 
 jobs:
   package:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure Yarn cache
+        run: printf 'YARN_CACHE_FOLDER=%s/yarn-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
@@ -34,6 +35,8 @@ jobs:
   demo:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure Yarn cache
+        run: printf 'YARN_CACHE_FOLDER=%s/yarn-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
@@ -52,6 +55,8 @@ jobs:
   documentation:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure Yarn cache
+        run: printf 'YARN_CACHE_FOLDER=%s/yarn-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:

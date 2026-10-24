@@ -16,22 +16,23 @@ if (realTemporaryRoot === realRoot || realTemporaryRoot.startsWith(`${realRoot}$
   throw new Error('Packed consumers must be created outside the repository dependency tree.');
 }
 
-function run(args, cwd = root) {
-  const command = yarn ? process.execPath : 'yarn';
-  const commandArguments = yarn ? [yarn, ...args] : args;
-
+function run(command, args, cwd = root) {
   // eslint-disable-next-line no-console
-  console.log(`[packed-consumer] yarn ${args.join(' ')} (${cwd})`);
+  console.log(`[packed-consumer] ${command} ${args.join(' ')} (${cwd})`);
 
-  const result = spawnSync(command, commandArguments, {
+  const result = spawnSync(command, args, {
     cwd,
     env: { ...process.env, HUSKY: '0' },
     stdio: 'inherit',
   });
 
   if (result.error || result.status !== 0) {
-    throw result.error || new Error(`Yarn ${args[0]} exited ${result.status}`);
+    throw result.error || new Error(`${command} ${args[0]} exited ${result.status}`);
   }
+}
+
+function runYarn(args, cwd = root) {
+  run(yarn ? process.execPath : 'yarn', yarn ? [yarn, ...args] : args, cwd);
 }
 
 const coreSource = `
@@ -141,16 +142,55 @@ const badEstimate = <Sticky data={data} renderItem={renderItem} estimatedItemSiz
 
 const lanes = [
   {
-    name: 'expo',
+    name: 'rn-0.83.0',
+    react: '19.2.0',
+    reactTypes: '19.2.18',
+    native: '0.83.0',
+    gestureHandler: '2.30.0',
+    reanimated: '4.2.1',
+    worklets: '0.7.4',
+    safeArea: '5.6.2',
+    flash: '2.0.2',
+  },
+  {
+    name: 'rn-0.83.10',
+    react: '19.2.0',
+    reactTypes: '19.2.18',
+    native: '0.83.10',
+    gestureHandler: '2.30.0',
+    reanimated: '4.2.1',
+    worklets: '0.7.4',
+    safeArea: '5.6.2',
+    flash: '2.0.2',
+  },
+  {
+    name: 'rn-0.86.3',
+    react: '19.2.3',
+    reactTypes: '19.2.18',
     native: '0.86.3',
+    gestureHandler: '2.32.0',
     reanimated: '4.5.1',
     worklets: '0.10.1',
     safeArea: '5.7.0',
     flash: '2.0.2',
   },
   {
-    name: 'bare',
+    name: 'rn-0.87.1',
+    react: '19.2.3',
+    reactTypes: '19.2.18',
     native: '0.87.1',
+    gestureHandler: '2.32.0',
+    reanimated: '4.7.1',
+    worklets: '0.13.0',
+    safeArea: '5.10.1',
+    flash: '2.3.3',
+  },
+  {
+    name: 'rn-0.88.0',
+    react: '19.3.0',
+    reactTypes: '19.3.0',
+    native: '0.88.0',
+    gestureHandler: '3.3.0',
     reanimated: '4.7.1',
     worklets: '0.13.0',
     safeArea: '5.10.1',
@@ -161,17 +201,38 @@ const lanes = [
 function install(cwd) {
   const flags = [
     'install',
+    '--strict-peer-deps',
+    '--legacy-peer-deps=false',
+    '--force=false',
     '--ignore-scripts',
-    '--non-interactive',
-    '--registry',
-    'https://registry.npmjs.org',
+    '--no-audit',
+    '--no-fund',
+    '--fetch-retries=0',
+    '--fetch-timeout=30000',
+    '--registry=https://registry.npmjs.org',
   ];
 
   if (process.env.PACKED_CONSUMER_OFFLINE === '1') {
     flags.push('--offline');
   }
 
-  run(flags, cwd);
+  run(process.platform === 'win32' ? 'npm.cmd' : 'npm', flags, cwd);
+}
+
+function verifyInstalledVersions(cwd, dependencies) {
+  for (const [name, expected] of Object.entries(dependencies)) {
+    if (expected.startsWith('file:')) {
+      continue;
+    }
+
+    const installed = JSON.parse(
+      fs.readFileSync(path.join(cwd, 'node_modules', name, 'package.json'), 'utf8')
+    );
+
+    if (installed.version !== expected) {
+      throw new Error(`${name}: expected ${expected}, installed ${installed.version}`);
+    }
+  }
 }
 
 function verifyDeclarationResolution(cwd, entry) {
@@ -220,7 +281,7 @@ function verifyArchiveContents(archive) {
     }
 
     return (
-      !/^(?:package\.json|README(?:\.[^/]*)?|LICENSE(?:\.[^/]*)?|(?:src|lib)(?:\/.*)?)$/i.test(
+      !/^(?:package\.json|README(?:\.[^/]*)?|LICENSE(?:\.[^/]*)?|CHANGELOG\.md|(?:src|lib)(?:\/.*)?)$/i.test(
         relative
       ) ||
       /(?:^|\/)(?:demo|__tests__|__fixtures__|__mocks__|node_modules|\.agents|\.claude)(?:\/|$)/.test(
@@ -272,15 +333,7 @@ function verifyArchiveContents(archive) {
 try {
   const packedArchive = path.join(temporaryRoot, 'library.tgz');
   const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
-  const compilerFailures = [];
-
-  function checkConsumer(cwd, description) {
-    try {
-      run(['exec', 'tsc', '--noEmit'], cwd);
-    } catch (error) {
-      compilerFailures.push(`${description}: ${error.message}`);
-    }
-  }
+  const failures = [];
 
   if (packageJson.files?.some((entry) => entry.startsWith('!'))) {
     throw new Error(
@@ -298,81 +351,105 @@ try {
     }
   }
 
-  run(['pack', '--filename', packedArchive]);
+  runYarn(['pack', '--filename', packedArchive]);
   verifyArchiveContents(packedArchive);
-  // Yarn Classic caches relative file: specifiers across different temporary consumers.
-  // A content-addressed filename ensures every lane installs this exact built snapshot.
+  // A content-addressed filename prevents a cached archive from masking this built snapshot.
   const archiveHash = createHash('sha256').update(fs.readFileSync(packedArchive)).digest('hex');
   const archive = path.join(temporaryRoot, `library-${archiveHash}.tgz`);
 
   fs.renameSync(packedArchive, archive);
   for (const lane of lanes) {
-    const cwd = path.join(temporaryRoot, lane.name);
+    for (const withFlashList of [false, true]) {
+      const description = `${lane.name}-${withFlashList ? 'flash' : 'core'}`;
+      const cwd = path.join(temporaryRoot, description);
 
-    fs.mkdirSync(cwd);
-    const manifest = {
-      name: `sticky-parallax-${lane.name}-consumer`,
-      private: true,
-      packageManager: 'yarn@1.22.22',
-      dependencies: {
-        '@mhedhili/react-native-sticky-parallax-header': `file:${archive}`,
-        'react': '19.2.3',
-        'react-native': lane.native,
-        'react-native-gesture-handler': '2.32.0',
-        'react-native-reanimated': lane.reanimated,
-        'react-native-worklets': lane.worklets,
-        'react-native-safe-area-context': lane.safeArea,
-        '@babel/core': '7.29.7',
-        '@react-native/metro-config': lane.native,
-        '@types/react': '19.2.18',
-        'typescript': '6.0.3',
-      },
-    };
-
-    fs.writeFileSync(path.join(cwd, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-    fs.writeFileSync(
-      path.join(cwd, 'tsconfig.json'),
-      JSON.stringify(
-        {
-          compilerOptions: {
-            strict: true,
-            skipLibCheck: false,
-            noEmit: true,
-            jsx: 'react-jsx',
-            module: 'ESNext',
-            moduleResolution: 'Bundler',
-            target: 'ES2022',
-            lib: ['ES2022'],
-            types: ['react'],
-          },
-          include: ['*.tsx'],
+      fs.mkdirSync(cwd);
+      const manifest = {
+        name: `sticky-parallax-${description}-consumer`,
+        private: true,
+        dependencies: {
+          '@mhedhili/react-native-sticky-parallax-header': `file:${archive}`,
+          'react': lane.react,
+          'react-native': lane.native,
+          'react-native-gesture-handler': lane.gestureHandler,
+          'react-native-reanimated': lane.reanimated,
+          'react-native-worklets': lane.worklets,
+          'react-native-safe-area-context': lane.safeArea,
+          '@babel/core': '7.29.7',
+          '@react-native/metro-config': lane.native,
+          '@types/react': lane.reactTypes,
+          'typescript': '6.0.3',
         },
-        null,
-        2
-      )
-    );
-    fs.writeFileSync(path.join(cwd, 'core.tsx'), coreSource);
-    install(cwd);
-    if (fs.existsSync(path.join(cwd, 'node_modules/@shopify/flash-list'))) {
-      throw new Error(`${lane.name}: core consumer unexpectedly has FlashList installed`);
-    }
+      };
 
-    verifyDeclarationResolution(cwd, '@mhedhili/react-native-sticky-parallax-header');
-    checkConsumer(cwd, `${lane.name} core without FlashList`);
-    manifest.dependencies['@shopify/flash-list'] = lane.flash;
-    fs.writeFileSync(path.join(cwd, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-    fs.writeFileSync(path.join(cwd, 'flash.tsx'), flashSource);
-    install(cwd);
-    verifyDeclarationResolution(cwd, '@mhedhili/react-native-sticky-parallax-header/flash-list');
-    checkConsumer(cwd, `${lane.name} optional FlashList`);
+      if (withFlashList) {
+        manifest.dependencies['@shopify/flash-list'] = lane.flash;
+        fs.writeFileSync(path.join(cwd, 'flash.tsx'), flashSource);
+      }
+
+      fs.writeFileSync(path.join(cwd, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+      fs.writeFileSync(
+        path.join(cwd, 'tsconfig.json'),
+        JSON.stringify(
+          {
+            compilerOptions: {
+              strict: true,
+              skipLibCheck: false,
+              noEmit: true,
+              jsx: 'react-jsx',
+              module: 'ESNext',
+              moduleResolution: 'Bundler',
+              target: 'ES2022',
+              lib: ['ES2022'],
+              types: ['react'],
+            },
+            include: ['*.tsx'],
+          },
+          null,
+          2
+        )
+      );
+      fs.writeFileSync(path.join(cwd, 'core.tsx'), coreSource);
+      try {
+        install(cwd);
+        verifyInstalledVersions(cwd, manifest.dependencies);
+        if (!withFlashList && fs.existsSync(path.join(cwd, 'node_modules/@shopify/flash-list'))) {
+          throw new Error('Core consumer unexpectedly has FlashList installed.');
+        }
+
+        // eslint-disable-next-line no-console
+        console.log(`[packed-consumer] ${description}: installation passed.`);
+      } catch (error) {
+        failures.push(`${description} installation: ${error.message}`);
+        continue;
+      }
+
+      try {
+        verifyDeclarationResolution(cwd, '@mhedhili/react-native-sticky-parallax-header');
+        if (withFlashList) {
+          verifyDeclarationResolution(
+            cwd,
+            '@mhedhili/react-native-sticky-parallax-header/flash-list'
+          );
+        }
+
+        run(process.execPath, [path.join(cwd, 'node_modules/typescript/bin/tsc'), '--noEmit'], cwd);
+        // eslint-disable-next-line no-console
+        console.log(`[packed-consumer] ${description}: compilation passed.`);
+      } catch (error) {
+        failures.push(`${description} compilation: ${error.message}`);
+      }
+    }
   }
 
-  if (compilerFailures.length > 0) {
-    throw new Error(`Strict packed consumer checks failed:\n${compilerFailures.join('\n')}`);
+  if (failures.length > 0) {
+    throw new Error(`Strict packed consumer checks failed:\n${failures.join('\n')}`);
   }
 
   // eslint-disable-next-line no-console
-  console.log('Packed core and optional FlashList declarations passed on both supported stacks.');
+  console.log(
+    `Packed installation and declarations passed on all ${lanes.length} dependency stacks.`
+  );
   fs.rmSync(temporaryRoot, { recursive: true, force: true });
 } catch (error) {
   console.error(`Consumer evidence retained at ${temporaryRoot}`);

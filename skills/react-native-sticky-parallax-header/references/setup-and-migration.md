@@ -6,32 +6,34 @@ Read this reference when installing the package, checking compatibility, changin
 
 The modern package is `@mhedhili/react-native-sticky-parallax-header` on the `2.0.0-beta` line. It requires React Native's New Architecture, React 19, Reanimated 4, React Native Worklets, React Native Gesture Handler, and React Native Safe Area Context. Reanimated 2/3, FlashList 1, and the legacy architecture are not supported targets.
 
-The repository validates these complete dependency pairs:
+The compatibility update accepts React `^19.0.0`. Keep the consumer's React version when it satisfies React Native's own peer requirements; the library's development pin is not a reason to upgrade it. Expo is not a library peer. These complete combinations are the checkout's strict npm installation and declaration-check targets:
 
-| Dependency | Expo consumer lane | Bare consumer lane |
-| --- | --- | --- |
-| Expo | 57.0.27 | Not required |
-| React Native | 0.86.3 | 0.87.1 |
-| React | 19.2.3 | 19.2.3 |
-| Reanimated | 4.5.1 | 4.7.1 |
-| React Native Worklets | 0.10.1 | 0.13.0 |
-| Safe Area Context | 5.7.x | 5.10.1 |
-| Gesture Handler | 2.32.x | 2.32.x |
-| FlashList, optional | 2.0.2 | 2.3.3 |
+| Consumer check | React Native | React | Gesture Handler | Reanimated / Worklets | Safe Area Context | FlashList, optional |
+| --- | --- | --- | --- | --- | --- | --- |
+| RN 0.83 lower bound | 0.83.0 | 19.2.0 | 2.30.0 | 4.2.1 / 0.7.4 | 5.6.2 | 2.0.2 |
+| SDK 55 combination | 0.83.10 | 19.2.0 | 2.30.0 | 4.2.1 / 0.7.4 | 5.6.2 | 2.0.2 |
+| SDK 57 demo combination | 0.86.3 | 19.2.3 | 2.32.0 | 4.5.1 / 0.10.1 | 5.7.0 | 2.0.2 |
+| Bare combination | 0.87.1 | 19.2.3 | 2.32.0 | 4.7.1 / 0.13.0 | 5.10.1 | 2.3.3 |
+| SDK 58 combination | 0.88.0 | 19.3.0 | 3.3.0 | 4.7.1 / 0.13.0 | 5.10.1 | 2.3.3 |
 
-Treat this table as the package's tested matrix, not permission to force those versions into every application. In Expo, let `expo install` choose SDK-compatible native packages. In an existing bare app, respect its React Native compatibility requirements and report when it lies outside the tested matrix.
+Do not treat this table as proof of native support for all rows or force its versions into every application. Native runtime evidence is from the maintained SDK 57 demo; RN 0.83 and 0.88 runtime verification is pending. Strict consumers still have upstream declaration failures, which block release. In Expo, let `expo install` choose SDK-compatible native packages and compare the resolved set with the matrix. In a bare app, respect React Native's requirements. Report unsupported combinations without inferring compatibility for intervening RN versions or arbitrary native dependency mixes.
+
+Fresh strict npm installation passed for RN 0.86, 0.87 and 0.88, with and without FlashList, retaining each selected React version. Fresh RN 0.83 installs remain blocked even without this library: `@react-native/virtualized-lists` has a wildcard RN peer that can select a newer RN. Separate checks adding this library to existing RN 0.83.0 and 0.83.10 dependency trees passed with and without FlashList, preserving React 19.2.0. Those existing-app results do not resolve the fresh-install limitation. Preserve an existing app's working lockfile; do not promise that broader peers fix this baseline failure. Strict compilation still reports upstream errors, with no package/consumer-fixture diagnostics.
 
 ## Install the modern package
 
-Use the consumer project's package manager. With Yarn:
+Use the consumer project's package manager:
 
 ```sh
+npm install @mhedhili/react-native-sticky-parallax-header@next
+# Or, with Yarn:
 yarn add @mhedhili/react-native-sticky-parallax-header@next
 ```
 
 Pin an exact prerelease instead of `next` when the application requires reproducible installs.
+Published beta.1 retains the narrower React/RN/Gesture Handler peers. The compatibility update in this checkout is unavailable from npm until released: inspect the installed version's declarations and peer dependencies before promising that the command resolves a conflict. Do not bypass resolution with `--force` or `--legacy-peer-deps`.
 
-For Expo 57, install compatible native peers with Expo:
+For Expo, install compatible native peers with Expo:
 
 ```sh
 npx expo install react-native-reanimated react-native-worklets react-native-safe-area-context react-native-gesture-handler
@@ -39,11 +41,15 @@ npx expo install react-native-reanimated react-native-worklets react-native-safe
 
 Keep `babel-preset-expo`; it supplies the Worklets transform for the supported Expo stack. Do not add the old Reanimated plugin as a second transform.
 
-For the validated bare React Native 0.87.1 lane:
+For the bare React Native 0.87.1 target:
 
 ```sh
+npm install react-native-reanimated@4.7.1 react-native-worklets@0.13.0 react-native-safe-area-context@5.10.1 react-native-gesture-handler@2.32.0
+# Or, with Yarn:
 yarn add react-native-reanimated@4.7.1 react-native-worklets@0.13.0 react-native-safe-area-context@5.10.1 react-native-gesture-handler@2.32.0
 ```
+
+For other targets, use the complete matching row and preserve the app's React version.
 
 Configure the Worklets plugin last:
 
