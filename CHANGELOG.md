@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0-beta.2 — prepared, unreleased
+## 2.0.0-beta.2
 
 ### Fixes
 
@@ -15,6 +15,8 @@
   without incrementing it again. Require `master` and an exact beta-version
   confirmation, create the normal version tag and GitHub prerelease, and remove
   the extra release-branch hook. Promoting npm `latest` remains a separate step.
+- Configure npm authentication only after validation so Yarn Classic can install
+  and test without publishing credentials or an unresolved `NODE_AUTH_TOKEN`.
 
 ### Verification
 
@@ -47,7 +49,7 @@
   Reanimated and FlashList declaration errors, reproduced without this package's
   imports. The scoped CI policy does not fix those upstream declarations or
   change consumers' TypeScript configuration.
-- Native verification of the added RN 0.83/0.88 combinations remains outstanding.
+- Native verification of the added RN 0.83/0.88 combinations is deferred for this beta.
   Installation and type checks do not establish native compatibility.
-- This entry records release preparation. Updating the version in Git does not
-  publish the package or move npm dist-tags; publication is a separate operation.
+- Updating the version in Git does not publish the package or move npm dist-tags;
+  check the registry for release availability.

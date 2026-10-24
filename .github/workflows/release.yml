@@ -26,7 +26,6 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-          registry-url: https://registry.npmjs.org
           package-manager-cache: false
       - name: Verify prepared beta release
         run: |
@@ -56,6 +55,11 @@ jobs:
         env:
           RELEASE_USER_NAME: ${{ secrets.USERNAME }}
           RELEASE_USER_EMAIL: ${{ secrets.USER_EMAIL }}
+      - name: Configure npm authentication
+        uses: actions/setup-node@v7
+        with:
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
       - name: Publish manually requested release
         run: yarn release --ci
         env:

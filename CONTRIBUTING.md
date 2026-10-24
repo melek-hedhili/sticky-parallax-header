@@ -130,40 +130,7 @@ policy described above:
 - Keep current public docs and frozen version snapshots distinct. Record a discovered
   documentation/source mismatch before deciding which behavior to change.
 
-## Publish a prepared beta
+## Releases
 
-Prepare the version and changelog in a reviewed PR first. After it is merged and
-required checks pass, publish only when the release is explicitly authorized.
-Complete and record native validation on RN 0.83 and 0.88 before publication;
-passing CI alone does not satisfy that release requirement. Immediately before
-publishing, finalize the changelog's draft status and release date in a reviewed,
-committed change so the published archive does not retain an unreleased heading.
-In the manual **Release to NPM** workflow, select `master` and enter the exact
-prepared version (for this release, `2.0.0-beta.2`). Its preflight requires that
-the input matches `package.json` and is a beta; static, Jest and packed-consumer
-checks run before publication.
-
-The local publishing command from a clean, current `master` checkout is below.
-It does not rerun the workflow's validation; use it only after all required
-checks and native validation have passed for that prepared revision:
-
-```sh
-yarn release --ci
-```
-
-The script uses `--no-increment`: it publishes the version already reviewed in
-Git to the explicit npm `next` tag, pushes the normal `v2.0.0-beta.2` tag, and
-creates a GitHub prerelease. It does not create another release branch or promote
-either npm `latest` or GitHub's latest release. The local command requires npm
-and GitHub authentication; the workflow uses its configured release secrets.
-
-After publishing, inspect the registry version, peer dependencies and dist-tags,
-install that exact registry version in a fresh consumer, and check its npm README.
-Promotion to npm `latest` is a separate authorized operation after those checks:
-
-```sh
-npm dist-tag add @mhedhili/react-native-sticky-parallax-header@2.0.0-beta.2 latest
-```
-
-Release preparation and validation do not publish. Documentation deployment also
-publishes externally and is separate from these checks.
+Package releases and documentation deployment are handled by the maintainers.
+Contributors do not need publishing credentials to submit or validate changes.

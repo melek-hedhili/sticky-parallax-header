@@ -57,6 +57,51 @@ test('publishes the prepared beta through next without a version bump or release
   }
 });
 
+test('configures npm authentication after validation with tokens scoped to publishing', () => {
+  const nodeSetup = steps.find((step) => step.uses?.startsWith('actions/setup-node@'));
+  const authentication = steps.filter((step) => step.with?.['registry-url']);
+  const publishIndex = steps.findIndex((step) => step.run === 'yarn release --ci');
+
+  expect(nodeSetup.with).not.toHaveProperty('registry-url');
+  expect(authentication).toHaveLength(1);
+  expect(authentication[0].uses).toBe(nodeSetup.uses);
+  expect(authentication[0].with).toEqual({
+    'registry-url': 'https://registry.npmjs.org',
+    'package-manager-cache': false,
+  });
+
+  const authenticationIndex = steps.indexOf(authentication[0]);
+  const identityIndex = steps.findIndex((step) => step.name === 'Configure release identity');
+
+  expect(authenticationIndex).toBe(publishIndex - 1);
+  expect(identityIndex).toBeGreaterThan(-1);
+  expect(authenticationIndex).toBeGreaterThan(identityIndex);
+  for (const command of [
+    'yarn install --frozen-lockfile --non-interactive',
+    'yarn check:static',
+    'yarn test:ci',
+    'yarn test:types',
+  ]) {
+    expect(steps.findIndex((step) => step.run === command)).toBeLessThan(authenticationIndex);
+  }
+
+  for (const env of [
+    workflow.env,
+    workflow.jobs.release.env,
+    ...steps.slice(0, publishIndex).map((step) => step.env),
+  ]) {
+    for (const token of ['NODE_AUTH_TOKEN', 'NPM_TOKEN', 'GITHUB_TOKEN']) {
+      expect(env || {}).not.toHaveProperty(token);
+    }
+  }
+
+  expect(steps[publishIndex].env).toEqual({
+    NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}',
+    NPM_TOKEN: '${{ secrets.NPM_TOKEN }}',
+    GITHUB_TOKEN: '${{ secrets.GH_TOKEN }}',
+  });
+});
+
 test.each([
   ['refs/heads/master', manifest.version, 0],
   ['refs/heads/feature', manifest.version, 1],
