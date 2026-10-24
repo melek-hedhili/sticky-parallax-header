@@ -9,6 +9,8 @@
   retaining the RN 0.86/0.87 combinations and optional FlashList 2 integration.
 - Initialize the Yarn cache path in GitHub Actions steps so the checks workflow
   passes expression validation and can start its jobs.
+- Align the demo's six outdated Expo SDK 57 dependencies and Yarn lockfile with
+  Expo's recommended patches; retain its React and React Native versions.
 
 ### Verification
 
@@ -18,6 +20,9 @@
   installation and strict compilation failures visible across all ten consumers.
 - Update npm/Yarn installation instructions and the consumer Agent Skill to
   distinguish dependency targets from verified native runtime support.
+- The patched demo passes online dependency validation, all 21 Expo Doctor
+  checks, frozen-lockfile installation, TypeScript, lint, seven Jest tests,
+  and iOS/Android/web JavaScript exports.
 
 ### Release blockers
 
@@ -28,8 +33,6 @@
 - Strict consumer compilation still reports upstream React Native, Reanimated,
   and FlashList declarations, reproduced without this package's imports. These
   failures are not suppressed or patched in consumers.
-- Native verification of the added RN 0.83/0.88 combinations and a hosted GitHub
+- Native verification of the added RN 0.83/0.88 combinations and a passing GitHub
   Actions run remain outstanding. This entry is not a published release; the
   package version and npm tags remain at 2.0.0-beta.1 until release gates pass.
-- Online Expo Doctor reports six outdated SDK 57 demo patch packages (20/21
-  checks pass). Demo dependencies and lockfiles were not changed by this update.
