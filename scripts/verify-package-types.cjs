@@ -233,6 +233,36 @@ function verifyInstalledVersions(cwd, dependencies) {
       throw new Error(`${name}: expected ${expected}, installed ${installed.version}`);
     }
   }
+
+  const native = JSON.parse(
+    fs.readFileSync(path.join(cwd, 'node_modules/react-native/package.json'), 'utf8')
+  );
+  const companion = dependencies['@react-native/virtualized-lists'];
+
+  if (companion && native.dependencies['@react-native/virtualized-lists'] !== companion) {
+    throw new Error("The virtualized-lists anchor must match React Native's exact dependency.");
+  }
+
+  const lock = JSON.parse(fs.readFileSync(path.join(cwd, 'package-lock.json'), 'utf8'));
+
+  for (const name of ['react', 'react-native']) {
+    const copies = Object.keys(lock.packages).filter(
+      (entry) => entry === `node_modules/${name}` || entry.endsWith(`/node_modules/${name}`)
+    );
+
+    if (copies.length !== 1) {
+      throw new Error(`Expected one installed ${name}, found ${copies.length}.`);
+    }
+  }
+
+  const graph = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['ls', '--all'], {
+    cwd,
+    encoding: 'utf8',
+  });
+
+  if (graph.error || graph.status !== 0) {
+    throw graph.error || new Error(`Installed dependency graph is invalid:\n${graph.stderr}`);
+  }
 }
 
 function verifyDeclarationResolution(cwd, entry) {
@@ -262,6 +292,109 @@ function verifyDeclarationResolution(cwd, entry) {
     if (result.resolvedModule?.resolvedFileName !== expected) {
       throw new Error(`${entry} ${format} did not resolve to the installed packed declarations.`);
     }
+  }
+}
+
+function verifyPackageDeclarations(cwd, checkGuard = false) {
+  const typescript = require(path.join(cwd, 'node_modules/typescript'));
+  const config = typescript.readConfigFile(
+    path.join(cwd, 'tsconfig.json'),
+    typescript.sys.readFile
+  );
+  const parsed = typescript.parseJsonConfigFileContent(config.config || {}, typescript.sys, cwd);
+  const options = { ...parsed.options, strict: true, skipLibCheck: false };
+  const declarationRoot = path.join(
+    cwd,
+    'node_modules/@mhedhili/react-native-sticky-parallax-header/lib/typescript'
+  );
+  const diagnosticHost = {
+    getCanonicalFileName: (filename) => filename,
+    getCurrentDirectory: () => cwd,
+    getNewLine: () => os.EOL,
+  };
+  const configDiagnostics = [...(config.error ? [config.error] : []), ...parsed.errors];
+
+  if (configDiagnostics.length > 0) {
+    throw new Error(typescript.formatDiagnostics(configDiagnostics, diagnosticHost));
+  }
+
+  function ownedDiagnostics(program) {
+    const files = program
+      .getSourceFiles()
+      .filter(
+        (file) =>
+          file.isDeclarationFile && file.fileName.startsWith(`${declarationRoot}${path.sep}`)
+      );
+
+    for (const format of ['module', 'commonjs']) {
+      if (
+        !files.some((file) =>
+          file.fileName.startsWith(`${declarationRoot}${path.sep}${format}${path.sep}`)
+        )
+      ) {
+        throw new Error(`No reachable packed ${format} declarations were checked.`);
+      }
+    }
+
+    // Check our declarations directly; upstream declaration diagnostics are outside this gate.
+    return [
+      ...program.getOptionsDiagnostics(),
+      ...files.flatMap((file) => [
+        ...program.getSyntacticDiagnostics(file),
+        ...program.getSemanticDiagnostics(file),
+      ]),
+    ];
+  }
+
+  const diagnostics = ownedDiagnostics(typescript.createProgram(parsed.fileNames, options));
+
+  if (diagnostics.length > 0) {
+    throw new Error(typescript.formatDiagnostics(diagnostics, diagnosticHost));
+  }
+
+  if (checkGuard) {
+    // Virtual defects prove both trees and transitive optional imports remain checked, without edits.
+    for (const format of ['module', 'commonjs']) {
+      const target = path.join(declarationRoot, format, 'index.d.ts');
+      const host = typescript.createCompilerHost(options);
+      const readFile = host.readFile;
+
+      host.readFile = (filename) => {
+        const content = readFile(filename);
+
+        return filename === target
+          ? `${content}
+export type GuardMissingName = GuardUndefinedType;
+export type GuardMissingImport = import('packed-guard-missing-module').Missing;
+export type GuardOptionalPeer = import('./flash-list.js').StickyHeaderFlashListProps<unknown>;
+`
+          : content;
+      };
+
+      const failures = ownedDiagnostics(typescript.createProgram(parsed.fileNames, options, host));
+
+      for (const [code, name] of [
+        [2304, 'GuardUndefinedType'],
+        [2307, 'packed-guard-missing-module'],
+        [2307, '@shopify/flash-list'],
+      ]) {
+        if (
+          !failures.some(
+            (diagnostic) =>
+              diagnostic.code === code &&
+              diagnostic.file?.fileName.startsWith(
+                `${declarationRoot}${path.sep}${format}${path.sep}`
+              ) &&
+              typescript.flattenDiagnosticMessageText(diagnostic.messageText, '\n').includes(name)
+          )
+        ) {
+          throw new Error(`Packed ${format} declaration guard failed to detect ${name}.`);
+        }
+      }
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('[packed-consumer] Declaration guard self-check passed for both formats.');
   }
 }
 
@@ -382,6 +515,11 @@ try {
         },
       };
 
+      if (lane.native.startsWith('0.83.')) {
+        // Anchor RN's exact companion to avoid npm's wildcard RN peer resolution cycle.
+        manifest.dependencies['@react-native/virtualized-lists'] = lane.native;
+      }
+
       if (withFlashList) {
         manifest.dependencies['@shopify/flash-list'] = lane.flash;
         fs.writeFileSync(path.join(cwd, 'flash.tsx'), flashSource);
@@ -394,7 +532,8 @@ try {
           {
             compilerOptions: {
               strict: true,
-              skipLibCheck: false,
+              // RN's consumer setting; our packed declarations are checked separately below.
+              skipLibCheck: true,
               noEmit: true,
               jsx: 'react-jsx',
               module: 'ESNext',
@@ -418,7 +557,13 @@ try {
         }
 
         // eslint-disable-next-line no-console
-        console.log(`[packed-consumer] ${description}: installation passed.`);
+        console.log(
+          `[packed-consumer] ${description}: installation passed${
+            manifest.dependencies['@react-native/virtualized-lists']
+              ? ' (RN-owned virtualized-lists anchored)'
+              : ''
+          }.`
+        );
       } catch (error) {
         failures.push(`${description} installation: ${error.message}`);
         continue;
@@ -432,12 +577,24 @@ try {
             '@mhedhili/react-native-sticky-parallax-header/flash-list'
           );
         }
+      } catch (error) {
+        failures.push(`${description} declaration resolution: ${error.message}`);
+      }
 
+      try {
         run(process.execPath, [path.join(cwd, 'node_modules/typescript/bin/tsc'), '--noEmit'], cwd);
         // eslint-disable-next-line no-console
-        console.log(`[packed-consumer] ${description}: compilation passed.`);
+        console.log(`[packed-consumer] ${description}: strict consumer API compilation passed.`);
       } catch (error) {
-        failures.push(`${description} compilation: ${error.message}`);
+        failures.push(`${description} consumer compilation: ${error.message}`);
+      }
+
+      try {
+        verifyPackageDeclarations(cwd, lane === lanes[0] && !withFlashList);
+        // eslint-disable-next-line no-console
+        console.log(`[packed-consumer] ${description}: strict package-owned declarations passed.`);
+      } catch (error) {
+        failures.push(`${description} package declarations: ${error.message}`);
       }
     }
   }
@@ -448,7 +605,7 @@ try {
 
   // eslint-disable-next-line no-console
   console.log(
-    `Packed installation and declarations passed on all ${lanes.length} dependency stacks.`
+    `Packed installation, consumer APIs and package declarations passed on all ${lanes.length} dependency stacks.`
   );
   fs.rmSync(temporaryRoot, { recursive: true, force: true });
 } catch (error) {

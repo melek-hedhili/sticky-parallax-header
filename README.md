@@ -36,7 +36,9 @@ The compatibility update in this checkout accepts React `^19.0.0` and targets
 React Native 0.83, 0.86, 0.87 and 0.88 with matched native dependencies. Keep the
 React version required by your application; Expo is not a library requirement.
 The [dependency matrix and verification limits](docs/docs/introduction/installation.md#dependency-compatibility-targets)
-distinguish installation/type checks from native runtime evidence. Published
+distinguish installation, consumer API and package declaration checks from native
+runtime evidence. CI does not audit upstream declaration internals; apps using
+`skipLibCheck: false` can still encounter known dependency type errors. Published
 beta.1 retains its narrower peers until the update is released.
 
 ## AI agent skill
