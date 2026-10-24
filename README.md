@@ -14,7 +14,7 @@ for component usage and examples.
 
 ## This fork
 
-- New Architecture support for React Native 0.86/0.87 and Reanimated 4 with Worklets.
+- New Architecture headers using React 19 and Reanimated 4 with Worklets.
 - FlashList v2 integrations at `@mhedhili/react-native-sticky-parallax-header/flash-list`.
 - One Expo SDK 57 / Expo Router demo, running in Expo Go without prebuild.
 - Elastic header pull on Android and iOS, with an `enableHeaderBounce` opt-out.
@@ -22,6 +22,8 @@ for component usage and examples.
 ## Install the beta
 
 ```sh
+npm install @mhedhili/react-native-sticky-parallax-header@next
+# Or, with Yarn:
 yarn add @mhedhili/react-native-sticky-parallax-header@next
 ```
 
@@ -29,6 +31,13 @@ The `2.0.0` beta line contains breaking changes from Netguru's `1.1.1` release.
 See the [fork's setup guide](docs/docs/introduction/installation.md) and
 [migration notes](docs/docs/introduction/modernization-guide.md) for required
 peer dependencies and API differences.
+
+The compatibility update in this checkout accepts React `^19.0.0` and targets
+React Native 0.83, 0.86, 0.87 and 0.88 with matched native dependencies. Keep the
+React version required by your application; Expo is not a library requirement.
+The [dependency matrix and verification limits](docs/docs/introduction/installation.md#dependency-compatibility-targets)
+distinguish installation/type checks from native runtime evidence. Published
+beta.1 retains its narrower peers until the update is released.
 
 ## AI agent skill
 
