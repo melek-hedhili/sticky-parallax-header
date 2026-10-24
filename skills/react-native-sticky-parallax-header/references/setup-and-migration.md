@@ -6,7 +6,7 @@ Read this reference when installing the package, checking compatibility, changin
 
 The modern package is `@mhedhili/react-native-sticky-parallax-header` on the `2.0.0-beta` line. It requires React Native's New Architecture, React 19, Reanimated 4, React Native Worklets, React Native Gesture Handler, and React Native Safe Area Context. Reanimated 2/3, FlashList 1, and the legacy architecture are not supported targets.
 
-The compatibility update accepts React `^19.0.0`. Keep the consumer's React version when it satisfies React Native's own peer requirements; the library's development pin is not a reason to upgrade it. Expo is not a library peer. These complete combinations are the checkout's strict npm installation and declaration-check targets:
+Version `2.0.0-beta.2` accepts React `^19.0.0`. Keep the consumer's React version when it satisfies React Native's own peer requirements; the library's development pin is not a reason to upgrade it. Expo is not a library peer. These complete combinations are beta.2's strict npm installation and declaration-check targets:
 
 | Consumer check | React Native | React | Gesture Handler | Reanimated / Worklets | Safe Area Context | FlashList, optional |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -40,8 +40,13 @@ npm install @mhedhili/react-native-sticky-parallax-header@next
 yarn add @mhedhili/react-native-sticky-parallax-header@next
 ```
 
-Pin an exact prerelease instead of `next` when the application requires reproducible installs.
-Published beta.1 retains the narrower React/RN/Gesture Handler peers. The compatibility update in this checkout is unavailable from npm until released: inspect the installed version's declarations and peer dependencies before promising that the command resolves a conflict. Do not bypass resolution with `--force` or `--legacy-peer-deps`.
+Pin an exact available prerelease instead of `next` when the application requires reproducible installs. Version `2.0.0-beta.1` has narrower React/RN/Gesture Handler peers than beta.2. Inspect the installed version and check the registry tag before promising that installation resolves a conflict:
+
+```sh
+npm view @mhedhili/react-native-sticky-parallax-header@next version peerDependencies
+```
+
+A prepared Git version is not evidence of npm publication. Do not bypass resolution with `--force` or `--legacy-peer-deps`.
 
 For Expo, install compatible native peers with Expo:
 

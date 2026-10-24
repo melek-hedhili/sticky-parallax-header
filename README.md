@@ -32,14 +32,16 @@ See the [fork's setup guide](docs/docs/introduction/installation.md) and
 [migration notes](docs/docs/introduction/modernization-guide.md) for required
 peer dependencies and API differences.
 
-The compatibility update in this checkout accepts React `^19.0.0` and targets
+Version `2.0.0-beta.2` accepts React `^19.0.0` and targets
 React Native 0.83, 0.86, 0.87 and 0.88 with matched native dependencies. Keep the
 React version required by your application; Expo is not a library requirement.
 The [dependency matrix and verification limits](docs/docs/introduction/installation.md#dependency-compatibility-targets)
 distinguish installation, consumer API and package declaration checks from native
 runtime evidence. CI does not audit upstream declaration internals; apps using
-`skipLibCheck: false` can still encounter known dependency type errors. Published
-beta.1 retains its narrower peers until the update is released.
+`skipLibCheck: false` can still encounter known dependency type errors.
+Version `2.0.0-beta.1` has narrower React, React Native and Gesture Handler peers.
+Check `npm view @mhedhili/react-native-sticky-parallax-header@next version`
+before assuming the tag includes the compatibility fix.
 
 ## AI agent skill
 

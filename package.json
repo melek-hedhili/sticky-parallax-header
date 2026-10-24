@@ -1,6 +1,6 @@
 {
   "name": "@mhedhili/react-native-sticky-parallax-header",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "packageManager": "yarn@1.22.22",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
@@ -28,7 +28,7 @@
     "build": "bob build",
     "check:static": "yarn lint && yarn typescript && yarn build",
     "prepare": "bob build && husky",
-    "release": "release-it",
+    "release": "release-it --no-increment",
     "prepush": "yarn lint && yarn typescript",
     "test:types": "node scripts/verify-package-types.cjs",
     "docs:typecheck": "yarn --cwd docs typecheck",
@@ -92,19 +92,20 @@
     "tag": "next"
   },
   "release-it": {
-    "hooks": {
-      "after:release": "git checkout -b releases/v_${version} && git push -u origin releases/v_${version}"
-    },
     "git": {
-      "commitMessage": "chore: release ${version}",
+      "requireBranch": "master",
+      "commit": false,
       "tagName": "v${version}",
-      "push": false
+      "push": true
     },
     "npm": {
-      "publish": true
+      "publish": true,
+      "tag": "next"
     },
     "github": {
-      "release": true
+      "release": true,
+      "preRelease": true,
+      "makeLatest": false
     },
     "plugins": {
       "@release-it/conventional-changelog": {
