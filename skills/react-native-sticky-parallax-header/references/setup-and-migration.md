@@ -16,9 +16,19 @@ The compatibility update accepts React `^19.0.0`. Keep the consumer's React vers
 | Bare combination | 0.87.1 | 19.2.3 | 2.32.0 | 4.7.1 / 0.13.0 | 5.10.1 | 2.3.3 |
 | SDK 58 combination | 0.88.0 | 19.3.0 | 3.3.0 | 4.7.1 / 0.13.0 | 5.10.1 | 2.3.3 |
 
-Do not treat this table as proof of native support for all rows or force its versions into every application. Native runtime evidence is from the maintained SDK 57 demo; RN 0.83 and 0.88 runtime verification is pending. Strict consumers still have upstream declaration failures, which block release. In Expo, let `expo install` choose SDK-compatible native packages and compare the resolved set with the matrix. In a bare app, respect React Native's requirements. Report unsupported combinations without inferring compatibility for intervening RN versions or arbitrary native dependency mixes.
+Do not treat this table as proof of native support for all rows or force its versions into every application. Native runtime evidence is from the maintained SDK 57 demo; RN 0.83 and 0.88 runtime verification is pending. In Expo, let `expo install` choose SDK-compatible native packages and compare the resolved set with the matrix. In a bare app, respect React Native's requirements. Report unsupported combinations without inferring compatibility for intervening RN versions or arbitrary native dependency mixes.
 
-Fresh strict npm installation passed for RN 0.86, 0.87 and 0.88, with and without FlashList, retaining each selected React version. Fresh RN 0.83 installs remain blocked even without this library: `@react-native/virtualized-lists` has a wildcard RN peer that can select a newer RN. Separate checks adding this library to existing RN 0.83.0 and 0.83.10 dependency trees passed with and without FlashList, preserving React 19.2.0. Those existing-app results do not resolve the fresh-install limitation. Preserve an existing app's working lockfile; do not promise that broader peers fix this baseline failure. Strict compilation still reports upstream errors, with no package/consumer-fixture diagnostics.
+Fresh strict npm installation passed for RN 0.86, 0.87 and 0.88, with and without FlashList, retaining each selected React version. Fresh RN 0.83.0 and 0.83.10 checks also pass when `@react-native/virtualized-lists` is an explicit dependency pinned to the exact RN version. All four core/FlashList installs retain React 19.2.0 and the selected RN, pass `npm ls --all`, and contain one React and one RN installation. Strict npm still rejects incompatible React 19.1.0.
+
+The packed-consumer gate checks application code strictly with `skipLibCheck: true`, then separately checks every reachable package-owned emitted declaration with `skipLibCheck: false` in both CommonJS and ESM trees. Upstream declaration internals are outside that gate. Applications using `skipLibCheck: false` can still encounter known React Native, Reanimated and FlashList declaration errors. Do not claim these upstream errors are fixed or change a consumer's TypeScript configuration merely to mirror the library's CI policy.
+
+Without the explicit companion dependency, fresh RN 0.83 npm installs can fail even without this library: `@react-native/virtualized-lists` has a wildcard RN peer that can select a newer RN. Only when an RN 0.83.0 app encounters this specific `ERESOLVE` error, pin the companion that RN already declares:
+
+```sh
+npm install --save-exact @react-native/virtualized-lists@0.83.0
+```
+
+For RN 0.83.10, use `@react-native/virtualized-lists@0.83.10` instead. Match the app's exact RN version, preserve its compatible React version and existing working lockfile, and keep this workaround scoped to the observed resolution error. The successful fresh-install checks use this explicit npm resolver workaround; they do not establish that the unanchored fresh install is fixed.
 
 ## Install the modern package
 

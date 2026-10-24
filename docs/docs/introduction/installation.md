@@ -24,19 +24,37 @@ representative combinations, not a requirement to adopt Expo or upgrade an app.
 | SDK 58 combination | 0.88.0 | 19.3.0 | 3.3.0 | 4.7.1 / 0.13.0 | 5.10.1 | 2.3.3 |
 
 Fresh strict npm installation passed for RN 0.86, 0.87 and 0.88, with and without
-FlashList, preserving each selected React version. Fresh RN 0.83 installs remain
-blocked: even without this library, npm selects a newer RN through
-`@react-native/virtualized-lists`' wildcard peer. Separate checks adding the
-package to existing RN 0.83.0 and 0.83.10 dependency trees passed with and without
-FlashList, preserving React 19.2.0. Those existing-app results do not resolve the
-fresh-install limitation; preserve an existing app's working lockfile.
+FlashList, preserving each selected React version. Fresh RN 0.83.0 and 0.83.10
+checks also pass when `@react-native/virtualized-lists` is an explicit dependency
+pinned to the exact RN version. All four core/FlashList installs retain React
+19.2.0 and the selected RN, pass `npm ls --all`, and contain one React and one RN
+installation. Incompatible React 19.1.0 remains rejected by strict npm.
 
-Strict declaration checks still fail on upstream types, with no package or
-consumer-fixture diagnostics. The maintained Expo SDK 57 demo provides native
-runtime evidence; native verification for the added RN 0.83 and 0.88 combinations
-is pending. These results do not establish native animation behavior, support for
-intervening RN versions, or compatibility between arbitrary native dependencies.
-Unresolved strict declaration errors block release.
+Without that explicit companion dependency, fresh RN 0.83 npm installs can fail
+even without this library: npm selects a newer RN through
+`@react-native/virtualized-lists`' wildcard peer. If an RN 0.83.0 app encounters
+this specific `ERESOLVE` error, pin the companion that RN already declares:
+
+```sh
+npm install --save-exact @react-native/virtualized-lists@0.83.0
+```
+
+For an RN 0.83.10 app, use `@react-native/virtualized-lists@0.83.10` instead. Match
+the app's exact RN version and retain its compatible React version. Preserve an
+existing app's working lockfile. The successful checks use this explicit npm
+resolver workaround; they do not establish that the unanchored fresh install is
+fixed.
+
+The packed-consumer gate checks application code strictly with
+`skipLibCheck: true`, then separately checks every reachable package-owned emitted
+declaration with `skipLibCheck: false` in both CommonJS and ESM trees. It checks
+consumer API usage and package declarations without auditing upstream declaration
+internals.
+
+The maintained Expo SDK 57 demo provides native runtime evidence; native
+verification for the added RN 0.83 and 0.88 combinations is pending. Installation
+and type checks do not establish native animation behavior, support for intervening
+RN versions, or compatibility between arbitrary native dependencies.
 Use Node 24.21.0 and Yarn Classic 1.22.22 when contributing to this repository.
 
 ## Install the beta
@@ -63,10 +81,10 @@ yarn pack --filename mhedhili-react-native-sticky-parallax-header.tgz
 Install that archive in your application using its actual local path. The old
 unscoped package's `@rc` command is not a compatibility guarantee.
 
-Strict consumers with `skipLibCheck: false` currently encounter declaration
-errors from the targeted React Native, Reanimated and optional FlashList
-versions. The package declarations build without package-owned diagnostics, but
-this beta does not claim that those upstream declaration errors are resolved.
+Applications using `skipLibCheck: false` still encounter known declaration errors
+inside the targeted React Native, Reanimated and optional FlashList versions.
+The scoped CI policy does not fix those upstream declarations or require a change
+to the application's TypeScript configuration.
 
 ## Expo
 
