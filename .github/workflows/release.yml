@@ -50,11 +50,9 @@ jobs:
       - run: yarn test:types
       - name: Configure release identity
         run: |
-          git config user.name "$RELEASE_USER_NAME"
-          git config user.email "$RELEASE_USER_EMAIL"
-        env:
-          RELEASE_USER_NAME: ${{ secrets.USERNAME }}
-          RELEASE_USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git var GIT_COMMITTER_IDENT >/dev/null
       - name: Configure npm authentication
         uses: actions/setup-node@v7
         with:
