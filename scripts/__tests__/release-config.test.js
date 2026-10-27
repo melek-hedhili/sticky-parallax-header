@@ -102,6 +102,17 @@ test('configures npm authentication after validation with tokens scoped to publi
   });
 });
 
+test('validates the GitHub Actions identity before publishing', () => {
+  const identity = steps.find((step) => step.name === 'Configure release identity');
+
+  expect(identity.env).toBeUndefined();
+  expect(identity.run).toBe(
+    'git config user.name "github-actions[bot]"\n' +
+      'git config user.email "41898282+github-actions[bot]@users.noreply.github.com"\n' +
+      'git var GIT_COMMITTER_IDENT >/dev/null\n'
+  );
+});
+
 test.each([
   ['refs/heads/master', manifest.version, 0],
   ['refs/heads/feature', manifest.version, 1],
