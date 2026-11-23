@@ -351,6 +351,6 @@ test('tabs expose pressable labels and select the pressed index', async () => {
       onTabPressed={onTabPressed}
     />
   );
-  await fireEvent.press(screen.getByRole('button', { name: 'Second' }));
+  await fireEvent.press(screen.getByRole('tab', { name: 'Second' }));
   expect(onTabPressed).toHaveBeenCalledWith(1);
 });

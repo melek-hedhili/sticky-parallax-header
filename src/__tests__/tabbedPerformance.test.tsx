@@ -60,7 +60,7 @@ test('identical fractional tab measurements avoid rendering the tab contents aga
       onTabPressed={jest.fn()}
     />
   );
-  const first = screen.getByRole('button', { name: 'First' });
+  const first = screen.getByRole('tab', { name: 'First' });
 
   await fireEvent(first, 'layout', { nativeEvent: { layout: { width: 101.25 } } });
   const rendersAfterMeasurement = renderIcon.mock.calls.length;
@@ -88,7 +88,7 @@ test.each([3, 20, 100])(
         onTabPressed={jest.fn()}
       />
     );
-    const first = screen.getByRole('button', { name: 'Tab 0' });
+    const first = screen.getByRole('tab', { name: 'Tab 0' });
     const measurement = { nativeEvent: { layout: { width: 101.25 } } };
 
     await fireEvent(first, 'layout', measurement);
@@ -115,16 +115,16 @@ test('fractional widths measured before enabling the underline retain their geom
   };
 
   await render(<Tabs {...props} />);
-  await fireEvent(screen.getByRole('button', { name: 'First' }), 'layout', {
+  await fireEvent(screen.getByRole('tab', { name: 'First' }), 'layout', {
     nativeEvent: { layout: { width: 101.25 } },
   });
-  await fireEvent(screen.getByRole('button', { name: 'Second' }), 'layout', {
+  await fireEvent(screen.getByRole('tab', { name: 'Second' }), 'layout', {
     nativeEvent: { layout: { width: 137.5 } },
   });
   await screen.rerender(<Tabs {...props} tabUnderlineColor="red" />);
 
   expect(underline()).toHaveStyle({ width: 137.5, transform: [{ translateX: 121.25 }] });
-  await fireEvent(screen.getByRole('button', { name: 'Second' }), 'layout', {
+  await fireEvent(screen.getByRole('tab', { name: 'Second' }), 'layout', {
     nativeEvent: { layout: { width: 137.75 } },
   });
   expect(underline()).toHaveStyle({ width: 137.75, transform: [{ translateX: 121.25 }] });
@@ -143,10 +143,10 @@ test('horizontal paging keeps its real shared driver and consumer scroll callbac
       <Text>Second page</Text>
     </TabbedHeaderPager>
   );
-  await fireEvent(screen.getByRole('button', { name: 'First' }), 'layout', {
+  await fireEvent(screen.getByRole('tab', { name: 'First' }), 'layout', {
     nativeEvent: { layout: { width: 101.25 } },
   });
-  await fireEvent(screen.getByRole('button', { name: 'Second' }), 'layout', {
+  await fireEvent(screen.getByRole('tab', { name: 'Second' }), 'layout', {
     nativeEvent: { layout: { width: 137.5 } },
   });
   const event = scrollEvent(0, 0, Dimensions.get('window').width * 0.625);
@@ -156,7 +156,7 @@ test('horizontal paging keeps its real shared driver and consumer scroll callbac
   expect(onScroll).toHaveBeenCalledTimes(1);
   expect(onScroll).toHaveBeenLastCalledWith(expect.objectContaining(event));
   // Re-evaluate the mocked animated style after the shared horizontal driver changes.
-  await fireEvent(screen.getByRole('button', { name: 'First' }), 'layout', {
+  await fireEvent(screen.getByRole('tab', { name: 'First' }), 'layout', {
     nativeEvent: { layout: { width: 101.5 } },
   });
   expect(underline()).toHaveStyle({ width: 124, transform: [{ translateX: 83.4375 }] });

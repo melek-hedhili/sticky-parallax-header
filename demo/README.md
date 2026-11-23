@@ -23,8 +23,11 @@ devices need a compatible Expo Go installation and a reachable Metro URL.
 - **Showcase:** all 21 original examples, quizzes, authors, custom headers, nested
   SectionLists, animated colors, and FlashList variants. The author view is a
   Router modal; card routes use local author IDs rather than serialized objects.
-- **Validation:** 15 deterministic cases with local content, refresh and
+- **Validation:** 15 scrollable cases plus Elastic Avatar, with local content, refresh and
   scroll-to-top controls, tab navigation, pager controls, and status reporting.
+  Avatar and Details include separately labeled Close/Share actions; Details
+  includes a tag and zero count. Pager pages include editable notes for checking
+  inactive-page isolation and retained state.
 - **Performance:** nine isolated workload previews, 240 local rows, and six pager
   pages. Only the focused scenario mounts. Sample counters after interacting;
   sampling itself renders the report. Expo Go timings are not release benchmarks.
@@ -81,3 +84,25 @@ the library's documented limitations for snapping and native RefreshControl.
 The independent newer RN/Reanimated stack remains covered by packed-consumer type
 checks, not by this Expo Go runtime. Physical-device release performance comparisons
 remain deferred; a production native harness would be a separate task.
+
+## Accessibility validation
+
+Use Avatar ScrollView, Details ScrollView, Tabbed Pager, Tabbed SectionList, and
+Tabbed FlashList in the Validation menu. Elastic Avatar covers pull/stretch and
+refresh. Each fixture has long local content so it can collapse without a network
+request. Header action buttons report `Close action` or `Share action` in the
+status area instead of leaving the fixture.
+
+Use the actual OS Reduce Motion setting, then return to the same mounted fixture.
+Check ordinary scrolling and collapse, disabled decorative motion/snapping, and
+unchanged tab/page destinations. The fixture's app-owned **Scroll to top** control
+deliberately requests an animated scroll; this is outside the library's motion
+policy. Built-in tab presses and **Second page** exercise library-owned navigation.
+
+With VoiceOver/TalkBack, traverse the heading, separate header actions, selected
+tabs, and body before and after collapse. Edit **First page note**, change pages,
+and return: the note should persist and the inactive page's note must not be
+reachable. An accessibility tree read alone does not establish screen reader
+traversal or announcements. Follow the [native/browser acceptance checklist](../maintainer/accessibility/README.md)
+and record the device, OS, Expo/native versions, actual settings, result and limits.
+No in-app preference switch overrides OS detection.

@@ -2,12 +2,11 @@ import * as React from 'react';
 import type { NativeScrollEvent } from 'react-native';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import type { Edge } from 'react-native-safe-area-context';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { commonStyles } from '../../constants';
 import type { ScrollViewRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderScrollView } from '../../primitiveComponents/StickyHeaderScrollView';
+import { getHeaderSummary } from '../common/utils/getHeaderSummary';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
 import type { TabbedHeaderPagerProps } from './TabbedHeaderProps';
@@ -87,19 +86,16 @@ export const TabbedHeaderPager: React.ForwardRefExoticComponent<
     <Animated.View style={[commonStyles.container, wrapperAnimatedStyle]}>
       {renderHeaderBar ? (
         renderHeaderBar()
-      ) : logo ? (
+      ) : (
         <HeaderBar
+          summary={getHeaderSummary(props)}
+          titleStyle={props.titleStyle}
           backgroundColor={backgroundColor}
           enableSafeAreaTopInset={enableSafeAreaTopInset}
           logo={logo}
           logoContainerStyle={logoContainerStyle}
           logoResizeMode={logoResizeMode}
           logoStyle={logoStyle}
-        />
-      ) : (
-        <SafeAreaView
-          edges={['left', 'right', ...(enableSafeAreaTopInset ? ['top' as Edge] : [])]}
-          style={commonStyles.stretch}
         />
       )}
       <View style={commonStyles.container}>
@@ -115,7 +111,7 @@ export const TabbedHeaderPager: React.ForwardRefExoticComponent<
           onScroll={onScroll}
           overScrollMode={overScrollMode}
           renderHeader={renderHeader ?? defaultRenderHeader}
-          renderTabs={renderTabs}
+          renderTabs={props.renderTabs ?? renderTabs}
           scrollEventThrottle={scrollEventThrottle}>
           <Pager
             {...pagerProps}

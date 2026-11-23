@@ -6,6 +6,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { commonStyles } from '../../constants';
 import type { FlashListComponent } from '../../primitiveComponents/withStickyHeaderFlashList';
 import { withStickyHeaderFlashList } from '../../primitiveComponents/withStickyHeaderFlashList';
+import { getHeaderSummary } from '../common/utils/getHeaderSummary';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
 import type { DetailsHeaderFlashListProps } from './DetailsHeaderFlashListProps';
@@ -74,6 +75,7 @@ export function withDetailsHeaderFlashList<ItemT>(
           renderHeaderBar()
         ) : (
           <HeaderBar
+            summary={getHeaderSummary(props)}
             backgroundColor={backgroundColor}
             enableSafeAreaTopInset={enableSafeAreaTopInset}
             headerTitleContainerAnimatedStyle={headerTitleContainerAnimatedStyle}

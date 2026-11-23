@@ -9,6 +9,7 @@ import {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
+import { useAccessibilityPreferences } from '../hooks/useAccessibilityPreferences';
 import { useResponsiveSize } from '../hooks/useResponsiveSize';
 
 import type { ScrollComponent } from './ScrollComponent';
@@ -22,6 +23,7 @@ export function useStickyHeaderScrollProps<T extends ScrollComponent>(
   props: StickyHeaderSharedProps & StickyHeaderSnapProps
 ) {
   const { responsiveHeight } = useResponsiveSize();
+  const { reduceMotion } = useAccessibilityPreferences();
 
   const {
     headerHeight = 100,
@@ -98,7 +100,7 @@ export function useStickyHeaderScrollProps<T extends ScrollComponent>(
       const isOverSnapToEdgeThresholdAndDragIsQuick =
         currentVal >= snapToEdgeThreshold && currentVal < scrollToHeight / 2 && dragsQuickToTop;
 
-      if (snapToEdge) {
+      if (snapToEdge && !reduceMotion) {
         // TODO: when react-native-web will support onMomentumScrollEnd & onScrollEndDrag events
         // handle web snap scroll
         if (isUnderSnapToEdgeThresholdAndDragIsSlow || isOverSnapToEdgeThresholdAndDragIsQuick) {
@@ -111,7 +113,15 @@ export function useStickyHeaderScrollProps<T extends ScrollComponent>(
         }
       }
     },
-    [snapStartThreshold, snapStopThreshold, snapToEdge, scrollHeight, scrollValue, scrollViewRef]
+    [
+      snapStartThreshold,
+      snapStopThreshold,
+      snapToEdge,
+      reduceMotion,
+      scrollHeight,
+      scrollValue,
+      scrollViewRef,
+    ]
   );
 
   const onMomentumScrollEndInternal = useCallback(

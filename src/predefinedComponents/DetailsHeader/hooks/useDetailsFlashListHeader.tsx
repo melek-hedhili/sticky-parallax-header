@@ -4,8 +4,10 @@ import type { ViewStyle } from 'react-native';
 import type { AnimatedStyle } from 'react-native-reanimated';
 import { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedFlashListHeader } from '../../common/hooks/usePredefinedFlashListHeader';
+import { getHeaderSummary } from '../../common/utils/getHeaderSummary';
 import { scrollPosition } from '../../common/utils/scrollPosition';
 import type { DetailsHeaderFlashListProps } from '../DetailsHeaderFlashListProps';
 import { Foreground } from '../components/HeaderForeground';
@@ -45,6 +47,7 @@ export function useDetailsFlashListHeader<
     titleTestID,
   } = props;
 
+  const { reduceMotion } = useAccessibilityPreferences();
   const headerTitleInputRange = [
     0,
     scrollPosition(scrollHeight, 60),
@@ -52,16 +55,16 @@ export function useDetailsFlashListHeader<
   ];
   const headerTitleContainerAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(
-        scrollValue.value,
-        headerTitleInputRange,
-        [0, 0, 1],
-        Extrapolation.CLAMP
-      ),
+      opacity: reduceMotion
+        ? scrollValue.value >= scrollPosition(scrollHeight, 90)
+          ? 1
+          : 0
+        : interpolate(scrollValue.value, headerTitleInputRange, [0, 0, 1], Extrapolation.CLAMP),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollValue, scrollHeight]);
+  }, [reduceMotion, scrollValue, scrollHeight]);
 
+  const hasSummary = !props.renderHeaderBar && !!getHeaderSummary(props);
   const renderHeader = React.useCallback(() => {
     return (
       <HeaderWrapper
@@ -74,6 +77,7 @@ export function useDetailsFlashListHeader<
         scrollValue={scrollValue}
         tabsContainerBackgroundColor={tabsContainerBackgroundColor}>
         <Foreground
+          hasSummary={hasSummary}
           height={parallaxHeight}
           scrollValue={scrollValue}
           contentIcon={contentIcon}
@@ -94,6 +98,7 @@ export function useDetailsFlashListHeader<
       </HeaderWrapper>
     );
   }, [
+    hasSummary,
     backgroundColor,
     backgroundImage,
     contentBackgroundColor,

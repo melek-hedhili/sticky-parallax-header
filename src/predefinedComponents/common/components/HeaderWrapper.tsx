@@ -5,6 +5,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { colors } from '../../../constants';
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import { useHeaderElasticity } from '../../../primitiveComponents/ElasticHeaderContext';
 import type { AnimatedColorProp } from '../SharedProps';
 import { parseAnimatedColorProp } from '../utils/parseAnimatedColorProp';
@@ -34,17 +35,18 @@ export const HeaderWrapper: React.FC<React.PropsWithChildren<HeaderWrapperProps>
   scrollValue,
   tabsContainerBackgroundColor,
 }) => {
+  const { reduceMotion } = useAccessibilityPreferences();
   const { width } = useWindowDimensions();
   const { displacement } = useHeaderElasticity();
   const hasBackgroundImage = !!backgroundImage;
   const backdropAnimatedStyle = useAnimatedStyle(() => {
-    const pull = scrollHeight > 0 ? Math.max(0, displacement.value) : 0;
+    const pull = !reduceMotion && scrollHeight > 0 ? Math.max(0, displacement.value) : 0;
 
     // The overlay moves down with the pull; extend its backdrop back to the original top.
     return {
       transform: [{ translateY: -pull / 2 }, { scaleY: 1 + pull / Math.max(scrollHeight, 1) }],
     };
-  }, [displacement, scrollHeight]);
+  }, [displacement, reduceMotion, scrollHeight]);
   const contentAnimatedStyle = useAnimatedStyle(() => {
     // TypeScript complains about AnimatedNode<StyleProp<ViewStyle>> from reanimated v1
     return { backgroundColor: parseAnimatedColorProp(contentBackgroundColor) as string };

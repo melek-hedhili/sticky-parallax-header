@@ -3,9 +3,11 @@ import type { ViewStyle } from 'react-native';
 import type { AnimatedStyle } from 'react-native-reanimated';
 import { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import type { ScrollComponent } from '../../common/SharedProps';
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedHeader } from '../../common/hooks/usePredefinedHeader';
+import { getHeaderSummary } from '../../common/utils/getHeaderSummary';
 import { scrollPosition } from '../../common/utils/scrollPosition';
 import type { DetailsHeaderSharedProps } from '../DetailsHeaderProps';
 import { Foreground } from '../components/HeaderForeground';
@@ -42,6 +44,7 @@ export function useDetailsHeader<T extends ScrollComponent>(props: DetailsHeader
     titleTestID,
   } = props;
 
+  const { reduceMotion } = useAccessibilityPreferences();
   const headerTitleInputRange = [
     0,
     scrollPosition(scrollHeight, 60),
@@ -49,15 +52,15 @@ export function useDetailsHeader<T extends ScrollComponent>(props: DetailsHeader
   ];
   const headerTitleContainerAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(
-        scrollValue.value,
-        headerTitleInputRange,
-        [0, 0, 1],
-        Extrapolation.CLAMP
-      ),
+      opacity: reduceMotion
+        ? scrollValue.value >= scrollPosition(scrollHeight, 90)
+          ? 1
+          : 0
+        : interpolate(scrollValue.value, headerTitleInputRange, [0, 0, 1], Extrapolation.CLAMP),
     };
   });
 
+  const hasSummary = !props.renderHeaderBar && !!getHeaderSummary(props);
   const renderHeader = React.useCallback(() => {
     return (
       <HeaderWrapper
@@ -70,6 +73,7 @@ export function useDetailsHeader<T extends ScrollComponent>(props: DetailsHeader
         scrollValue={scrollValue}
         tabsContainerBackgroundColor={tabsContainerBackgroundColor}>
         <Foreground
+          hasSummary={hasSummary}
           height={parallaxHeight}
           scrollValue={scrollValue}
           contentIcon={contentIcon}
@@ -90,6 +94,7 @@ export function useDetailsHeader<T extends ScrollComponent>(props: DetailsHeader
       </HeaderWrapper>
     );
   }, [
+    hasSummary,
     backgroundColor,
     backgroundImage,
     contentBackgroundColor,

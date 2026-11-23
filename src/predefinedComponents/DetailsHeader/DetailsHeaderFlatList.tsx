@@ -5,6 +5,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { commonStyles } from '../../constants';
 import type { FlatListRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderFlatList } from '../../primitiveComponents/StickyHeaderFlatList';
+import { getHeaderSummary } from '../common/utils/getHeaderSummary';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
 import type { DetailsHeaderFlatListProps } from './DetailsHeaderProps';
@@ -64,6 +65,7 @@ function DetailsHeaderFlatListInner<ItemT>(
         renderHeaderBar()
       ) : (
         <HeaderBar
+          summary={getHeaderSummary(props)}
           backgroundColor={backgroundColor}
           enableSafeAreaTopInset={enableSafeAreaTopInset}
           headerTitleContainerAnimatedStyle={headerTitleContainerAnimatedStyle}

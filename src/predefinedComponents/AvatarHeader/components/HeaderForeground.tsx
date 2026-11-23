@@ -5,11 +5,13 @@ import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { colors, commonStyles, constants } from '../../../constants';
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import { useRTLStyles } from '../../common/hooks/useRTLStyles';
 import { getForegroundImageSizes } from '../../common/utils/getForegroundImageSizes';
 import { scrollPosition } from '../../common/utils/scrollPosition';
 
 interface ForegroundProps {
+  hasSummary?: boolean;
   height: number;
   image?: ImageSourcePropType;
   scrollValue: SharedValue<number>;
@@ -25,6 +27,7 @@ const finishImgPosition = 31;
 const startImgPosition = 27;
 
 export const Foreground: React.FC<ForegroundProps> = ({
+  hasSummary,
   height,
   image,
   scrollValue,
@@ -35,6 +38,8 @@ export const Foreground: React.FC<ForegroundProps> = ({
   titleStyle,
   titleTestID = 'AvatarHeaderForegroundTitleTestID',
 }) => {
+  const { reduceMotion, screenReaderEnabled } = useAccessibilityPreferences();
+  const hideFromAccessibility = screenReaderEnabled && hasSummary;
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const isLandscape =
@@ -56,6 +61,10 @@ export const Foreground: React.FC<ForegroundProps> = ({
   ];
 
   const imageOpacityAnimatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return { opacity: 1 };
+    }
+
     return {
       opacity: interpolate(
         scrollValue.value,
@@ -64,14 +73,16 @@ export const Foreground: React.FC<ForegroundProps> = ({
         Extrapolation.CLAMP
       ),
     };
-  }, [scrollValue, startImgAnimation, finishImgAnimation]);
+  }, [reduceMotion, scrollValue, startImgAnimation, finishImgAnimation]);
   const imageAnimatedStyle = useAnimatedStyle(() => {
-    const imageSize = interpolate(
-      scrollValue.value,
-      [0, startImgAnimation, finishImgAnimation],
-      [startSize, startSize, endSize],
-      Extrapolation.CLAMP
-    );
+    const imageSize = reduceMotion
+      ? startSize
+      : interpolate(
+          scrollValue.value,
+          [0, startImgAnimation, finishImgAnimation],
+          [startSize, startSize, endSize],
+          Extrapolation.CLAMP
+        );
 
     return {
       borderRadius: profilePicBorderRadius,
@@ -79,6 +90,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
       width: imageSize,
     };
   }, [
+    reduceMotion,
     scrollValue,
     startImgAnimation,
     finishImgAnimation,
@@ -87,6 +99,10 @@ export const Foreground: React.FC<ForegroundProps> = ({
     profilePicBorderRadius,
   ]);
   const authorAnimatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return { opacity: 1 };
+    }
+
     return {
       opacity: interpolate(
         scrollValue.value,
@@ -95,8 +111,12 @@ export const Foreground: React.FC<ForegroundProps> = ({
         Extrapolation.CLAMP
       ),
     };
-  }, [scrollValue, startAuthorFade, finishAuthorFade]);
+  }, [reduceMotion, scrollValue, startAuthorFade, finishAuthorFade]);
   const aboutAnimatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return { opacity: 1 };
+    }
+
     return {
       opacity: interpolate(
         scrollValue.value,
@@ -105,7 +125,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
         Extrapolation.CLAMP
       ),
     };
-  }, [scrollValue, startAboutFade, fininshAboutFade]);
+  }, [reduceMotion, scrollValue, startAboutFade, fininshAboutFade]);
   const foregroundTitleRTLStyle = useRTLStyles<TextStyle>(
     styles.foregroundTitlePaddingRight,
     styles.foregroundTitlePaddingLeft,
@@ -119,6 +139,9 @@ export const Foreground: React.FC<ForegroundProps> = ({
 
   return (
     <View
+      accessibilityElementsHidden={hideFromAccessibility}
+      importantForAccessibility={hideFromAccessibility ? 'no-hide-descendants' : 'auto'}
+      aria-hidden={hideFromAccessibility}
       pointerEvents="none"
       style={
         isLandscape
@@ -126,7 +149,13 @@ export const Foreground: React.FC<ForegroundProps> = ({
           : [commonStyles.foreground, commonStyles.column]
       }>
       <Animated.View style={imageOpacityAnimatedStyle}>
-        <Animated.Image source={image as ImageSourcePropType} style={imageAnimatedStyle} />
+        <Animated.Image
+          accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
+          source={image as ImageSourcePropType}
+          style={imageAnimatedStyle}
+        />
       </Animated.View>
       <View style={[isLandscape && styles.landscapeTitleContainer]}>
         <Animated.View style={[styles.userModalMessageContainer, authorAnimatedStyle]}>

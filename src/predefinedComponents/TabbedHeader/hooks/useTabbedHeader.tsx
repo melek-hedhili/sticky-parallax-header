@@ -5,11 +5,13 @@ import type { AnimatedRef } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import type { ScrollViewRef, SectionListRef } from '../../../primitiveComponents/ScrollComponent';
 import type { ScrollComponent } from '../../common/SharedProps';
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedHeader } from '../../common/hooks/usePredefinedHeader';
 import { debounce } from '../../common/utils/debounce';
+import { getHeaderSummary } from '../../common/utils/getHeaderSummary';
 import type {
   TabbedHeaderListProps,
   TabbedHeaderPagerProps,
@@ -50,6 +52,7 @@ function useRenderHeader<T extends ScrollComponent>(props: TabbedHeaderSharedPro
     [horizontalScrollValue]
   );
 
+  const hasSummary = !props.renderHeaderBar && !!getHeaderSummary(props);
   const renderHeader = React.useCallback(() => {
     return (
       <HeaderWrapper
@@ -62,6 +65,7 @@ function useRenderHeader<T extends ScrollComponent>(props: TabbedHeaderSharedPro
         scrollValue={scrollValue}
         tabsContainerBackgroundColor={tabsContainerBackgroundColor}>
         <Foreground
+          hasSummary={hasSummary}
           height={parallaxHeight}
           scrollValue={scrollValue}
           foregroundImage={foregroundImage}
@@ -72,6 +76,7 @@ function useRenderHeader<T extends ScrollComponent>(props: TabbedHeaderSharedPro
       </HeaderWrapper>
     );
   }, [
+    hasSummary,
     backgroundColor,
     backgroundImage,
     contentBackgroundColor,
@@ -209,13 +214,14 @@ export function useTabbedHeaderList<
 
   const [activeSection, setActiveSection] = React.useState(0);
 
+  const { reduceMotion } = useAccessibilityPreferences();
   const goToSection = React.useCallback(
     (sectionIndex: number) => {
       const section = sections[sectionIndex] as { data: readonly ItemT[] } | undefined;
 
-      ignoreViewabilityItemsChangedEvent.value = true;
+      ignoreViewabilityItemsChangedEvent.value = !reduceMotion;
       scrollViewRef.current?.scrollToLocation({
-        animated: true,
+        animated: !reduceMotion,
         // RN's cell 0 is the section header. Its sticky layout can report offset
         // 0; cell 1 is the first data row and RN compensates for the header height.
         // Empty/nonsticky sections must still target their header, not a footer/row.
@@ -225,7 +231,13 @@ export function useTabbedHeaderList<
       });
       setActiveSection(sectionIndex);
     },
-    [ignoreViewabilityItemsChangedEvent, scrollViewRef, sections, stickySectionHeadersEnabled]
+    [
+      ignoreViewabilityItemsChangedEvent,
+      reduceMotion,
+      scrollViewRef,
+      sections,
+      stickySectionHeadersEnabled,
+    ]
   );
 
   const onViewableItemsChanged = React.useCallback<

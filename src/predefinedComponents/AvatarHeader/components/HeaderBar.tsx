@@ -7,6 +7,7 @@ import type { Edge } from 'react-native-safe-area-context';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors, commonStyles } from '../../../constants';
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import type { AnimatedColorProp, IconProps } from '../../common/SharedProps';
 import IconRenderer from '../../common/components/IconRenderer';
 import { useRTLStyles } from '../../common/hooks/useRTLStyles';
@@ -21,6 +22,7 @@ const HIT_SLOP = {
 };
 
 interface HeaderProps extends IconProps {
+  summary?: string;
   backgroundColor?: AnimatedColorProp;
   enableSafeAreaTopInset?: boolean;
   height: number;
@@ -32,6 +34,7 @@ interface HeaderProps extends IconProps {
 }
 
 export const HeaderBar: React.FC<HeaderProps> = ({
+  summary,
   backgroundColor,
   enableSafeAreaTopInset,
   height,
@@ -49,6 +52,9 @@ export const HeaderBar: React.FC<HeaderProps> = ({
   titleStyle,
   titleTestID = 'AvatarHeaderBarTestID',
 }) => {
+  const { reduceMotion, screenReaderEnabled } = useAccessibilityPreferences();
+  const summaryLabel = summary ?? title;
+  const hasSummary = screenReaderEnabled && !!summaryLabel;
   const [beforeFadeImg, startFadeImg, finishFadeImg] = [
     scrollPosition(height, 30),
     scrollPosition(height, 40),
@@ -62,24 +68,34 @@ export const HeaderBar: React.FC<HeaderProps> = ({
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(
-        scrollValue.value,
-        [0, beforeFadeImg, startFadeImg, finishFadeImg],
-        [0, 0, 0.5, 1],
-        Extrapolation.CLAMP
-      ),
+      opacity: reduceMotion
+        ? scrollValue.value >= finishFadeImg
+          ? 1
+          : 0
+        : interpolate(
+            scrollValue.value,
+            [0, beforeFadeImg, startFadeImg, finishFadeImg],
+            [0, 0, 0.5, 1],
+            Extrapolation.CLAMP
+          ),
     };
-  }, [scrollValue, beforeFadeImg, startFadeImg, finishFadeImg]);
+  }, [reduceMotion, scrollValue, beforeFadeImg, startFadeImg, finishFadeImg]);
   const nameAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: interpolate(
-        scrollValue.value,
-        [0, beforeFadeName, startFadeName, finishFadeName],
-        [0, 0, 0.5, 1],
-        Extrapolation.CLAMP
-      ),
+      opacity: hasSummary
+        ? 1
+        : reduceMotion
+          ? scrollValue.value >= finishFadeName
+            ? 1
+            : 0
+          : interpolate(
+              scrollValue.value,
+              [0, beforeFadeName, startFadeName, finishFadeName],
+              [0, 0, 0.5, 1],
+              Extrapolation.CLAMP
+            ),
     };
-  }, [scrollValue, beforeFadeName, startFadeName, finishFadeName]);
+  }, [hasSummary, reduceMotion, scrollValue, beforeFadeName, startFadeName, finishFadeName]);
   const headerTitleContainerRTLStyle = useRTLStyles<ViewStyle>(
     styles.headerTitleContainerMarginRight,
     styles.headerTitleContainerMarginLeft,
@@ -113,8 +129,15 @@ export const HeaderBar: React.FC<HeaderProps> = ({
           </Pressable>
         ) : null}
 
-        <View style={[styles.headerTitleContainer, headerTitleContainerRTLStyle]}>
+        <View
+          accessible={hasSummary}
+          accessibilityRole={hasSummary ? 'header' : undefined}
+          accessibilityLabel={hasSummary ? summaryLabel : undefined}
+          style={[styles.headerTitleContainer, headerTitleContainerRTLStyle]}>
           <Animated.Image
+            accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
             source={image as ImageSourcePropType}
             style={[styles.headerPic, imageAnimatedStyle]}
           />
@@ -122,7 +145,7 @@ export const HeaderBar: React.FC<HeaderProps> = ({
             numberOfLines={1}
             style={[styles.headerTitle, nameAnimatedStyle, titleStyle]}
             testID={titleTestID}>
-            {title}
+            {hasSummary ? title?.trim() || summaryLabel : title}
           </Animated.Text>
         </View>
         {rightTopIcon ? (

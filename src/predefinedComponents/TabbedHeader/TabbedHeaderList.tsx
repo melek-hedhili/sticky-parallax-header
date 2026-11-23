@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import type { Edge } from 'react-native-safe-area-context';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { commonStyles } from '../../constants';
 import type { SectionListRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderSectionList } from '../../primitiveComponents/StickyHeaderSectionList';
+import { getHeaderSummary } from '../common/utils/getHeaderSummary';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
 import type { TabbedHeaderListProps } from './TabbedHeaderProps';
@@ -60,19 +59,16 @@ function TabbedHeaderListInner<ItemT, SectionT>(
     <Animated.View style={[commonStyles.container, wrapperAnimatedStyle]}>
       {renderHeaderBar ? (
         renderHeaderBar()
-      ) : logo ? (
+      ) : (
         <HeaderBar
+          summary={getHeaderSummary(props)}
+          titleStyle={props.titleStyle}
           backgroundColor={backgroundColor}
           enableSafeAreaTopInset={enableSafeAreaTopInset}
           logo={logo}
           logoContainerStyle={logoContainerStyle}
           logoResizeMode={logoResizeMode}
           logoStyle={logoStyle}
-        />
-      ) : (
-        <SafeAreaView
-          edges={['left', 'right', ...(enableSafeAreaTopInset ? ['top' as Edge] : [])]}
-          style={commonStyles.stretch}
         />
       )}
       <View style={commonStyles.container}>
@@ -91,7 +87,7 @@ function TabbedHeaderListInner<ItemT, SectionT>(
           renderHeader={renderHeader ?? defaultRenderHeader}
           renderSectionFooter={renderSectionFooter}
           renderSectionHeader={renderSectionHeader}
-          renderTabs={renderTabs}
+          renderTabs={props.renderTabs ?? renderTabs}
           scrollEventThrottle={scrollEventThrottle}
           stickySectionHeadersEnabled={stickySectionHeadersEnabled}
           viewabilityConfig={viewabilityConfig}

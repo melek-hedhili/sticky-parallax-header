@@ -6,9 +6,11 @@ import { Platform } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedFlashListHeader } from '../../common/hooks/usePredefinedFlashListHeader';
 import { debounce } from '../../common/utils/debounce';
+import { getHeaderSummary } from '../../common/utils/getHeaderSummary';
 import { isNotEmpty } from '../../common/utils/isNotEmpty';
 import type { TabbedHeaderFlashListProps } from '../TabbedHeaderFlashListProps';
 import { Foreground } from '../components/HeaderForeground';
@@ -48,6 +50,7 @@ function useRenderFlashListHeader<T extends FlashListRef<any>>(
     [horizontalScrollValue]
   );
 
+  const hasSummary = !props.renderHeaderBar && !!getHeaderSummary(props);
   const renderHeader = React.useCallback(() => {
     return (
       <HeaderWrapper
@@ -60,6 +63,7 @@ function useRenderFlashListHeader<T extends FlashListRef<any>>(
         scrollValue={scrollValue}
         tabsContainerBackgroundColor={tabsContainerBackgroundColor}>
         <Foreground
+          hasSummary={hasSummary}
           height={parallaxHeight}
           scrollValue={scrollValue}
           foregroundImage={foregroundImage}
@@ -70,6 +74,7 @@ function useRenderFlashListHeader<T extends FlashListRef<any>>(
       </HeaderWrapper>
     );
   }, [
+    hasSummary,
     backgroundColor,
     backgroundImage,
     contentBackgroundColor,
@@ -151,18 +156,19 @@ export function useTabbedFlashListHeader<
     },
     [ignoreViewabilityItemsChangedEvent, stickyHeaderIndices]
   );
+  const { reduceMotion } = useAccessibilityPreferences();
   const goToSection = React.useCallback(
     (sectionIndex: number) => {
-      ignoreViewabilityItemsChangedEvent.value = true;
+      ignoreViewabilityItemsChangedEvent.value = !reduceMotion;
       scrollViewRef.current?.scrollToIndex({
-        animated: true,
+        animated: !reduceMotion,
         index: stickyHeaderIndices[sectionIndex],
         viewPosition: 0,
         viewOffset: 0,
       });
       setActiveSection(sectionIndex);
     },
-    [ignoreViewabilityItemsChangedEvent, scrollViewRef, stickyHeaderIndices]
+    [ignoreViewabilityItemsChangedEvent, reduceMotion, scrollViewRef, stickyHeaderIndices]
   );
   const onMomentumScrollEndInternal = React.useCallback(
     (e: NativeScrollEvent) => {

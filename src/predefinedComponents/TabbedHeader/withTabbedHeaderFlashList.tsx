@@ -2,12 +2,11 @@ import type { FlashList, FlashListRef } from '@shopify/flash-list';
 import * as React from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import type { Edge } from 'react-native-safe-area-context';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { commonStyles } from '../../constants';
 import type { FlashListComponent } from '../../primitiveComponents/withStickyHeaderFlashList';
 import { withStickyHeaderFlashList } from '../../primitiveComponents/withStickyHeaderFlashList';
+import { getHeaderSummary } from '../common/utils/getHeaderSummary';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
 import type { TabbedHeaderFlashListProps } from './TabbedHeaderFlashListProps';
@@ -70,19 +69,16 @@ export function withTabbedHeaderFlashList<ItemT>(
       <Animated.View style={[commonStyles.container, wrapperAnimatedStyle]}>
         {renderHeaderBar ? (
           renderHeaderBar()
-        ) : logo ? (
+        ) : (
           <HeaderBar
+            summary={getHeaderSummary(props)}
+            titleStyle={props.titleStyle}
             backgroundColor={backgroundColor}
             enableSafeAreaTopInset={enableSafeAreaTopInset}
             logo={logo}
             logoContainerStyle={logoContainerStyle}
             logoResizeMode={logoResizeMode}
             logoStyle={logoStyle}
-          />
-        ) : (
-          <SafeAreaView
-            edges={['left', 'right', ...(enableSafeAreaTopInset ? ['top' as Edge] : [])]}
-            style={commonStyles.stretch}
           />
         )}
         <View style={commonStyles.wrapper}>
@@ -96,7 +92,7 @@ export function withTabbedHeaderFlashList<ItemT>(
             scrollEventThrottle={scrollEventThrottle}
             viewabilityConfig={viewabilityConfig}
             renderHeader={renderHeader ?? defaultRenderHeader}
-            renderTabs={renderTabs}
+            renderTabs={props.renderTabs ?? renderTabs}
             onScroll={onScroll}
             onScrollEndDrag={onScrollEndDrag}
             onMomentumScrollEnd={onMomentumScrollEnd}

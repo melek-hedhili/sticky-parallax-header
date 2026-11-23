@@ -17,6 +17,10 @@ export const HeaderBackgroundImage: React.FC<HeaderBackgroundImageProps> = ({
 
   return (
     <ImageBackground
+      accessible={false}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      aria-hidden
       style={[styles.headerStyle, { height: backgroundHeight, width }]}
       source={backgroundImage}
       testID="HeaderBackgroundImage">

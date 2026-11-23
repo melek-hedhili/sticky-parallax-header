@@ -43,7 +43,8 @@ export const TabItem: React.FC<TabItemProps> = ({
   return (
     <Pressable
       accessibilityLabel={tabKey}
-      accessibilityRole="button"
+      accessibilityRole="tab"
+      accessibilityState={{ selected: isTabActive }}
       key={tabKey}
       onLayout={onTabLayout}
       onPress={onTabPress}
