@@ -5,11 +5,13 @@ import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { colors, commonStyles, constants } from '../../../constants';
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import { useRTLStyles } from '../../common/hooks/useRTLStyles';
 import { getForegroundImageSizes } from '../../common/utils/getForegroundImageSizes';
 import { scrollPosition } from '../../common/utils/scrollPosition';
 
 interface ForegroundProps {
+  hasSummary?: boolean;
   foregroundImage?: ImageSourcePropType;
   height: number;
   scrollValue: SharedValue<number>;
@@ -19,6 +21,7 @@ interface ForegroundProps {
 }
 
 export const Foreground: React.FC<ForegroundProps> = ({
+  hasSummary,
   foregroundImage,
   height,
   scrollValue,
@@ -26,6 +29,8 @@ export const Foreground: React.FC<ForegroundProps> = ({
   titleStyle,
   titleTestID = 'TabbedHeaderForegroundTitleTestID',
 }) => {
+  const { reduceMotion, screenReaderEnabled } = useAccessibilityPreferences();
+  const hideFromAccessibility = screenReaderEnabled && hasSummary;
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const isLandscape =
@@ -42,6 +47,10 @@ export const Foreground: React.FC<ForegroundProps> = ({
   ];
 
   const imageOpacityAnimatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return { opacity: 1 };
+    }
+
     return {
       opacity: interpolate(
         scrollValue.value,
@@ -50,22 +59,36 @@ export const Foreground: React.FC<ForegroundProps> = ({
         Extrapolation.CLAMP
       ),
     };
-  }, [scrollValue, startImgFade, finishImgFade]);
+  }, [reduceMotion, scrollValue, startImgFade, finishImgFade]);
   const imageAnimatedStyle = useAnimatedStyle(() => {
-    const imageSize = interpolate(
-      scrollValue.value,
-      [0, startImgSize, finishImgSize],
-      [startSize, startSize, endSize],
-      Extrapolation.CLAMP
-    );
+    const imageSize = reduceMotion
+      ? startSize
+      : interpolate(
+          scrollValue.value,
+          [0, startImgSize, finishImgSize],
+          [startSize, startSize, endSize],
+          Extrapolation.CLAMP
+        );
 
     return {
       borderRadius: profilePicBorderRadius,
       height: imageSize,
       width: imageSize,
     };
-  }, [scrollValue, startImgSize, finishImgSize, startSize, endSize, profilePicBorderRadius]);
+  }, [
+    reduceMotion,
+    scrollValue,
+    startImgSize,
+    finishImgSize,
+    startSize,
+    endSize,
+    profilePicBorderRadius,
+  ]);
   const titleAnimatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return { opacity: 1 };
+    }
+
     return {
       opacity: interpolate(
         scrollValue.value,
@@ -74,7 +97,7 @@ export const Foreground: React.FC<ForegroundProps> = ({
         Extrapolation.CLAMP
       ),
     };
-  }, [scrollValue, startTitleFade, finishTitleFade]);
+  }, [reduceMotion, scrollValue, startTitleFade, finishTitleFade]);
 
   const landscapeStyle = useRTLStyles<ViewStyle>(
     commonStyles.row,
@@ -84,6 +107,9 @@ export const Foreground: React.FC<ForegroundProps> = ({
 
   return (
     <View
+      accessibilityElementsHidden={hideFromAccessibility}
+      importantForAccessibility={hideFromAccessibility ? 'no-hide-descendants' : 'auto'}
+      aria-hidden={hideFromAccessibility}
       pointerEvents="none"
       style={
         isLandscape
@@ -92,7 +118,13 @@ export const Foreground: React.FC<ForegroundProps> = ({
       }>
       {foregroundImage ? (
         <Animated.View style={imageOpacityAnimatedStyle}>
-          <Animated.Image source={foregroundImage} style={imageAnimatedStyle} />
+          <Animated.Image
+            accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+            source={foregroundImage}
+            style={imageAnimatedStyle}
+          />
         </Animated.View>
       ) : null}
       <Animated.View style={[commonStyles.messageContainer, titleAnimatedStyle]}>

@@ -5,6 +5,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { commonStyles } from '../../constants';
 import type { SectionListRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderSectionList } from '../../primitiveComponents/StickyHeaderSectionList';
+import { getHeaderSummary } from '../common/utils/getHeaderSummary';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
 import type { DetailsHeaderSectionListProps } from './DetailsHeaderProps';
@@ -65,6 +66,7 @@ function DetailsHeaderSectionListInner<ItemT, SectionT>(
         renderHeaderBar()
       ) : (
         <HeaderBar
+          summary={getHeaderSummary(props)}
           backgroundColor={backgroundColor}
           enableSafeAreaTopInset={enableSafeAreaTopInset}
           headerTitleContainerAnimatedStyle={headerTitleContainerAnimatedStyle}

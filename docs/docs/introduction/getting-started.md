@@ -62,6 +62,9 @@ application. Core imports do not require FlashList.
 
 ## In Use
 
+Read the [accessibility guide](../guides/accessibility.md) for system Reduce Motion,
+screen reader behavior, and the responsibilities of custom renderers.
+
 The repository contains one [Expo Router demo](https://github.com/melek-hedhili/sticky-parallax-header/tree/master/demo)
 with 21 showcase screens, 15 deterministic validation cases and nine performance
 workloads. Run `yarn demo ios`, `yarn demo android` or `yarn demo web` from the

@@ -18,6 +18,8 @@ for component usage and examples.
 - FlashList v2 integrations at `@mhedhili/react-native-sticky-parallax-header/flash-list`.
 - One Expo SDK 57 / Expo Router demo, running in Expo Go without prebuild.
 - Elastic header pull on Android and iOS, with an `enableHeaderBounce` opt-out.
+- System Reduce Motion handling and built-in screen reader summaries, tab states,
+  and inactive pager-page isolation. See the [accessibility guide](docs/docs/guides/accessibility.md).
 
 ## Install the beta
 

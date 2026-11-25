@@ -29,6 +29,7 @@ interface HeaderBounceOptions {
   hasRefreshControl: boolean;
   headerHeight: number;
   nativeGestureSupported: boolean;
+  reduceMotion?: boolean;
   refreshing?: unknown;
   scrollEnabled?: unknown;
 }
@@ -64,6 +65,7 @@ export function useHeaderBounce({
   hasRefreshControl,
   headerHeight,
   nativeGestureSupported,
+  reduceMotion = false,
   refreshing,
   scrollEnabled,
 }: HeaderBounceOptions): HeaderBounceState {
@@ -84,6 +86,7 @@ export function useHeaderBounce({
   const canBounce = useDerivedValue(
     () =>
       enableHeaderBounce &&
+      !reduceMotion &&
       headerHeight > 0 &&
       (isIOS || (isAndroid && nativeGestureSupported)) &&
       readBooleanProp(bounces, true) &&
@@ -96,6 +99,7 @@ export function useHeaderBounce({
       isAndroid,
       isIOS,
       nativeGestureSupported,
+      reduceMotion,
       refreshing,
       scrollEnabled,
     ]

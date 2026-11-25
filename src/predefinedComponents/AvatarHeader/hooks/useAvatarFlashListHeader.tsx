@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedFlashListHeader } from '../../common/hooks/usePredefinedFlashListHeader';
+import { getHeaderSummary } from '../../common/utils/getHeaderSummary';
 import type { AvatarHeaderFlashListProps } from '../AvatarHeaderFlashListProps';
 import { Foreground } from '../components/HeaderForeground';
 
@@ -34,6 +35,7 @@ export function useAvatarFlashListHeader<
     titleTestID,
   } = props;
 
+  const hasSummary = !props.renderHeaderBar && !!getHeaderSummary(props);
   const renderHeader = React.useCallback(() => {
     return (
       <HeaderWrapper
@@ -46,6 +48,7 @@ export function useAvatarFlashListHeader<
         scrollValue={scrollValue}
         tabsContainerBackgroundColor={tabsContainerBackgroundColor}>
         <Foreground
+          hasSummary={hasSummary}
           height={parallaxHeight}
           scrollValue={scrollValue}
           image={image}
@@ -59,6 +62,7 @@ export function useAvatarFlashListHeader<
       </HeaderWrapper>
     );
   }, [
+    hasSummary,
     backgroundColor,
     backgroundImage,
     contentBackgroundColor,

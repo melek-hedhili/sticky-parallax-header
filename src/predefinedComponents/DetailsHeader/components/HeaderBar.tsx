@@ -7,11 +7,13 @@ import type { Edge } from 'react-native-safe-area-context';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors, commonStyles } from '../../../constants';
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import type { AnimatedColorProp, IconProps } from '../../common/SharedProps';
 import IconRenderer from '../../common/components/IconRenderer';
 import { parseAnimatedColorProp } from '../../common/utils/parseAnimatedColorProp';
 
 interface HeaderBarProps extends IconProps {
+  summary?: string;
   backgroundColor?: AnimatedColorProp;
   enableSafeAreaTopInset?: boolean;
   headerTitleContainerAnimatedStyle: StyleProp<AnimatedStyle<ViewStyle>>;
@@ -28,6 +30,7 @@ const HIT_SLOP = {
 };
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
+  summary,
   backgroundColor,
   enableSafeAreaTopInset,
   headerTitleContainerAnimatedStyle,
@@ -43,6 +46,9 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   titleStyle,
   titleTestID = 'DetailsHeaderBarTitleTestID',
 }) => {
+  const { screenReaderEnabled } = useAccessibilityPreferences();
+  const summaryLabel = summary ?? title;
+  const hasSummary = screenReaderEnabled && !!summaryLabel;
   const wrapperAnimatedStyle = useAnimatedStyle(() => {
     return {
       // TypeScript complains about AnimatedNode<StyleProp<ViewStyle>> from reanimated v1
@@ -69,9 +75,16 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             <IconRenderer icon={leftTopIcon} />
           </Pressable>
         ) : null}
-        <Animated.View style={[styles.headerTitleContainer, headerTitleContainerAnimatedStyle]}>
+        <Animated.View
+          accessible={hasSummary}
+          accessibilityRole={hasSummary ? 'header' : undefined}
+          accessibilityLabel={hasSummary ? summaryLabel : undefined}
+          style={[
+            styles.headerTitleContainer,
+            hasSummary ? styles.summaryVisible : headerTitleContainerAnimatedStyle,
+          ]}>
           <Animated.Text style={[styles.headerTitle, titleStyle]} testID={titleTestID}>
-            {title}
+            {hasSummary ? title?.trim() || summaryLabel : title}
           </Animated.Text>
         </Animated.View>
         {rightTopIcon ? (
@@ -91,6 +104,9 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
 };
 
 const styles = StyleSheet.create({
+  summaryVisible: {
+    opacity: 1,
+  },
   headerTitle: {
     color: colors.white,
     fontSize: 16,

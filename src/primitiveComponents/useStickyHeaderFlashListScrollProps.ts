@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 import { useAnimatedReaction, useAnimatedRef, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
+import { useAccessibilityPreferences } from '../hooks/useAccessibilityPreferences';
 import { useResponsiveSize } from '../hooks/useResponsiveSize';
 
 import type { StickyHeaderSharedProps, StickyHeaderSnapProps } from './StickyHeaderProps';
@@ -18,6 +19,7 @@ export function useStickyHeaderFlashListScrollProps<
   T extends FlashListRef<any> = FlashListRef<any>,
 >(props: StickyHeaderSharedProps & StickyHeaderSnapProps) {
   const { responsiveHeight } = useResponsiveSize();
+  const { reduceMotion } = useAccessibilityPreferences();
 
   const {
     headerHeight = 100,
@@ -102,7 +104,7 @@ export function useStickyHeaderFlashListScrollProps<
       const isOverSnapToEdgeThresholdAndDragIsQuick =
         currentVal >= snapToEdgeThreshold && currentVal < scrollToHeight / 2 && dragsQuickToTop;
 
-      if (snapToEdge) {
+      if (snapToEdge && !reduceMotion) {
         // TODO: when react-native-web will support onMomentumScrollEnd & onScrollEndDrag events
         // handle web snap scroll
         if (isUnderSnapToEdgeThresholdAndDragIsSlow || isOverSnapToEdgeThresholdAndDragIsQuick) {
@@ -121,6 +123,7 @@ export function useStickyHeaderFlashListScrollProps<
       snapToBottom,
       snapToTop,
       snapToEdge,
+      reduceMotion,
       scrollHeight,
       scrollValue,
     ]

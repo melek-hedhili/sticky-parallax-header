@@ -194,8 +194,12 @@ test.each(['color', 'image'] as const)(
     expect(backdrop).not.toContainElement(title);
 
     if (background === 'image') {
-      expect(backdrop).toContainElement(screen.getByTestId('HeaderBackgroundImage'));
-      expect(screen.getByTestId('HeaderBackgroundImage')).toHaveStyle({ height, width: 390 });
+      expect(backdrop).toContainElement(
+        screen.getByTestId('HeaderBackgroundImage', { includeHiddenElements: true })
+      );
+      expect(
+        screen.getByTestId('HeaderBackgroundImage', { includeHiddenElements: true })
+      ).toHaveStyle({ height, width: 390 });
     }
 
     displacement.value = 0;

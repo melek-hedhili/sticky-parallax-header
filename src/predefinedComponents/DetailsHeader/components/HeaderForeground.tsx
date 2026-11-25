@@ -5,10 +5,12 @@ import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { colors, commonStyles, constants } from '../../../constants';
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import { useRTLStyles } from '../../common/hooks/useRTLStyles';
 import { scrollPosition } from '../../common/utils/scrollPosition';
 
 interface ForegroundProps {
+  hasSummary?: boolean;
   contentIcon?: ImageSourcePropType;
   contentIconNumber?: number;
   contentIconNumberStyle?: StyleProp<AnimatedStyle<TextStyle>>;
@@ -28,6 +30,7 @@ interface ForegroundProps {
 }
 
 export const Foreground: React.FC<ForegroundProps> = ({
+  hasSummary,
   contentIcon,
   contentIconNumber,
   contentIconNumberStyle,
@@ -45,6 +48,8 @@ export const Foreground: React.FC<ForegroundProps> = ({
   titleStyle,
   titleTestID = 'DetailsHeaderForegroundTitleTestID',
 }) => {
+  const { reduceMotion, screenReaderEnabled } = useAccessibilityPreferences();
+  const hideFromAccessibility = screenReaderEnabled && hasSummary;
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const isLandscape =
@@ -52,25 +57,37 @@ export const Foreground: React.FC<ForegroundProps> = ({
   const outputRange = [1, 0.8, 0];
   const labelInputRange = [0, scrollPosition(height, 19), scrollPosition(height, 25)];
   const labelAnimatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return { opacity: 1 };
+    }
+
     return {
       opacity: interpolate(scrollValue.value, labelInputRange, outputRange, Extrapolation.CLAMP),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollValue, height]);
+  }, [reduceMotion, scrollValue, height]);
   const titleInputRange = [0, scrollPosition(height, 45), scrollPosition(height, 55)];
   const titleAnimatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return { opacity: 1 };
+    }
+
     return {
       opacity: interpolate(scrollValue.value, titleInputRange, outputRange, Extrapolation.CLAMP),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollValue, height]);
+  }, [reduceMotion, scrollValue, height]);
   const authorInputRange = [0, scrollPosition(height, 55), scrollPosition(height, 70)];
   const authorAnimatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return { opacity: 1 };
+    }
+
     return {
       opacity: interpolate(scrollValue.value, authorInputRange, outputRange, Extrapolation.CLAMP),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollValue, height]);
+  }, [reduceMotion, scrollValue, height]);
   const authorNameRTLStyle = useRTLStyles<TextStyle>(
     styles.authorNamePaddingLeft,
     styles.authorNamePaddingRight,
@@ -89,6 +106,9 @@ export const Foreground: React.FC<ForegroundProps> = ({
 
   return (
     <View
+      accessibilityElementsHidden={hideFromAccessibility}
+      importantForAccessibility={hideFromAccessibility ? 'no-hide-descendants' : 'auto'}
+      aria-hidden={hideFromAccessibility}
       pointerEvents="none"
       style={
         isLandscape
@@ -112,7 +132,15 @@ export const Foreground: React.FC<ForegroundProps> = ({
       </View>
       <Animated.View style={[styles.infoContainer, authorAnimatedStyle]}>
         <View style={styles.iconContainer}>
-          {contentIcon && <Image source={contentIcon} style={styles.icon} />}
+          {contentIcon && (
+            <Image
+              accessible={false}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+              source={contentIcon}
+              style={styles.icon}
+            />
+          )}
           <Animated.Text
             style={[styles.number, numberRTLStyle, contentIconNumberStyle ?? titleStyle]}
             testID={contentIconNumberTestID}>
@@ -120,7 +148,16 @@ export const Foreground: React.FC<ForegroundProps> = ({
           </Animated.Text>
         </View>
         <View style={styles.footerContainer}>
-          {image && <Image source={image} style={styles.authorPhoto} resizeMode="contain" />}
+          {image && (
+            <Image
+              accessible={false}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+              source={image}
+              style={styles.authorPhoto}
+              resizeMode="contain"
+            />
+          )}
           <Animated.Text
             numberOfLines={1}
             style={[styles.authorName, authorNameRTLStyle, subtitleStyle ?? titleStyle]}

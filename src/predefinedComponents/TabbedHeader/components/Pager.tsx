@@ -13,6 +13,7 @@ import Animated, {
 import { scheduleOnRN, scheduleOnUI } from 'react-native-worklets';
 
 import { commonStyles } from '../../../constants';
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import { useHeaderElasticity } from '../../../primitiveComponents/ElasticHeaderContext';
 import type { FlatListRef } from '../../../primitiveComponents/ScrollComponent';
 import { debounce } from '../../common/utils/debounce';
@@ -60,6 +61,9 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
     },
     ref
   ) => {
+    const { reduceMotion } = useAccessibilityPreferences();
+    const initialReduceMotion = React.useRef(reduceMotion);
+    const [currentPage, setCurrentPage] = React.useState(initialPage);
     const [containerWidth, setContainerWidth] = React.useState(
       () => Dimensions.get('window').width
     );
@@ -69,6 +73,7 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
     const { reset: resetElasticity } = useHeaderElasticity();
 
     const scrollToTabPositionTimeoutValue = useSharedValue(1);
+    const pendingScrollTarget = useSharedValue(-1);
 
     const data = React.useMemo(() => {
       return React.Children.toArray(children);
@@ -86,29 +91,37 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
       (offset: number) => {
         'worklet';
         if (Platform.OS === 'web') {
-          horizontalFlatListRef.current?.scrollToOffset({ offset, animated: true });
+          horizontalFlatListRef.current?.scrollToOffset({ offset, animated: !reduceMotion });
 
           return;
         }
 
-        scrollTo(horizontalFlatListRef, offset, 0, true);
+        scrollTo(horizontalFlatListRef, offset, 0, !reduceMotion);
       },
-      [horizontalFlatListRef]
+      [horizontalFlatListRef, reduceMotion]
     );
 
     const scrollToTabPosition = React.useCallback(
       (position: number) => {
         'worklet';
         if (Platform.OS === 'web') {
-          scrollRef.current?.scrollTo({ x: 0, y: position, animated: true });
+          scrollRef.current?.scrollTo({ x: 0, y: position, animated: !reduceMotion });
 
           return;
         }
 
-        scrollTo(scrollRef, 0, position, true);
+        scrollTo(scrollRef, 0, position, !reduceMotion);
       },
-      [scrollRef]
+      [reduceMotion, scrollRef]
     );
+
+    React.useEffect(() => {
+      cancelAnimation(scrollToTabPositionTimeoutValue);
+      if (reduceMotion && pendingScrollTarget.value >= 0) {
+        scheduleOnUI(scrollToTabPosition, pendingScrollTarget.value);
+        pendingScrollTarget.value = -1;
+      }
+    }, [pendingScrollTarget, reduceMotion, scrollToTabPosition, scrollToTabPositionTimeoutValue]);
 
     const handleScrollToTabPosition = React.useCallback(
       (prevPage: number, newPage: number) => {
@@ -130,12 +143,20 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
             ? Math.max(0, savedPosition)
             : scrollHeight;
 
+        if (reduceMotion) {
+          scheduleOnUI(scrollToTabPosition, scrollTargetPosition);
+
+          return;
+        }
+
+        pendingScrollTarget.value = scrollTargetPosition;
         scrollToTabPositionTimeoutValue.value = withDelay(
           SCROLL_TO_PAGE_OFFSET_TIMEOUT,
           withTiming(scrollToTabPositionTimeoutValue.value * -1, { duration: 0 }, (finished) => {
             'worklet';
             if (finished) {
               scrollToTabPosition(scrollTargetPosition);
+              pendingScrollTarget.value = -1;
             }
           })
         );
@@ -143,7 +164,9 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
       [
         data.length,
         disableScrollToPosition,
+        pendingScrollTarget,
         rememberTabScrollPosition,
+        reduceMotion,
         scrollHeight,
         scrollToTabPosition,
         scrollToTabPositionTimeoutValue,
@@ -153,8 +176,9 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
 
     const cancelPreviousPageMotion = React.useCallback(() => {
       cancelAnimation(scrollToTabPositionTimeoutValue);
+      pendingScrollTarget.value = -1;
       scheduleOnUI(resetElasticity);
-    }, [resetElasticity, scrollToTabPositionTimeoutValue]);
+    }, [pendingScrollTarget, resetElasticity, scrollToTabPositionTimeoutValue]);
 
     const goToPage = React.useCallback(
       (pageNumber: number) => {
@@ -172,6 +196,7 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
         handleScrollToTabPosition(previousPage, pageNumber);
         scheduleOnUI(scrollToPage, offset);
         currentPageRef.current = pageNumber;
+        setCurrentPage(pageNumber);
         onChangeTab?.(previousPage, pageNumber);
       },
       [cancelPreviousPageMotion, data.length, handleScrollToTabPosition, onChangeTab, scrollToPage]
@@ -187,8 +212,14 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
       // Retain the initial visibility workaround at the requested page offset.
       const offset = currentPageRef.current * containerWidthRef.current;
 
-      horizontalFlatListRef.current?.scrollToOffset({ offset: offset + 1, animated: true });
-      horizontalFlatListRef.current?.scrollToOffset({ offset, animated: true });
+      horizontalFlatListRef.current?.scrollToOffset({
+        offset: offset + 1,
+        animated: !initialReduceMotion.current,
+      });
+      horizontalFlatListRef.current?.scrollToOffset({
+        offset,
+        animated: !initialReduceMotion.current,
+      });
 
       return () => {
         cancelAnimation(scrollToTabPositionTimeoutValue);
@@ -224,6 +255,7 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
         if (previousPage !== newPage && newPage >= 0 && newPage < data.length) {
           cancelPreviousPageMotion();
           currentPageRef.current = newPage;
+          setCurrentPage(newPage);
           swipedPage?.(newPage);
           onChangeTab?.(previousPage, newPage);
           handleScrollToTabPosition(previousPage, newPage);
@@ -272,9 +304,19 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
     React.useImperativeHandle(ref, () => ({ goToPage }), [goToPage]);
 
     const renderItem = React.useCallback(
-      ({ item }: ListRenderItemInfo<Page>) => {
+      ({ item, index }: ListRenderItemInfo<Page>) => {
+        const inactive = index !== currentPage;
+        const webProps =
+          Platform.OS === 'web'
+            ? ({ inert: inactive } satisfies Pick<React.HTMLAttributes<HTMLElement>, 'inert'>)
+            : {};
+
         return (
           <Animated.View
+            {...webProps}
+            accessibilityElementsHidden={inactive}
+            importantForAccessibility={inactive ? 'no-hide-descendants' : 'auto'}
+            aria-hidden={inactive}
             style={[
               isInvertedAndroid && styles.inversionStyle,
               // used to calculate current height of scroll
@@ -287,7 +329,7 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
           </Animated.View>
         );
       },
-      [containerWidth, isInvertedAndroid, pageContainerStyle]
+      [containerWidth, currentPage, isInvertedAndroid, pageContainerStyle]
     );
 
     return (
@@ -307,6 +349,7 @@ export const Pager = React.forwardRef<PagerMethods, PagerProps & InternalPagerPr
           ]}
           contentOffset={{ x: initialPage * containerWidth, y: 0 }}
           data={data}
+          extraData={currentPage}
           directionalLockEnabled={directionalLockEnabled}
           horizontal
           keyExtractor={(_, i) => `${i}`}

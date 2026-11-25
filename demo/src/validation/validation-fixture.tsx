@@ -24,11 +24,13 @@ import { FlashList } from '@shopify/flash-list';
 import type { FlashListRef } from '@shopify/flash-list';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { FlatList, ScrollView, SectionList } from 'react-native';
-import { Button, Platform, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { Button, Platform, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import type { ValidationCaseName } from '@/validation/catalogue';
 
 const avatar = require('../../assets/validation/avatar.png');
+const closeIcon = require('../showcase/assets/icons/close.png');
+const shareIcon = require('../showcase/assets/icons/share.png');
 const rows = Array.from({ length: 24 }, (_, i) => `Row ${i + 1}`);
 const tabs = [
   { title: 'First', testID: 'tab-first' },
@@ -128,7 +130,14 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
   const common = {
     title: name,
     titleTestID: 'fixture-title',
-    subtitle: 'Local deterministic content',
+    leftTopIcon: closeIcon,
+    leftTopIconAccessibilityLabel: 'Close header example',
+    leftTopIconTestID: 'fixture-close',
+    leftTopIconOnPress: () => setStatus('Close action'),
+    rightTopIcon: shareIcon,
+    rightTopIconAccessibilityLabel: 'Share header example',
+    rightTopIconTestID: 'fixture-share',
+    rightTopIconOnPress: () => setStatus('Share action'),
     backgroundColor: colors.header,
     image: avatar,
     foregroundImage: avatar,
@@ -144,6 +153,7 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       ),
   };
+  const withSubtitle = { ...common, subtitle: 'Local deterministic content' };
   const primitive = {
     renderHeader,
     renderTabs,
@@ -208,7 +218,7 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
       break;
     case 'Avatar ScrollView':
       content = (
-        <AvatarHeaderScrollView {...common} ref={scrollRef}>
+        <AvatarHeaderScrollView {...withSubtitle} ref={scrollRef}>
           {children}
         </AvatarHeaderScrollView>
       );
@@ -216,7 +226,7 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
     case 'Avatar FlatList':
       content = (
         <AvatarHeaderFlatList
-          {...common}
+          {...withSubtitle}
           ref={flatRef}
           data={rows}
           renderItem={renderRow}
@@ -227,7 +237,7 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
     case 'Avatar SectionList':
       content = (
         <AvatarHeaderSectionList
-          {...common}
+          {...withSubtitle}
           ref={sectionRef}
           sections={sections}
           renderItem={renderRow}
@@ -237,7 +247,11 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
       break;
     case 'Details ScrollView':
       content = (
-        <DetailsHeaderScrollView {...common} ref={scrollRef}>
+        <DetailsHeaderScrollView
+          {...withSubtitle}
+          tag="Accessibility checks"
+          contentIconNumber={0}
+          ref={scrollRef}>
           {children}
         </DetailsHeaderScrollView>
       );
@@ -245,7 +259,9 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
     case 'Details FlatList':
       content = (
         <DetailsHeaderFlatList
-          {...common}
+          {...withSubtitle}
+          tag="Accessibility checks"
+          contentIconNumber={0}
           ref={flatRef}
           data={rows}
           renderItem={renderRow}
@@ -256,7 +272,9 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
     case 'Details SectionList':
       content = (
         <DetailsHeaderSectionList
-          {...common}
+          {...withSubtitle}
+          tag="Accessibility checks"
+          contentIconNumber={0}
           ref={sectionRef}
           sections={sections}
           renderItem={renderRow}
@@ -287,8 +305,22 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
           rememberTabScrollPosition
           pagerProps={{ ref: pagerRef }}
           onChangeTab={(_, page) => setStatus(`Page ${page + 1}`)}>
-          <View>{children}</View>
           <View>
+            <TextInput
+              accessibilityLabel="First page note"
+              testID="first-page-note"
+              defaultValue="Keep this note when changing pages"
+              style={styles.row}
+            />
+            {children}
+          </View>
+          <View>
+            <TextInput
+              accessibilityLabel="Second page note"
+              testID="second-page-note"
+              defaultValue="Only the active page should be reachable"
+              style={styles.row}
+            />
             {rows.map((item) => (
               <Text style={styles.row} key={item}>
                 Second {item}
@@ -315,7 +347,7 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
     case 'Avatar FlashList':
       content = (
         <AvatarFlash
-          {...common}
+          {...withSubtitle}
           ref={flashRef}
           data={rows}
           renderItem={renderRow}
@@ -326,7 +358,9 @@ export function ValidationFixture({ name }: { name: ValidationCaseName }) {
     case 'Details FlashList':
       content = (
         <DetailsFlash
-          {...common}
+          {...withSubtitle}
+          tag="Accessibility checks"
+          contentIconNumber={0}
           ref={flashRef}
           data={rows}
           renderItem={renderRow}

@@ -5,6 +5,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { commonStyles } from '../../constants';
 import type { ScrollViewRef } from '../../primitiveComponents/ScrollComponent';
 import { StickyHeaderScrollView } from '../../primitiveComponents/StickyHeaderScrollView';
+import { getHeaderSummary } from '../common/utils/getHeaderSummary';
 import { parseAnimatedColorProp } from '../common/utils/parseAnimatedColorProp';
 
 import type { DetailsHeaderScrollViewProps } from './DetailsHeaderProps';
@@ -61,6 +62,7 @@ export const DetailsHeaderScrollView: React.ForwardRefExoticComponent<
         renderHeaderBar()
       ) : (
         <HeaderBar
+          summary={getHeaderSummary(props)}
           backgroundColor={backgroundColor}
           enableSafeAreaTopInset={enableSafeAreaTopInset}
           headerTitleContainerAnimatedStyle={headerTitleContainerAnimatedStyle}

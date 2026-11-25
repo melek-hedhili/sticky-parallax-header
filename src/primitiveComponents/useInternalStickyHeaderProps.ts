@@ -11,6 +11,8 @@ import {
   useSharedValue,
 } from 'react-native-reanimated';
 
+import { useAccessibilityPreferences } from '../hooks/useAccessibilityPreferences';
+
 import type { StickyHeaderSharedProps } from './StickyHeaderProps';
 import { useHeaderBounce } from './useHeaderBounce';
 
@@ -18,6 +20,7 @@ export function useInternalStickyHeaderProps(
   props: StickyHeaderSharedProps,
   nativeGestureSupported = false
 ) {
+  const { reduceMotion } = useAccessibilityPreferences();
   const {
     contentContainerStyle,
     enableHeaderBounce = false,
@@ -51,6 +54,7 @@ export function useInternalStickyHeaderProps(
     hasRefreshControl: !!nativeProps.refreshControl || !!nativeProps.onRefresh,
     headerHeight,
     nativeGestureSupported,
+    reduceMotion,
     refreshing: nativeProps.refreshControl?.props?.refreshing ?? nativeProps.refreshing,
     scrollEnabled: nativeProps.scrollEnabled,
   });
@@ -132,7 +136,9 @@ export function useInternalStickyHeaderProps(
         {
           translateY:
             interpolate(
-              enableHeaderBounce ? Math.max(0, scrollValue.value) : scrollValue.value,
+              enableHeaderBounce || reduceMotion
+                ? Math.max(0, scrollValue.value)
+                : scrollValue.value,
               [0, headerHeight],
               [0, -headerHeight],
               stickyTabs ? Extrapolation.CLAMP : Extrapolation.EXTEND
@@ -140,7 +146,7 @@ export function useInternalStickyHeaderProps(
         },
       ],
     };
-  }, [scrollValue, headerHeight, stickyTabs, displacement, enableHeaderBounce]);
+  }, [scrollValue, headerHeight, stickyTabs, displacement, enableHeaderBounce, reduceMotion]);
 
   return {
     contentContainerPaddingTop,

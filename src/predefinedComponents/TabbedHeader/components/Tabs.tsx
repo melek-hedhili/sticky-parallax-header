@@ -5,6 +5,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import Animated, { interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
 import { commonStyles } from '../../../constants';
+import { useAccessibilityPreferences } from '../../../hooks/useAccessibilityPreferences';
 import type { ScrollViewRef } from '../../../primitiveComponents/ScrollComponent';
 import type { Tab, TabsConfig } from '../../common/SharedProps';
 import { parseAnimatedColorProp } from '../../common/utils/parseAnimatedColorProp';
@@ -34,6 +35,8 @@ export const Tabs: React.FC<TabsProps> = ({
   tabTextStyle,
   tabsContainerHorizontalPadding,
 }) => {
+  const { reduceMotion } = useAccessibilityPreferences();
+  const initialReduceMotion = React.useRef(reduceMotion);
   const { width } = useWindowDimensions();
   const horizontalScrollRef = React.useRef<ScrollViewRef>(null);
 
@@ -49,10 +52,13 @@ export const Tabs: React.FC<TabsProps> = ({
 
       if (page <= lastHidden) {
         currentPositionX.current = width * 0.3 * page;
-        horizontalScrollRef.current?.scrollTo({ animated: true, x: currentPositionX.current });
+        horizontalScrollRef.current?.scrollTo({
+          animated: !reduceMotion,
+          x: currentPositionX.current,
+        });
       }
     },
-    [width]
+    [reduceMotion, width]
   );
 
   const adjustNext = React.useCallback(
@@ -61,28 +67,31 @@ export const Tabs: React.FC<TabsProps> = ({
 
       if (invisibleX < 0) {
         currentPositionX.current = currentPositionX.current - invisibleX;
-        horizontalScrollRef.current?.scrollTo?.({ animated: true, x: currentPositionX.current });
+        horizontalScrollRef.current?.scrollTo?.({
+          animated: !reduceMotion,
+          x: currentPositionX.current,
+        });
       }
     },
-    [width]
+    [reduceMotion, width]
   );
 
   const scrollToTab = React.useCallback(
     (page: number) => {
       if (tabs.length > 3) {
         if (page === 0) {
-          horizontalScrollRef.current?.scrollTo({ animated: true, x: 0 });
+          horizontalScrollRef.current?.scrollTo({ animated: !reduceMotion, x: 0 });
           currentPositionX.current = 0;
         } else if (page !== tabs.length - 1) {
           adjustPrevious(page - 1);
           adjustNext(page + 1);
         } else {
-          horizontalScrollRef.current?.scrollToEnd?.({ animated: true });
+          horizontalScrollRef.current?.scrollToEnd?.({ animated: !reduceMotion });
           currentPositionX.current = width * 0.3 * tabs.length - width;
         }
       }
     },
-    [adjustNext, adjustPrevious, tabs.length, width]
+    [adjustNext, adjustPrevious, reduceMotion, tabs.length, width]
   );
 
   const scrollToTabRef = React.useRef(scrollToTab);
@@ -99,8 +108,8 @@ export const Tabs: React.FC<TabsProps> = ({
   }, [activeTab, width]);
 
   React.useEffect(() => {
-    horizontalScrollRef.current?.scrollTo({ x: 1 });
-    horizontalScrollRef.current?.scrollTo({ x: 0 });
+    horizontalScrollRef.current?.scrollTo({ x: 1, animated: !initialReduceMotion.current });
+    horizontalScrollRef.current?.scrollTo({ x: 0, animated: !initialReduceMotion.current });
   }, []);
 
   const onTabLayout = React.useCallback(
@@ -178,7 +187,8 @@ export const Tabs: React.FC<TabsProps> = ({
   }, [tabsWidth, tabUnderlineColor, HORIZONTAL_PADDINGS, allSizes, width]);
 
   const tabUnderlineAnimatedStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(horizontalScrollValue.value, inputRange, translateXOutputRange);
+    const underlinePosition = reduceMotion ? activeTab * width : horizontalScrollValue.value;
+    const translateX = interpolate(underlinePosition, inputRange, translateXOutputRange);
 
     return {
       backgroundColor: parseAnimatedColorProp(tabUnderlineColor),
@@ -187,9 +197,12 @@ export const Tabs: React.FC<TabsProps> = ({
           translateX: isInvertedIOS ? translateX * -1 : translateX,
         },
       ],
-      width: interpolate(horizontalScrollValue.value, inputRange, widthOutputRange),
+      width: interpolate(underlinePosition, inputRange, widthOutputRange),
     };
   }, [
+    activeTab,
+    reduceMotion,
+    width,
     horizontalScrollValue,
     inputRange,
     isInvertedIOS,
@@ -205,7 +218,10 @@ export const Tabs: React.FC<TabsProps> = ({
   }, [tabsContainerBackgroundColor]);
 
   return (
-    <Animated.View style={[styles.container, containerAnimatedStyle]}>
+    <Animated.View
+      accessible={false}
+      accessibilityRole="tablist"
+      style={[styles.container, containerAnimatedStyle]}>
       <ScrollView
         ref={horizontalScrollRef}
         bounces={false}

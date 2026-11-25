@@ -88,7 +88,7 @@ test('tab navigation uses the first data cell and RN sticky-header compensation'
   const ref = await renderList();
 
   metrics.scrollToIndex.mockClear();
-  await fireEvent.press(screen.getByRole('button', { name: 'Second' }));
+  await fireEvent.press(screen.getByRole('tab', { name: 'Second' }));
   expect(metrics.scrollToIndex).toHaveBeenLastCalledWith({
     animated: true,
     itemIndex: 1,
@@ -126,7 +126,7 @@ test.each([
 
   await renderList({ data: sections([...data]), stickySectionHeadersEnabled: sticky });
   metrics.scrollToIndex.mockClear();
-  await fireEvent.press(screen.getByRole('button', { name: 'Second' }));
+  await fireEvent.press(screen.getByRole('tab', { name: 'Second' }));
   expect(metrics.scrollToIndex).toHaveBeenLastCalledWith({
     animated: true,
     itemIndex: 0,

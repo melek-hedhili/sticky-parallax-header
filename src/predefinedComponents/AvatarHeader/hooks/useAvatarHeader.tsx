@@ -3,6 +3,7 @@ import * as React from 'react';
 import type { ScrollComponent } from '../../common/SharedProps';
 import { HeaderWrapper } from '../../common/components/HeaderWrapper';
 import { usePredefinedHeader } from '../../common/hooks/usePredefinedHeader';
+import { getHeaderSummary } from '../../common/utils/getHeaderSummary';
 import type { AvatarHeaderSharedProps } from '../AvatarHeaderProps';
 import { Foreground } from '../components/HeaderForeground';
 
@@ -31,6 +32,7 @@ export function useAvatarHeader<T extends ScrollComponent>(props: AvatarHeaderSh
     titleTestID,
   } = props;
 
+  const hasSummary = !props.renderHeaderBar && !!getHeaderSummary(props);
   const renderHeader = React.useCallback(() => {
     return (
       <HeaderWrapper
@@ -43,6 +45,7 @@ export function useAvatarHeader<T extends ScrollComponent>(props: AvatarHeaderSh
         scrollValue={scrollValue}
         tabsContainerBackgroundColor={tabsContainerBackgroundColor}>
         <Foreground
+          hasSummary={hasSummary}
           height={parallaxHeight}
           scrollValue={scrollValue}
           image={image}
@@ -56,6 +59,7 @@ export function useAvatarHeader<T extends ScrollComponent>(props: AvatarHeaderSh
       </HeaderWrapper>
     );
   }, [
+    hasSummary,
     backgroundColor,
     backgroundImage,
     contentBackgroundColor,
