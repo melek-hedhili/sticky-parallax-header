@@ -1,8 +1,8 @@
 import type { FlashListProps, FlashListRef } from '@shopify/flash-list';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import * as React from 'react';
-import type { ScrollViewProps } from 'react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import type { FlatListProps, ScrollViewProps } from 'react-native';
+import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { installAnimationHarness, scrollEvent } from '../__fixtures__/animationHarness';
 import { withStickyHeader } from '../primitiveComponents/withStickyHeader';
@@ -19,6 +19,90 @@ const layoutEvent = (height: number) => ({
 afterEach(() => {
   jest.restoreAllMocks();
 });
+
+test.each([undefined, 72, 0])(
+  'core preserves progressViewOffset=%s and explicit refresh controls',
+  async (progressViewOffset) => {
+    installAnimationHarness();
+    let captured: FlatListProps<string> = { data: [], renderItem: () => null };
+    const Probe = React.forwardRef<View, FlatListProps<string>>((props, _ref) => {
+      captured = props;
+
+      return <View />;
+    });
+    const Header = withStickyHeader(Probe);
+    const onRefresh = jest.fn();
+    const props = {
+      data: ['one'],
+      renderItem: () => null,
+      renderHeader: () => <Text>Header</Text>,
+      progressViewOffset,
+      onRefresh,
+      refreshing: true,
+    };
+
+    await render(<Header {...props} />);
+    await fireEvent(screen.getByText('Header'), 'layout', layoutEvent(180));
+    expect(captured.progressViewOffset).toBe(progressViewOffset ?? 180);
+    expect(captured.onRefresh).toBe(onRefresh);
+    expect(captured.refreshing).toBe(true);
+    const refreshControl = (
+      <RefreshControl refreshing={false} onRefresh={onRefresh} progressViewOffset={24} />
+    );
+    const refreshControlProps = refreshControl.props;
+
+    await screen.rerender(<Header {...props} refreshControl={refreshControl} />);
+    expect(captured.refreshControl).toBe(refreshControl);
+    expect(captured.refreshControl?.props).toBe(refreshControlProps);
+    expect(refreshControl.props).toMatchObject({
+      refreshing: false,
+      onRefresh,
+      progressViewOffset: 24,
+    });
+  }
+);
+
+test.each([undefined, 72, 0])(
+  'FlashList preserves progressViewOffset=%s and explicit refresh controls',
+  async (progressViewOffset) => {
+    installAnimationHarness();
+    let captured: FlashListProps<string> = { data: [], renderItem: () => null };
+    const Probe = React.forwardRef<FlashListRef<string>, FlashListProps<string>>((props, _ref) => {
+      captured = props;
+
+      return <View />;
+    });
+    const Header = withStickyHeaderFlashList<string>(Probe);
+    const onRefresh = jest.fn();
+    const props = {
+      data: ['one'],
+      renderItem: () => null,
+      renderHeader: () => <Text>Header</Text>,
+      progressViewOffset,
+      onRefresh,
+      refreshing: true,
+    };
+
+    await render(<Header {...props} />);
+    await fireEvent(screen.getByText('Header'), 'layout', layoutEvent(180));
+    expect(captured.progressViewOffset).toBe(progressViewOffset ?? 180);
+    expect(captured.onRefresh).toBe(onRefresh);
+    expect(captured.refreshing).toBe(true);
+    const refreshControl = (
+      <RefreshControl refreshing={false} onRefresh={onRefresh} progressViewOffset={24} />
+    );
+    const refreshControlProps = refreshControl.props;
+
+    await screen.rerender(<Header {...props} refreshControl={refreshControl} />);
+    expect(captured.refreshControl).toBe(refreshControl);
+    expect(captured.refreshControl?.props).toBe(refreshControlProps);
+    expect(refreshControl.props).toMatchObject({
+      refreshing: false,
+      onRefresh,
+      progressViewOffset: 24,
+    });
+  }
+);
 
 test('function components preserve layout padding, callbacks, refresh offset, and imperative refs', async () => {
   const harness = installAnimationHarness();

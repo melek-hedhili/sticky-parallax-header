@@ -37,6 +37,11 @@ export default function PagerScreen() {
 }
 ```
 
+For separate vertical and horizontal refs, see the
+[typed pager navigation example](../guides/scrollview-reference.md#changing-the-horizontal-page).
+For custom foregrounds, start-aligned tabs and prop behavior, see
+[troubleshooting](../guides/troubleshooting.md).
+
 ## Expanded header height
 
 The predefined tabbed header uses a compact `parallaxHeight` based on the current
@@ -91,6 +96,7 @@ Inherits [ScrollViewProps](https://reactnative.dev/docs/scrollview#props)
 | pagerProps                     | [pager props](#pagerprops) - `PagerProps`                | -                      |
 | parallaxHeight                 | number                                                   | Compact; see above     |
 | rememberTabScrollPosition      | boolean                                                  | -                      |
+| renderHeader                   | render function; replaces collapsing foreground | - |
 | renderHeaderBar                | render function                                          | -                      |
 | snapStartThreshold             | number                                                   | -                      |
 | snapStopThreshold              | number                                                   | -                      |

@@ -74,11 +74,15 @@ part of the modern API.
 so FlashList's position maintenance does not compete with header scrolling. An
 explicit caller value passes through.
 
+Scroll callbacks must be worklets; see the
+[callback and React state example](../guides/troubleshooting.md#scroll-callbacks-and-react-state).
+
 ### Tabbed FlashList
 
 `withTabbedHeaderFlashList` uses flat `data` and `stickyHeaderIndices`. Supply
 one tab per sticky index in ascending order. It does **not** accept SectionList
-`sections`; use `TabbedHeaderList` for a SectionList data model. The tab selection
+`sections`; use `TabbedHeaderList` for a SectionList data model. This adapter
+does not provide independent horizontal pages of FlashList data. The tab selection
 tracks the visible range, and pressing a tab requests a scroll to its corresponding
 index. In the current iOS Expo demo, a later-tab jump can remain at the first
 section with First selected. This also reproduces in the pre-bounce checkout;

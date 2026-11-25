@@ -6,7 +6,9 @@ sidebar_position: 5
 
 ## Example usage
 
-Check [custom header example](../examples/custom-header.md)
+Check [custom header example](../examples/custom-header.md). For worklet callbacks,
+tall header content and custom headers with horizontal pages, see
+[troubleshooting](../guides/troubleshooting.md).
 
 ## Props
 

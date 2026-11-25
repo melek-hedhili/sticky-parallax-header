@@ -92,7 +92,7 @@ export function withStickyHeader<T extends React.ComponentType<any>>(component: 
           onMomentumScrollBegin={NOOP}
           onMomentumScrollEnd={NOOP}
           overScrollMode={overScrollMode}
-          progressViewOffset={headerHeight}
+          progressViewOffset={rest.progressViewOffset ?? headerHeight}
           scrollEventThrottle={scrollEventThrottle}
           style={[style, { paddingTop: tabsHeight + listPaddingTop }]}
         />

@@ -35,3 +35,37 @@ export default function ScrollReferenceScreen() {
 ```
 
 `TabbedHeaderPager` exposes the vertical scroll ref at `ref`. Its horizontal pager ref belongs in `pagerProps.ref` and uses the exported `PagerMethods` type. FlashList adapters use `FlashListRef<ItemT>` from `@shopify/flash-list`, as shown in the [migration guide](../introduction/modernization-guide.md).
+
+## Changing the horizontal page
+
+Keep separate typed refs when both axes need imperative control:
+
+```tsx
+import { type ComponentRef, useRef } from 'react';
+import { Button, ScrollView, Text } from 'react-native';
+import {
+  type PagerMethods,
+  TabbedHeaderPager,
+} from '@mhedhili/react-native-sticky-parallax-header';
+
+export function PagerReferenceScreen() {
+  const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
+  const pagerRef = useRef<PagerMethods>(null);
+
+  return (
+    <TabbedHeaderPager
+      ref={scrollRef}
+      pagerProps={{ ref: pagerRef }}
+      containerStyle={{ flex: 1 }}
+      tabs={[{ title: 'Overview' }, { title: 'Notes' }]}>
+      <Button title="Read notes" onPress={() => pagerRef.current?.goToPage(1)} />
+      <Text style={{ minHeight: 1200 }}>Notes</Text>
+    </TabbedHeaderPager>
+  );
+}
+```
+
+`goToPage` ignores noninteger and out-of-range indices. Use
+`scrollRef.current?.scrollTo({ y: 0, animated: true })` for vertical scrolling.
+Keep the ref object outside worklets; schedule ordinary navigation handlers on
+the JavaScript runtime as shown in [troubleshooting](./troubleshooting.md).

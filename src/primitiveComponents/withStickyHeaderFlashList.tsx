@@ -102,7 +102,7 @@ export function withStickyHeaderFlashList<ItemT>(
         onMomentumScrollBegin={NOOP}
         onMomentumScrollEnd={NOOP}
         overScrollMode={overScrollMode}
-        progressViewOffset={headerHeight}
+        progressViewOffset={rest.progressViewOffset ?? headerHeight}
         scrollEventThrottle={scrollEventThrottle}
       />
     );

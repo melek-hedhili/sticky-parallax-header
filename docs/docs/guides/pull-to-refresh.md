@@ -46,6 +46,16 @@ Keep the refresh indicator above the header overlay on iOS with the shown
 `zIndex`. The sample delays briefly to demonstrate the refreshing state; replace
 that asynchronous operation with your application's data reload.
 
+## Indicator offset
+
+For list headers, `progressViewOffset` defaults to the measured collapsing header
+height. Pass an explicit number on the list to override that default, for example
+`progressViewOffset={240}`. The override does not resize the header or tabs. A
+custom `RefreshControl` owns its own offset and styling; pass
+`progressViewOffset` on that element when needed. Offset and stacking behavior
+differ between platforms, so verify the indicator while pulling and refreshing
+on each target platform.
+
 ## Web
 
 Native pull-to-refresh is not part of the web compatibility contract. Omit
