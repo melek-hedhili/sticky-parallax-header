@@ -1,3 +1,4 @@
+import type { FlashListRef } from '@shopify/flash-list';
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react-native';
 import * as React from 'react';
 import { Dimensions, FlatList, Platform, Pressable, ScrollView, Text, View } from 'react-native';
@@ -330,7 +331,7 @@ test('reduced FlashList jumps allow subsequent manual viewability to select anot
   >;
   preferences.mockReturnValue({ reduceMotion: true, screenReaderEnabled: false });
   await hook.rerender({});
-  await act(() => hook.result.current.goToSection(1));
+  await act(async () => hook.result.current.goToSection(1));
   expect(scrollToIndex).toHaveBeenLastCalledWith(
     expect.objectContaining({ animated: false, index: 1 })
   );
@@ -342,4 +343,148 @@ test('reduced FlashList jumps allow subsequent manual viewability to select anot
     })
   );
   expect(hook.result.current.renderTabs()?.props.activeTab).toBe(0);
+});
+
+test('iOS FlashList tab jumps use immediate index scrolling once layout is available', async () => {
+  installAnimationHarness();
+  const data = Array.from({ length: 24 }, (_, index) => `row ${index}`);
+  const hook = await renderHook(() =>
+    useTabbedFlashListHeader({
+      data,
+      renderItem: ({ item }) => <Text>{item}</Text>,
+      stickyHeaderIndices: [0, 12],
+      tabs: [{ title: 'First' }, { title: 'Second' }],
+    })
+  );
+  const scrollToIndex = jest.fn().mockResolvedValue(undefined);
+  const getLayout = jest.fn(() => ({ y: 1056 }));
+
+  hook.result.current.scrollViewRef.current = {
+    getLayout,
+    scrollToIndex,
+  } as unknown as FlashListRef<string>;
+  await act(async () => hook.result.current.goToSection(1));
+
+  expect(getLayout).toHaveBeenCalledWith(12);
+  expect(scrollToIndex).toHaveBeenCalledWith({
+    animated: false,
+    index: 12,
+    viewPosition: 0,
+    viewOffset: 0,
+  });
+  expect(hook.result.current.renderTabs()?.props.activeTab).toBe(1);
+  await act(() =>
+    hook.result.current.onViewableItemsChanged({
+      viewableItems: [{ item: data[0], index: 0, isViewable: true, key: data[0], timestamp: 0 }],
+      changed: [],
+    })
+  );
+  expect(hook.result.current.renderTabs()?.props.activeTab).toBe(0);
+});
+
+test('rejected immediate FlashList jumps release viewability suppression', async () => {
+  installAnimationHarness();
+  const data = Array.from({ length: 24 }, (_, index) => `row ${index}`);
+  const hook = await renderHook(() =>
+    useTabbedFlashListHeader({
+      data,
+      renderItem: ({ item }) => <Text>{item}</Text>,
+      stickyHeaderIndices: [0, 12],
+      tabs: [{ title: 'First' }, { title: 'Second' }],
+    })
+  );
+
+  hook.result.current.scrollViewRef.current = {
+    getLayout: jest.fn(() => ({ y: 1056 })),
+    scrollToIndex: jest.fn().mockRejectedValue(new Error('scroll failed')),
+  } as unknown as FlashListRef<string>;
+  await act(async () => hook.result.current.goToSection(1));
+  await act(() =>
+    hook.result.current.onViewableItemsChanged({
+      viewableItems: [{ item: data[0], index: 0, isViewable: true, key: data[0], timestamp: 0 }],
+      changed: [],
+    })
+  );
+
+  expect(hook.result.current.renderTabs()?.props.activeTab).toBe(0);
+});
+
+test('overlapping iOS FlashList jumps release suppression only for the latest jump', async () => {
+  installAnimationHarness();
+  const data = Array.from({ length: 24 }, (_, index) => `row ${index}`);
+  const hook = await renderHook(() =>
+    useTabbedFlashListHeader({
+      data,
+      renderItem: ({ item }) => <Text>{item}</Text>,
+      stickyHeaderIndices: [0, 12],
+      tabs: [{ title: 'First' }, { title: 'Second' }],
+    })
+  );
+  const resolvers: Array<() => void> = [];
+  const scrollToIndex = jest.fn(
+    () =>
+      new Promise<void>((resolve) => {
+        resolvers.push(resolve);
+      })
+  );
+
+  hook.result.current.scrollViewRef.current = {
+    getLayout: jest.fn(() => ({ y: 1056 })),
+    scrollToIndex,
+  } as unknown as FlashListRef<string>;
+  await act(async () => hook.result.current.goToSection(1));
+  await act(async () => hook.result.current.goToSection(0));
+  expect(scrollToIndex).toHaveBeenCalledTimes(2);
+  expect(scrollToIndex).toHaveBeenNthCalledWith(2, {
+    animated: false,
+    index: 0,
+    viewPosition: 0,
+    viewOffset: 0,
+  });
+
+  await act(async () => resolvers[0]?.());
+  await act(() =>
+    hook.result.current.onViewableItemsChanged({
+      viewableItems: [{ item: data[12], index: 12, isViewable: true, key: data[12], timestamp: 0 }],
+      changed: [],
+    })
+  );
+  expect(hook.result.current.renderTabs()?.props.activeTab).toBe(0);
+
+  await act(async () => resolvers[1]?.());
+  await act(() =>
+    hook.result.current.onViewableItemsChanged({
+      viewableItems: [{ item: data[12], index: 12, isViewable: true, key: data[12], timestamp: 0 }],
+      changed: [],
+    })
+  );
+  expect(hook.result.current.renderTabs()?.props.activeTab).toBe(1);
+});
+
+test('Android FlashList tab jumps preserve animated index scrolling', async () => {
+  installAnimationHarness();
+  jest.replaceProperty(Platform, 'OS', 'android');
+  const data = Array.from({ length: 24 }, (_, index) => `row ${index}`);
+  const hook = await renderHook(() =>
+    useTabbedFlashListHeader({
+      data,
+      renderItem: ({ item }) => <Text>{item}</Text>,
+      stickyHeaderIndices: [0, 12],
+      tabs: [{ title: 'First' }, { title: 'Second' }],
+    })
+  );
+  const scrollToIndex = jest.fn().mockResolvedValue(undefined);
+
+  hook.result.current.scrollViewRef.current = {
+    getLayout: jest.fn(() => ({ y: 1056 })),
+    scrollToIndex,
+  } as unknown as FlashListRef<string>;
+  await act(async () => hook.result.current.goToSection(1));
+
+  expect(scrollToIndex).toHaveBeenCalledWith({
+    animated: true,
+    index: 12,
+    viewPosition: 0,
+    viewOffset: 0,
+  });
 });

@@ -129,7 +129,7 @@ export function LibraryScreen() {
 }
 ```
 
-In the current iOS Expo demo, jumping to a later tab can remain at the first section with the first tab selected; the equivalent Android case reaches the destination. Offscreen accessibility nodes do not prove the visible scroll succeeded. Verify the visible destination on iOS when using tabbed FlashList.
+On iOS, tab presses use immediate index positioning once layout is available because FlashList 2.0.2 can resolve animated `scrollToIndex` without moving. Android and web retain animated navigation. Offscreen accessibility nodes do not prove the visible scroll succeeded; verify the visible destination when using tabbed FlashList.
 
 ## Custom FlashList header
 

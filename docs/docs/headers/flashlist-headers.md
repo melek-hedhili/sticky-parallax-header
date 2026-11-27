@@ -84,10 +84,10 @@ one tab per sticky index in ascending order. It does **not** accept SectionList
 `sections`; use `TabbedHeaderList` for a SectionList data model. This adapter
 does not provide independent horizontal pages of FlashList data. The tab selection
 tracks the visible range, and pressing a tab requests a scroll to its corresponding
-index. In the current iOS Expo demo, a later-tab jump can remain at the first
-section with First selected. This also reproduces in the pre-bounce checkout;
-Android validation reaches the second section. Verify the visible destination,
-since offscreen accessibility nodes can exist before a jump succeeds.
+index. On iOS, tab presses use immediate index positioning once layout is available
+because FlashList 2.0.2 can resolve animated `scrollToIndex` without moving. Android
+and web retain animated navigation. Verify the visible destination, since offscreen
+accessibility nodes can exist before a jump succeeds.
 
 ## Custom layout
 

@@ -119,6 +119,7 @@ export function useTabbedFlashListHeader<
   } = useRenderFlashListHeader<T>(props);
   const { stickyHeaderIndices = [], backgroundColor, tabsContainerBackgroundColor } = props;
   const [activeSection, setActiveSection] = React.useState(0);
+  const activeScrollIdRef = React.useRef(0);
   const ignoreViewabilityItemsChangedEvent = useSharedValue(false);
   const onViewableItemsChanged = React.useCallback(
     ({ viewableItems }: { viewableItems: ViewToken<ItemT>[]; changed: ViewToken<ItemT>[] }) => {
@@ -159,14 +160,31 @@ export function useTabbedFlashListHeader<
   const { reduceMotion } = useAccessibilityPreferences();
   const goToSection = React.useCallback(
     (sectionIndex: number) => {
+      const scrollId = ++activeScrollIdRef.current;
+      const listRef = scrollViewRef.current;
+      const index = stickyHeaderIndices[sectionIndex];
+      // FlashList 2.0.2 can resolve animated index scrolling without moving on iOS.
+      const animated = !reduceMotion && !(Platform.OS === 'ios' && !!listRef?.getLayout(index));
+      const releaseViewabilitySuppression = () => {
+        if (activeScrollIdRef.current === scrollId) {
+          ignoreViewabilityItemsChangedEvent.value = false;
+        }
+      };
+
       ignoreViewabilityItemsChangedEvent.value = !reduceMotion;
-      scrollViewRef.current?.scrollToIndex({
-        animated: !reduceMotion,
-        index: stickyHeaderIndices[sectionIndex],
+
+      const scrollPromise = listRef?.scrollToIndex({
+        animated,
+        index,
         viewPosition: 0,
         viewOffset: 0,
       });
+
       setActiveSection(sectionIndex);
+
+      if (!reduceMotion && !animated && scrollPromise) {
+        scrollPromise.then(releaseViewabilitySuppression, releaseViewabilitySuppression);
+      }
     },
     [ignoreViewabilityItemsChangedEvent, reduceMotion, scrollViewRef, stickyHeaderIndices]
   );

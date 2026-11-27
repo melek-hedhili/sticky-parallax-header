@@ -125,7 +125,7 @@ every tall-header gesture report. `headerContainerStyle` is not a supported prop
 
 `TabbedHeaderList` navigates SectionList sections. `withTabbedHeaderFlashList`
 navigates sticky indices in one flat list. Neither provides independent horizontal
-FlashList pages. See the [FlashList contract and known iOS tab-jump limitation](../headers/flashlist-headers.md#tabbed-flashlist)
+FlashList pages. See the [FlashList contract](../headers/flashlist-headers.md#tabbed-flashlist)
 before choosing that adapter. Adding a horizontal FlashList pager requires a
 separate design for nested scrolling, refs and saved offsets.
 
@@ -140,7 +140,7 @@ review did not run a native build or validate these reports on devices.
 | --- | --- |
 | [#420: FlashList begin callbacks](https://github.com/netguru/sticky-parallax-header/issues/420) | Already wired through the shared animated handler. Preserve the native listener workaround; a current native reproduction is needed before changing event plumbing. |
 | [#409: tall custom header](https://github.com/netguru/sticky-parallax-header/issues/409) | Deferred gesture/layout investigation. The measured absolute overlay remains by design; changing touch ownership globally could break interactive headers. See the content guidance above. |
-| [#355: FlashList pages](https://github.com/netguru/sticky-parallax-header/issues/355) | Deferred feature. Current tabbed FlashList is one vertical list; horizontal pages need a distinct contract. The existing iOS sticky-index jump remains a separate known limitation. |
+| [#355: FlashList pages](https://github.com/netguru/sticky-parallax-header/issues/355) | Deferred feature. Current tabbed FlashList is one vertical list; horizontal pages need a distinct contract. The separate iOS sticky-index jump has a focused current-source correction; see the FlashList header contract. |
 | [#416: Avatar/Details props](https://github.com/netguru/sticky-parallax-header/issues/416) | Listed supported props are wired to their owning families. Documented family ownership and image/color conditions; no version or reproduction was supplied for further repair. |
 | [#415: pager props](https://github.com/netguru/sticky-parallax-header/issues/415) | Current image, page styling and position flags are wired. Documented their scope and existing snap-threshold semantics; no unsupported behavior change without a reproduction. |
 | [#381: header container styling](https://github.com/netguru/sticky-parallax-header/issues/381) | Deferred optional API feature. No `headerContainerStyle` exists; adding control over a measured overlay needs a concrete consumer requirement and layout validation. |
